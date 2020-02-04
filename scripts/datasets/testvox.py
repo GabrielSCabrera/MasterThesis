@@ -11,7 +11,7 @@ sn = 1200
 
 all_data = []
 
-frames = 4 # Maximum 34
+frames = 34 # Maximum 34
 
 print("0%", end = "")
 for n,f in enumerate(files[:frames]):
@@ -26,22 +26,22 @@ for n,f in enumerate(files[:frames]):
 print()
 
 
-points = mlab.points3d(*all_data[0], mode = "cube", color = (0, 1, 0),
+points = mlab.points3d(*all_data[0], mode = "cube", color = (0, 0, 1),
                      scale_factor = 1)
 
-@mlab.animate(delay = 1000, ui = True)
+# @mlab.animate(delay = 1000, ui = True)
 def anim():
     f = mlab.gcf()
     n = 0
-    while True:
-    # for n,frame in enumerate(all_data):
+    # while True:
+    for n,frame in enumerate(all_data):
         frame = all_data[n]
         points.mlab_source.reset(x = frame[0], y = frame[1], z = frame[2])
-        f.scene.render()
+        mlab.savefig(f"./imgs/img_{n+1}.png")
         # print(n)
-        n += 1
-        n = n%len(all_data)
-        yield
+        # n += 1
+        # n = n%len(all_data)
+        # yield
 
 anim()
-mlab.show()
+# mlab.show()
