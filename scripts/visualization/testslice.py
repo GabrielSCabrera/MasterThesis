@@ -1,7 +1,10 @@
-import config
-import numpy as np
-from time import time
 import matplotlib.pyplot as plt
+from time import time
+import numpy as np
+
+import sys
+sys.path.insert(0, '..')
+from datasets import config
 
 path = config.bin_dirs['M8_1'] + "M8_1_26MPa.bin"
 data = np.fromfile(path, dtype = np.uint8)
