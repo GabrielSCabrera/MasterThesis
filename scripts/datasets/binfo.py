@@ -1,6 +1,7 @@
 from zipfile import ZipFile
 import numpy as np
 import os
+import re
 
 class Binfo():
     """
@@ -20,16 +21,33 @@ class Binfo():
         # Extracting valid filenames for the compressed binaries and
         # identifying the pressures (MPa) in each filename and extracting them
         files_dict = {}
+        order = []
+        self.pressures = []
+        self.bins = []
         for f in self.bin_dir.namelist():
             if ".bin" in f and "__MACOSX" not in f:
                 label_len = len(f"bins/{self.label}") + 1
-                MPa = f[label_len:-7]
+                MPa = re.sub(f'bins/{self.label}_' + r'(.*)MPa\.bin', r'\1', f)
                 files_dict[MPa] = f
+                # In case the pressures aren't in order
+                if '_' in MPa:
+                    split_string = MPa.split('_')
+                    order.append(split_string[0])
+                    self.pressures.append(split_string[1])
+                    self.bins.append(f)
         # Determining the chronological order of the files and saving the
         # respective pressures
-        self.pressures = sorted(files_dict.keys())
-        # Reordering the files and saving them as attributes
-        self.bins = [files_dict[p] for p in self.pressures]
+        if len(self.pressures) > 0 and len(self.bins) > 0:
+            order = np.array(order, dtype = np.int64)
+            order = np.argsort(order)
+            self.pressures = list(map(str, np.array(self.pressures)[order]))
+            # Reordering the files and saving them as attributes
+            self.bins = list(map(str, np.array(self.bins)[order]))
+        else:
+            self.pressures = sorted(files_dict.keys())
+            # Reordering the files and saving them as attributes
+            self.bins = [files_dict[p] for p in self.pressures]
+
         # Iterable length
         self.index = self.__len__()
         # Creating dummy array for quick slicing reference
