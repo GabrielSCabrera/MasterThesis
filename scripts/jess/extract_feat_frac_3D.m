@@ -16,7 +16,7 @@ while ei<=4
         exp = 'M8_1'
         rn = 1000;
         cn = 1000;
-     
+
         axial_stress= [26:4:78 80:2:118 122:2:130];
         Pc  = 20;
         Poring  = 10;
@@ -27,17 +27,17 @@ while ei<=4
         rn = 900;
         cn = 900;
 
-        axial_stress = [152:185 187:196];        
+        axial_stress = [152:185 187:196];
         Pc = 25;
         Poring = 15;
         diff_stress = axial_stress - Pc - Poring;
-        fail_stress = 196.82 - 25 - Poring;        
+        fail_stress = 196.82 - 25 - Poring;
     elseif ei==3
         exp = 'MONZ5'
         rn = 800;
         cn = 800;
         %sigs = [2 5 30 35 40 40:5:90 92:2:130 131:149 150.5:0.5:161.5];
-        
+
         axial_stress = [30:5:40 40:5:85 90:2:128 130:1:149 150.5:0.5:161.5];
         Pc = 25;
         Poring = 21.875-0.2344;
@@ -48,11 +48,11 @@ while ei<=4
         bfilo = strrep(bfilo, 'EXP_', 'EXP_SCAN_');
         rn = 800;
         cn = 800;
-        
+
         % removed scans 46, 47, stresses = 142, 143
         scans = [1 2 4:10 12:22 25:36 39:44 48:55 59 60 60 60:63];
         axial_stress = [15 15:5:95 95:5:110 112:2:140 141 144:1:148 148.5 149 149.5 149.5 150 150.5 151 151.5 152 152.5];
-        
+
         Pc = 10;
         Poring = 13.43;
         diff_stress = axial_stress.*(25/16) - Pc - Poring;           % Differential stress of all the volumes \sigma
@@ -61,18 +61,18 @@ while ei<=4
 
     sigs = axial_stress;
     sig_dists = (fail_stress-diff_stress)/fail_stress;
-    
+
 %     figure(1)
 %     hold on
 %     plot(diff_stress, sig_dists, 'ro')
-%     
+%
 %     return
-    
+
     bfil = strrep(bfilo, 'EXP', exp);
-    
+
     for ai=1:length(as)
         a_noise = as(ai);
-        
+
         prop_str = "%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f ";
         format = strcat("%.1f %.3f %.2f %.2f %.2f ", prop_str, "\n");
         filestr = "sig sig_d cx cy cz area theta lmin lmax aniso dcmin dc5 dc10 dc25 dc50 dc75\n";
@@ -91,21 +91,21 @@ while ei<=4
             bin = strrep(bfil, 'X', num2str(sig));
 
             if ei==4
-               scan = scans(si); 
-               bin = strrep(bin, 'SCAN', num2str(scan)); 
+               scan = scans(si);
+               bin = strrep(bin, 'SCAN', num2str(scan));
             end
 
             disp(bin);
             if exist(bin, 'file')==0
                disp('File not found')
                disp(bin)
-               return 
+               return
             end
-            
+
             fid = fopen(bin);
             A = fread(fid);
             data = reshape(A, [rn cn sn]);
-           
+
             sub = data;
 
             CC = bwconncomp(sub); % 26, most conservation connection
@@ -142,9 +142,9 @@ while ei<=4
                         datalines(di, :) = [sig sig_d centc(1) centc(2) centc(3) area theta l_min l_max aniso min(dists_c) prctile(dists_c, 5) prctile(dists_c, 10) prctile(dists_c, 25) prctile(dists_c, 50) prctile(dists_c, 75)];
                         di=di+1;
 
-                    end            
+                    end
                 end
-            end    
+            end
          end
 
         datalines = datalines(~isnan(datalines(:, 1)), :);
@@ -157,8 +157,8 @@ while ei<=4
         fprintf(fid, filestr);
         fclose(fid);
         disp(txtfile)
-        
+
     end
-    
+
     ei=ei+1;
 end

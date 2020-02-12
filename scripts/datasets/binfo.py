@@ -38,16 +38,19 @@ class Binfo():
         # Determining the chronological order of the files and saving the
         # respective pressures
         if len(self.pressures) > 0 and len(self.bins) > 0:
-            order = np.array(order, dtype = np.int64)
+            order = np.array(order, dtype = np.float64)
             order = np.argsort(order)
+            self.pressures = list(map(float, self.pressures))
             self.pressures = list(map(str, np.array(self.pressures)[order]))
             # Reordering the files and saving them as attributes
             self.bins = list(map(str, np.array(self.bins)[order]))
         else:
-            self.pressures = sorted(files_dict.keys())
+            order = list(map(float, files_dict.keys()))
+            order = np.array(order, dtype = np.float64)
+            order = np.argsort(order)
+            self.pressures = list(map(str, np.array(list(files_dict.keys()))[order]))
             # Reordering the files and saving them as attributes
             self.bins = [files_dict[p] for p in self.pressures]
-
         # Iterable length
         self.index = self.__len__()
         # Creating dummy array for quick slicing reference
@@ -126,8 +129,9 @@ class Binfo():
                    f'{type(index)}')
             raise TypeError(msg)
 
-    def iter_ones(self, index = slice(0)):
-
+    def iter_ones(self, index = None):
+        if index is None:
+            index = slice(0, self.__len__(), 1)
         if isinstance(index, int):
             length = self.__len__()
             if index >= length or index < -length:
