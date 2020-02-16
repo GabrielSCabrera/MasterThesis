@@ -6,7 +6,7 @@ import os
 
 import sys
 sys.path.insert(0, '..')
-from datasets import config
+from preprocessing import config
 
 labels = ['M8_1', 'M8_2', 'MONZ5', 'WG04']  # Names of datasets
 img_dpi = 300                               # Saved image resolution (dpi)

@@ -1,4 +1,4 @@
-from .binfo import Binfo
+from binfo import Binfo
 import numpy as np
 
 bins_relpath = '../../data/bins/'
@@ -33,3 +33,9 @@ bin_stresses['WG04'] = np.concatenate([[15], np.arange(15,100,5),
                        np.arange(95,115,5), np.arange(112,142,2), [141],
                        np.arange(144,149), [148.5, 149, 142, 143, 149.5, 149.5,
                        150, 150.5, 151, 151.5, 152, 152.5]])
+
+bin_fail_times = {}
+bin_fail_times['M8_1'] = np.arange(0, len(bin_stresses['M8_1']))[::-1] + 1
+bin_fail_times['M8_2'] = np.arange(0, len(bin_stresses['M8_2']))[::-1] + 1
+bin_fail_times['MONZ5'] = np.arange(0, len(bin_stresses['MONZ5']))[::-1] + 1
+bin_fail_times['WG04'] = np.arange(0, len(bin_stresses['WG04']))[::-1] + 1

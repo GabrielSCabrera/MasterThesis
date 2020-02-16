@@ -55,6 +55,8 @@ class Binfo():
         self.index = self.__len__()
         # Creating dummy array for quick slicing reference
         self.dummy_arr = np.arange(0, self.__len__(), 1)
+        # Number of time-steps in the dataset
+        self.samples = len(self.pressures)
 
     def __iter__(self):
         return self
