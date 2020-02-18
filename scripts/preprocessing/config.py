@@ -1,6 +1,10 @@
 from binfo import Binfo
 import numpy as np
 
+seed = 1337
+
+np.random.seed(seed)
+
 bins_relpath = '../../data/bins/'
 
 bin_dirs = {'M8_1'  :   f'{bins_relpath}M8_1_bins',
