@@ -171,34 +171,3 @@ def test_train_split(dataset, fail_times, splits, mode, test_size = 0.25):
     print(f'\rLoading Segments {100:3d}%')
 
     return np.array(X_train), np.array(X_test), np.array(y_train), np.array(y_test)
-
-if __name__ == "__main__":
-    label = 'M8_1'
-    splits = 125
-    dataset = config.bins[label]
-    fail_times = config.bin_fail_times[label]
-
-    X_train, X_test, y_train, y_test = \
-    test_train_split(dataset, fail_times, splits, mode = 'col')
-
-    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
-
-    del X_train
-    del X_test
-    del y_train
-    del y_test
-
-    X_train, X_test, y_train, y_test = \
-    test_train_split(dataset, fail_times, splits, mode = 'slice')
-
-    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
-
-    del X_train
-    del X_test
-    del y_train
-    del y_test
-
-    X_train, X_test, y_train, y_test = \
-    test_train_split(dataset, fail_times, splits, mode = 'cube')
-
-    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
