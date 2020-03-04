@@ -22,6 +22,9 @@ if not os.path.isdir(bins_relpath):
           f'.  Dataset required in this location.')
     raise IOError(msg)
 
+if not os.path.isdir(results_path):
+    os.mkdir(results_path)
+
 if not os.path.isdir(split_bins_relpath):
     os.mkdir(split_bins_relpath)
 

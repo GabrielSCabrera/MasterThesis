@@ -15,3 +15,8 @@ clean:
 test: clean
 	@ echo "Run tests"
 	@ python3 ./main.py -test
+
+reset: clean
+	@ echo "Removing all saved data and generated directories"
+	@ rm -f -r ~/Documents/MasterThesis/results/
+	@ rm -f -r ~/Documents/MasterThesis/data/split_bins
