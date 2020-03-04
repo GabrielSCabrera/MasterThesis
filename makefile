@@ -21,8 +21,8 @@ reset: clean
 	@ rm -f -r ~/Documents/MasterThesis/results/
 	@ rm -f -r ~/Documents/MasterThesis/data/split_bins
 
-backup: clean
-	@ echo "Updating dev branch"
+push: clean
+	@ echo "Updating master branch"
 	@ git add .
 	@ git commit -m "Auto-Backup"
-	@ git push -u origin dev
+	@ git push
