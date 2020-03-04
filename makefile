@@ -25,4 +25,4 @@ backup: clean
 	@ echo "Updating dev branch"
 	@ git add .
 	@ git commit -m "Auto-Backup"
-	@ git push origin dev
+	@ git push -u origin dev
