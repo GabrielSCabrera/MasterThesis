@@ -20,3 +20,9 @@ reset: clean
 	@ echo "Removing all saved data and generated directories"
 	@ rm -f -r ~/Documents/MasterThesis/results/
 	@ rm -f -r ~/Documents/MasterThesis/data/split_bins
+
+update: clean
+	@ echo "Updating dev branch"
+	@ git checkout 
+	@ git add .
+	@ git commit -m ""
