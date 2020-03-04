@@ -68,6 +68,8 @@ def test_split_2D():
               'shuffle'     :   True
              }
 
+    label += '_2D_' + params['mode']
+
     X_train, X_test, y_train, y_test = split_2D.test_train_split(**params)
 
     print('Pre-Saving Shapes:', end = '\n\t')
@@ -97,6 +99,8 @@ def test_split_3D():
               'limit'       :   0.1,
               'shuffle'     :   True
              }
+
+    label += '_3D_' + params['mode']
 
     X_train, X_test, y_train, y_test = split_3D.test_train_split(**params)
 
