@@ -16,6 +16,10 @@ test: clean
 	@ echo "Run tests"
 	@ python3 ./main.py -test
 
+split: clean
+	@ echo "Splitting Datasets and Saving"
+	@ python3 ./main.py -split
+
 reset: clean
 	@ echo "Removing all saved data and generated directories"
 	@ rm -f -r ~/Documents/MasterThesis/results/
