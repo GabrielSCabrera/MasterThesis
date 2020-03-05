@@ -6,6 +6,8 @@ import os
 
 from scripts import *
 
+globals()['status_entries'] = []
+
 def parse_args():
 
     argparse_desc = ('Runs various aspects of the rock fracture analysis '
@@ -32,6 +34,9 @@ def I(string):
 
 def clear_line():
     return '\033[0K'
+
+def reset_screen():
+    print('\033[2J\033[H', end = '\r')
 
 def cursor_up():
     return '\033[1A'
@@ -77,7 +82,7 @@ def select_int(title, val_range):
         valid = f' [{low:g}, {high:g}]'
         print(B(title + ':') + valid)
     while True:
-        print(f'\r>{clear_line()}', end = '')
+        print(f'\r> {clear_line()}', end = '')
         val = input()
         try:
             val = int(val)
@@ -99,6 +104,16 @@ def select_int(title, val_range):
                 break
     return val
 
+def update_status(new_entry):
+    globals()['status_entries'].append(new_entry)
+
+def display_status():
+    status = B('Prev. Selections:') + '\t'
+    for entry in globals()['status_entries']:
+        status += f'{I(entry)} > '
+    status = status[:-3]
+    print(status, end = '\n\n')
+
 """MAIN SCRIPT"""
 
 args = parse_args()
@@ -108,17 +123,31 @@ if args.test is True:
 
 if args.split is True:
 
+    reset_screen()
+
     choices = config.labels
     label = select('Choose a Dataset', choices)
     dataset = config.bins[label]
     dims = dataset.dims
 
+    reset_screen()
+    update_status(label)
+    display_status()
+
     selection = select('Splitting Options', ['2-D', '3-D'])
+
+    reset_screen()
+    update_status(selection)
+    display_status()
 
     if selection == '2-D':
 
         options = ['Columns (Vertical)', 'Slices (Horizontal)']
         selection = select('2-D Shape Options', options)
+
+        reset_screen()
+        update_status(selection)
+        display_status()
 
         if selection == 'Columns (Vertical)':
             N_cols = select_int('Select Number of Columns p/ 2-D Slice',
@@ -131,6 +160,10 @@ if args.split is True:
 
         options = ['Columns (Vertical)', 'Slabs (Horizontal)', 'Cubes']
         selection = select('3-D Shape Options', options)
+
+        reset_screen()
+        update_status(selection)
+        display_status()
 
         if selection == 'Columns (Vertical)':
             N_cols = select_int('Select Approx. Number of Columns',
