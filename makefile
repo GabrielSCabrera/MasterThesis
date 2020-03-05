@@ -18,7 +18,7 @@ test: clean
 
 split: clean
 	@ echo "Splitting Datasets and Saving"
-	@ python3 ./main.py -split
+	@ python3 ./main.py --split
 
 reset: clean
 	@ echo "Removing all saved data and generated directories"

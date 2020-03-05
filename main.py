@@ -62,7 +62,7 @@ def select(title, options):
             time.sleep(1)
     selection = options[int(key)-1]
     print(f'\r> {I(selection)}')
-    print('–'*40)
+    print('–'*40, end = '\n\n')
     return selection
 
 def select_int(title, val_range):
@@ -123,6 +123,7 @@ if args.split is True:
         if selection == 'Columns (Vertical)':
             N_cols = select_int('Select Number of Columns p/ 2-D Slice',
                                 [5, dims[0]//5])
+
         elif selection == 'Slices (Horizontal)':
             pass
 
@@ -132,15 +133,13 @@ if args.split is True:
         selection = select('3-D Shape Options', options)
 
         if selection == 'Columns (Vertical)':
-            N_cols = select_int('Select Total Number of Columns',
+            N_cols = select_int('Select Approx. Number of Columns',
                                 [25, dims[0]//5])
 
         elif selection == 'Slabs (Horizontal)':
-            N_cols = select_int('Select Total Number of Slabs',
+            N_cols = select_int('Select Approx. Number of Slabs',
                                 [5, dims[2]//5])
 
         elif selection == 'Cubes':
-            N_cols = select_int('Select Total Number of Cubes',
+            N_cols = select_int('Select Approx. Number of Cubes',
                                 [125, np.prod(dims)//1000])
-
-    
