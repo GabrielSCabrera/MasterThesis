@@ -64,7 +64,7 @@ def select(title, options):
             exit()
         else:
             print('\rInvalid Selection!', end = '')
-            time.sleep(1)
+            time.sleep(1.5)
     selection = options[int(key)-1]
     print(f'\r> {I(selection)}')
     print('–'*40, end = '\n\n')
@@ -92,25 +92,114 @@ def select_int(title, val_range):
                 print(f'\rInput must be an integer', end = '')
             else:
                 print(f'\rInput must be an integer in:{valid}', end = '')
-            time.sleep(1.5)
+            time.sleep(2)
         else:
             if val_range is None:
                 break
             elif not low <= val <= high:
                 print(clear_line() + cursor_up(), end = '')
                 print(f'\rInput must be an integer in:{valid}', end = '')
-                time.sleep(1.5)
+                time.sleep(2)
             else:
                 break
-    return val
+    return int(val)
+
+def select_float(title, val_range):
+    '''
+        val_range: list of two floats, with val_range[0] < val_range[1]
+    '''
+    if val_range is None:
+        print(B(title))
+    else:
+        low = val_range[0]
+        high = val_range[1]
+        valid = f' [{low:g}, {high:g}]'
+        print(B(title + ':') + valid)
+    while True:
+        print(f'\r> {clear_line()}', end = '')
+        val = input()
+        try:
+            val = float(val)
+        except:
+            print(clear_line() + cursor_up(), end = '')
+            if val_range is None:
+                print(f'\rInput must be a number', end = '')
+            else:
+                print(f'\rInput must be a number in:{valid}', end = '')
+            time.sleep(2)
+        else:
+            if val_range is None:
+                break
+            elif not low <= val <= high:
+                print(clear_line() + cursor_up(), end = '')
+                print(f'\rInput must be a number in:{valid}', end = '')
+                time.sleep(2)
+            else:
+                break
+    return float(val)
+
+def select_bool(title):
+    print(B(title) + I(" [Y/n]"))
+
+    while True:
+        print(f'\r>{clear_line()}', end = '')
+        key = str(getKeyPress())
+        if key.lower() == 'q':
+            print('\r> User Exit')
+            exit()
+        elif key.lower() in ['y','n']:
+            selection = key
+            break
+        else:
+            print('\rInvalid Selection!', end = '')
+            time.sleep(1.5)
+    print(f'\r> {I(selection)}')
+    print('–'*40, end = '\n\n')
+    if selection.lower() == 'y':
+        return True
+    elif selection.lower() == 'n':
+        return False
+    else:
+        raise Exception('Unexpected Error')
+
+def select_str(title):
+    print(B(title))
+    selection = input('> ')
+    return selection
+
+# def update_status(new_entry):
+#     globals()['status_entries'].append(new_entry)
+#
+# def display_status():
+#     status = B('Prev. Selections:') + '\t'
+#     for entry in globals()['status_entries']:
+#         status += f'{I(entry)} > '
+#     status = status[:-3]
+#     print(status, end = '\n\n')
 
 def update_status(new_entry):
+    tab_len = len('Prev. Selections:') + 7
+    tot_len = tab_len
+    max_len = 80
+    for entry in globals()['status_entries']:
+        if entry == '<newline>':
+            continue
+        elif tot_len + len(entry) >= max_len:
+            tot_len = tab_len + len(entry) + 3
+        else:
+            tot_len += len(entry) + 3
+    if tot_len + len(new_entry) >= max_len:
+        globals()['status_entries'].append('<newline>')
     globals()['status_entries'].append(new_entry)
 
 def display_status():
-    status = B('Prev. Selections:') + '\t'
+    tab_len = len('Prev. Selections:') + 7
+    status = B('Prev. Selections:') + ' '*7
     for entry in globals()['status_entries']:
-        status += f'{I(entry)} > '
+        if entry == '<newline>':
+            status += '\n' + ' '*tab_len
+        else:
+            status += f'{I(entry)} > '
     status = status[:-3]
     print(status, end = '\n\n')
 
@@ -129,15 +218,37 @@ if args.split is True:
     label = select('Choose a Dataset', choices)
     dataset = config.bins[label]
     dims = dataset.dims
+    split_dataset = None
 
     reset_screen()
     update_status(label)
+    display_status()
+
+    savename = select_str('Save As')
+
+    reset_screen()
+    update_status('Save As ' + savename + '.npz')
     display_status()
 
     selection = select('Splitting Options', ['2-D', '3-D'])
 
     reset_screen()
     update_status(selection)
+    display_status()
+
+    shuffle = not select_bool('Split by Region?')
+
+    reset_screen()
+    if shuffle is True:
+        update_status('Random')
+    else:
+        update_status('Split')
+    display_status()
+
+    limit = select_float('Dataset Size', [1E-3, 1])
+
+    reset_screen()
+    update_status(f'{limit*100:g}% of Data')
     display_status()
 
     if selection == '2-D':
@@ -149,12 +260,33 @@ if args.split is True:
         update_status(selection)
         display_status()
 
-        if selection == 'Columns (Vertical)':
+        if selection == options[0]:
             N_cols = select_int('Select Number of Columns p/ 2-D Slice',
                                 [5, dims[0]//5])
 
-        elif selection == 'Slices (Horizontal)':
-            pass
+            params = {
+                        'dataset'     :   dataset,
+                        'splits'      :   N_cols,
+                        'mode'        :   'col',
+                        'test_size'   :   0.25,
+                        'limit'       :   limit,
+                        'shuffle'     :   shuffle
+                     }
+
+            split_dataset = split_2D.test_train_split(**params)
+
+        elif selection == options[1]:
+
+            params = {
+                        'dataset'     :   dataset,
+                        'splits'      :   None,
+                        'mode'        :   'slice',
+                        'test_size'   :   0.25,
+                        'limit'       :   limit,
+                        'shuffle'     :   shuffle
+                     }
+
+            split_dataset = split_2D.test_train_split(**params)
 
     elif selection == '3-D':
 
@@ -165,14 +297,55 @@ if args.split is True:
         update_status(selection)
         display_status()
 
-        if selection == 'Columns (Vertical)':
+        if selection == options[0]:
             N_cols = select_int('Select Approx. Number of Columns',
                                 [25, dims[0]//5])
 
-        elif selection == 'Slabs (Horizontal)':
-            N_cols = select_int('Select Approx. Number of Slabs',
+            params = {
+                        'dataset'     :   dataset,
+                        'splits'      :   N_cols,
+                        'mode'        :   'col',
+                        'test_size'   :   0.25,
+                        'limit'       :   limit,
+                        'shuffle'     :   shuffle
+                     }
+
+            split_dataset = split_3D.test_train_split(**params)
+
+        elif selection == options[1]:
+            N_slices = select_int('Select Approx. Number of Slabs',
                                 [5, dims[2]//5])
 
-        elif selection == 'Cubes':
-            N_cols = select_int('Select Approx. Number of Cubes',
+            params = {
+                        'dataset'     :   dataset,
+                        'splits'      :   N_slices,
+                        'mode'        :   'slice',
+                        'test_size'   :   0.25,
+                        'limit'       :   limit,
+                        'shuffle'     :   shuffle
+                     }
+
+            split_dataset = split_3D.test_train_split(**params)
+
+        elif selection == options[2]:
+            N_cubes = select_int('Select Approx. Number of Cubes',
                                 [125, np.prod(dims)//1000])
+
+            params = {
+                        'dataset'     :   dataset,
+                        'splits'      :   N_cubes,
+                        'mode'        :   'cube',
+                        'test_size'   :   0.25,
+                        'limit'       :   limit,
+                        'shuffle'     :   shuffle
+                     }
+
+            split_dataset = split_3D.test_train_split(**params)
+
+    if split_dataset is None:
+        raise Exception('Unexpected Error')
+
+    X_train, X_test, y_train, y_test = split_dataset
+    print(B('Saving Segments'))
+    file_io.save_split(savename, X_train, X_test, y_train, y_test)
+    print(B('Saved to ') + I(f'{config.split_bins_relpath}{savename}.npz'))

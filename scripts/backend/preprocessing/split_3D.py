@@ -1,5 +1,13 @@
 import numpy as np
 
+def B(string):
+    '''Bold String Formatter'''
+    return f'\033[1m{string}\033[m'
+
+def I(string):
+    '''Italic String Formatter'''
+    return f'\033[3m{string}\033[m'
+
 def split_cols_idx(dataset, splits, test_size = 0.25, limit = 1, shuffle = True):
     """
         splits – approximate number of columns to create (>= 25)
@@ -192,7 +200,7 @@ def test_train_split(dataset, splits, mode, test_size = 0.25, limit = 1, shuffle
             new_perc = int(100*(m*step_iter + n)/tot_iter)
             if new_perc > perc:
                 perc = new_perc
-                print(f'\rLoading Segments {perc:3d}%', end = '')
+                print(B('\rLoading Segments ') + I(f'{perc:3d}%'), end = '')
 
         for n, idx_test in enumerate(indices_test):
 
@@ -203,11 +211,11 @@ def test_train_split(dataset, splits, mode, test_size = 0.25, limit = 1, shuffle
             new_perc = int(100*(m*step_iter + n + len(indices_train))/tot_iter)
             if new_perc > perc:
                 perc = new_perc
-                print(f'\rLoading Segments {perc:3d}%', end = '')
+                print(B('\rLoading Segments ') + I(f'{perc:3d}%'), end = '')
 
         idx_iter += 1
 
     # LOADING BAR
-    print(f'\rLoading Segments {100:3d}%')
+    print(B('\rLoading Segments ') + I(f'{100:3d}%'))
 
     return X_train, X_test, y_train, y_test
