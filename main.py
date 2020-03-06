@@ -167,16 +167,6 @@ def select_str(title):
     selection = input('> ')
     return selection
 
-# def update_status(new_entry):
-#     globals()['status_entries'].append(new_entry)
-#
-# def display_status():
-#     status = B('Prev. Selections:') + '\t'
-#     for entry in globals()['status_entries']:
-#         status += f'{I(entry)} > '
-#     status = status[:-3]
-#     print(status, end = '\n\n')
-
 def update_status(new_entry):
     tab_len = len('Prev. Selections:') + 7
     tot_len = tab_len
