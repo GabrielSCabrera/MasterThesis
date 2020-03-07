@@ -13,9 +13,12 @@ results_path        =   storage_path  + 'results/'
 
 bins_relpath        =   data_path     + 'bins/'
 split_bins_relpath  =   data_path     + 'split_bins/'
+DNN_models_relpath  =   data_path     + 'DNN_models/'
 
 plot_2D_relpath     =   results_path  + 'img_2D/'
 plot_3D_relpath     =   results_path  + 'img_3D/'
+
+DNN_model_extension     =   '.dnn'
 
 if not os.path.isdir(bins_relpath):
     msg = ('Missing required directory: \'/Documents/MasterThesis/data/bins/\''
@@ -27,6 +30,9 @@ if not os.path.isdir(results_path):
 
 if not os.path.isdir(split_bins_relpath):
     os.mkdir(split_bins_relpath)
+
+if not os.path.isdir(DNN_models_relpath):
+    os.mkdir(DNN_models_relpath)
 
 if not os.path.isdir(plot_2D_relpath):
     os.mkdir(plot_2D_relpath)

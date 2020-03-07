@@ -1,3 +1,4 @@
 from .config import *
+from .models import *
 from .preprocessing import *
-from .prototypes import *
+from .utils import *
