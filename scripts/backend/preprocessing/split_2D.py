@@ -86,7 +86,7 @@ def test_train_split(dataset, splits, mode, test_size = 0.25, limit = 1, shuffle
             split_cols_idx(dataset, splits, test_size, limit, shuffle)
         elif mode == 'slice':
             indices_train, indices_test = \
-            split_slices_idx(dataset, test_size, limit, shuffle)
+            split_slices_idx(dataset, splits, test_size, limit, shuffle)
 
         if X_train is None:
 

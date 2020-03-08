@@ -36,7 +36,7 @@ def update_status(new_entry):
     for entry in globals()['status_entries']:
         if entry == '<newline>':
             continue
-        elif tot_len + len(entry) >= max_len:
+        elif tot_len + len(entry) + 3 >= max_len:
             tot_len = tab_len + len(entry) + 3
         else:
             tot_len += len(entry) + 3
@@ -47,13 +47,14 @@ def update_status(new_entry):
 def display_status():
     tab_len = len('Prev. Selections:') + 7
     status = format.B('Prev. Selections:') + ' '*7
-    for entry in globals()['status_entries']:
+    for n,entry in enumerate(globals()['status_entries']):
         if entry == '<newline>':
             status += '\n' + ' '*tab_len
+        elif n == len(globals()['status_entries'])-1:
+            status += f'{format.I(entry)}'
         else:
-            status += f'{format.I(entry)} 🞂'
-    status = status[:-2] + '\n'
-    return status
+            status += f'{format.I(entry)} > '
+    return status + '\n'
 
 """MAIN SCRIPT"""
 
@@ -91,6 +92,12 @@ if args.split is True:
     update_status(f'Save As \'{savename}\'')
     print(display_status())
 
+    test_size = select.select_float('Test Size', [0.05, 0.9])
+
+    terminal.reset_screen()
+    update_status(f'Train {100*(1-test_size):g}% & Test {100*(test_size):g}%')
+    print(display_status())
+
     selection = select.select('Splitting Options', ['2-D', '3-D'])
 
     terminal.reset_screen()
@@ -117,9 +124,7 @@ if args.split is True:
 
         if selection == options[0]:
 
-            min_cols = 4
-            max_cols = int(dims[0]//4)
-
+            min_cols = 2
             min_size = min(min_cols/(dims[0]), 1)
 
             limit = select.select_float('Dataset Size', [min_size, 1])
@@ -136,7 +141,7 @@ if args.split is True:
                         'dataset'     :   dataset,
                         'splits'      :   N_cols,
                         'mode'        :   'col',
-                        'test_size'   :   0.25,
+                        'test_size'   :   test_size,
                         'limit'       :   limit,
                         'shuffle'     :   shuffle
                      }
@@ -159,7 +164,7 @@ if args.split is True:
                         'dataset'     :   dataset,
                         'splits'      :   None,
                         'mode'        :   'slice',
-                        'test_size'   :   0.25,
+                        'test_size'   :   test_size,
                         'limit'       :   limit,
                         'shuffle'     :   shuffle
                      }
@@ -169,7 +174,7 @@ if args.split is True:
     elif selection == '3-D':
 
         options = ['Columns (Vertical)', 'Slabs (Horizontal)', 'Cubes']
-        selection = terminal.select('3-D Shape Options', options)
+        selection = select.select('3-D Shape Options', options)
 
         terminal.reset_screen()
         update_status(selection)
@@ -188,14 +193,14 @@ if args.split is True:
             print(display_status())
 
             max_cols = int(limit*dims[0]*dims[1]//4)
-            N_cols = terminal.select_int('Select Approx. Number of Columns',
+            N_cols = select.select_int('Select Approx. Number of Columns',
                                          [min_cols, max_cols])
 
             params = {
                         'dataset'     :   dataset,
                         'splits'      :   N_cols,
                         'mode'        :   'col',
-                        'test_size'   :   0.25,
+                        'test_size'   :   test_size,
                         'limit'       :   limit,
                         'shuffle'     :   shuffle
                      }
@@ -215,14 +220,14 @@ if args.split is True:
             print(display_status())
 
             max_slabs = int(limit*dims[2]//2)
-            N_slices = terminal.select_int('Select Approx. Number of Slabs',
+            N_slices = select.select_int('Select Approx. Number of Slabs',
                                             [min_slabs, max_slabs])
 
             params = {
                         'dataset'     :   dataset,
                         'splits'      :   N_slices,
                         'mode'        :   'slice',
-                        'test_size'   :   0.25,
+                        'test_size'   :   test_size,
                         'limit'       :   limit,
                         'shuffle'     :   shuffle
                      }
@@ -242,14 +247,14 @@ if args.split is True:
             print(display_status())
 
             max_cubes = int(limit*min(dims)**3//8)
-            N_cubes = terminal.select_int('Select Approx. Number of Cubes',
+            N_cubes = select.select_int('Select Approx. Number of Cubes',
                                           [min_cubes, max_cubes])
 
             params = {
                         'dataset'     :   dataset,
                         'splits'      :   N_cubes,
                         'mode'        :   'cube',
-                        'test_size'   :   0.25,
+                        'test_size'   :   test_size,
                         'limit'       :   limit,
                         'shuffle'     :   shuffle
                      }
