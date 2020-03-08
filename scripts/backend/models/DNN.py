@@ -1,5 +1,4 @@
 from sklearn.neural_network import MLPClassifier
-import argparse
 import pickle
 
 from ..utils import parsers
@@ -33,13 +32,13 @@ class Model:
 
     def save(self, label):
         path = config.DNN_models_relpath + f'/{label}'
-        if config.model_extension not in path:
-            path += config.model_extension
-        pickle.dump(model, open(path, 'wb'))
+        if config.DNN_model_extension not in path:
+            path += config.DNN_model_extension
+        pickle.dump(self.model, open(path, 'wb'))
 
 def load(label):
     path = config.DNN_models_relpath + f'/{label}'
-    if config.model_extension not in path:
-        path += config.model_extension
+    if config.DNN_model_extension not in path:
+        path += config.DNN_model_extension
     model = pickle.load(open(path, 'rb'))
     return DNN(model = model)

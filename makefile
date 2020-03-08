@@ -1,9 +1,9 @@
 main:
-	@ echo "Run main script"
+	@ echo "Running main script"
 	@ python3 ./main.py
 
 clean:
-	@ echo "Clean __pycache__"
+	@ echo "Cleaning __pycache__"
 	@ rm -f -r ./scripts/__pycache__/
 	@ rm -f -r ./scripts/frontend/__pycache__/
 	@ rm -f -r ./scripts/frontend/visualization/__pycache__/
@@ -14,8 +14,12 @@ clean:
 	@ rm -f -r ./scripts/backend/utils/__pycache__/
 
 test:
-	@ echo "Run tests"
-	@ python3 ./main.py -test
+	@ echo "Running test script"
+	@ python3 ./main.py --test
+
+unit_tests:
+	@ echo "Running unit tests"
+	@ python3 ./main.py --unit_tests
 
 split:
 	@ echo "Splitting Datasets and Saving"

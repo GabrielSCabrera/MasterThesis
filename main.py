@@ -22,7 +22,8 @@ def parse_args():
 
     parser = argparse.ArgumentParser(description = argparse_desc)
 
-    parser.add_argument('--test', action='store_true', help = 'Runs all tests')
+    parser.add_argument('--unit_tests', action='store_true', help = 'Runs all unit tests')
+    parser.add_argument('--test', action='store_true', help = 'Runs the latest test script')
     parser.add_argument('--split', action='store_true', help = help_split)
     parser.add_argument('--train_DNN', action='store_true', help = help_train_DNN)
 
@@ -51,14 +52,14 @@ def display_status():
             status += '\n' + ' '*tab_len
         else:
             status += f'{format.I(entry)} > '
-    status = status[:-3]
-    print(status, end = '\n\n')
+    status = status[:-3] + '\n'
+    return status
 
 """MAIN SCRIPT"""
 
 args = parse_args()
 
-if args.test is True:
+if args.unit_tests is True:
     tests.run_tests()
 
 if args.split is True:
@@ -73,19 +74,19 @@ if args.split is True:
 
     terminal.reset_screen()
     update_status(label)
-    display_status()
+    print(display_status())
 
     savename = terminal.select_str('Save As')
 
     terminal.reset_screen()
     update_status('Save As ' + savename + '.npz')
-    display_status()
+    print(display_status())
 
     selection = terminal.select('Splitting Options', ['2-D', '3-D'])
 
     terminal.reset_screen()
     update_status(selection)
-    display_status()
+    print(display_status())
 
     shuffle = not terminal.select_bool('Split by Region?')
 
@@ -94,13 +95,7 @@ if args.split is True:
         update_status('Random')
     else:
         update_status('Split')
-    display_status()
-
-    limit = terminal.select_float('Dataset Size', [1E-3, 1])
-
-    terminal.reset_screen()
-    update_status(f'{limit*100:g}% of Data')
-    display_status()
+    print(display_status())
 
     if selection == '2-D':
 
@@ -109,11 +104,24 @@ if args.split is True:
 
         terminal.reset_screen()
         update_status(selection)
-        display_status()
+        print(display_status())
 
         if selection == options[0]:
+
+            min_cols = 4
+            max_cols = int(dims[0]//4)
+
+            min_size = min(min_cols/(dims[0]), 1)
+
+            limit = terminal.select_float('Dataset Size', [min_size, 1])
+
+            terminal.reset_screen()
+            update_status(f'{limit*100:g}% of Data')
+            print(display_status())
+
+            max_cols = int(limit*dims[0]//4)
             N_cols = terminal.select_int('Select Number of Columns p/ 2-D Slice',
-                                [5, dims[0]//5])
+                                         [min_cols, max_cols])
 
             params = {
                         'dataset'     :   dataset,
@@ -127,6 +135,16 @@ if args.split is True:
             split_dataset = split_2D.test_train_split(**params)
 
         elif selection == options[1]:
+
+            min_slices = 2
+
+            min_size = min(min_slices/(dims[2]), 1)
+
+            limit = terminal.select_float('Dataset Size', [min_size, 1])
+
+            terminal.reset_screen()
+            update_status(f'{limit*100:g}% of Data')
+            print(display_status())
 
             params = {
                         'dataset'     :   dataset,
@@ -146,11 +164,23 @@ if args.split is True:
 
         terminal.reset_screen()
         update_status(selection)
-        display_status()
+        print(display_status())
 
         if selection == options[0]:
+
+            min_cols = 4
+
+            min_size = min(min_cols**2/(min(dims[:2])**2), 1)
+
+            limit = terminal.select_float('Dataset Size', [min_size, 1])
+
+            terminal.reset_screen()
+            update_status(f'{limit*100:g}% of Data')
+            print(display_status())
+
+            max_cols = int(limit*dims[0]*dims[1]//4)
             N_cols = terminal.select_int('Select Approx. Number of Columns',
-                                [25, dims[0]//5])
+                                         [min_cols, max_cols])
 
             params = {
                         'dataset'     :   dataset,
@@ -164,8 +194,20 @@ if args.split is True:
             split_dataset = split_3D.test_train_split(**params)
 
         elif selection == options[1]:
+
+            min_slabs = 4
+
+            min_size = min(min_slabs/dims[2], 1)
+
+            limit = terminal.select_float('Dataset Size', [min_size, 1])
+
+            terminal.reset_screen()
+            update_status(f'{limit*100:g}% of Data')
+            print(display_status())
+
+            max_slabs = int(limit*dims[2]//2)
             N_slices = terminal.select_int('Select Approx. Number of Slabs',
-                                [5, dims[2]//5])
+                                            [min_slabs, max_slabs])
 
             params = {
                         'dataset'     :   dataset,
@@ -179,8 +221,20 @@ if args.split is True:
             split_dataset = split_3D.test_train_split(**params)
 
         elif selection == options[2]:
+
+            min_cubes = 8
+
+            min_size = min(min_cubes**2/(min(dims)**3), 1)
+
+            limit = terminal.select_float('Dataset Size', [min_size, 1])
+
+            terminal.reset_screen()
+            update_status(f'{limit*100:g}% of Data')
+            print(display_status())
+
+            max_cubes = int(limit*min(dims)**3//8)
             N_cubes = terminal.select_int('Select Approx. Number of Cubes',
-                                [125, np.prod(dims)//1000])
+                                          [min_cubes, max_cubes])
 
             params = {
                         'dataset'     :   dataset,
@@ -197,13 +251,13 @@ if args.split is True:
         raise Exception('Unexpected Error')
 
     X_train, X_test, y_train, y_test = split_dataset
-    print(B('Saving Segments'))
+    print(format.B('Saving Segments'))
     file_io.save_split(savename, X_train, X_test, y_train, y_test)
-    print(B('Saved to ') + I(f'{config.split_bins_relpath}{savename}.npz'))
+    print(format.B('Saved to ') + format.I(f'{config.split_bins_relpath}{savename}.npz'))
 
 if args.train_DNN is True:
 
-    label = 'small_dataset'
+    label = '430KB'
 
     layers = (512, 256, 128, 64)
     model = DNN.Model(hidden_layer_sizes = layers, verbose = True)
@@ -220,3 +274,23 @@ if args.train_DNN is True:
     model.fit(X_train, y_train)
 
     model.save(label)
+
+if args.test is True:
+
+    alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
+             'q','r','s','t','u','v','w','x','y','z','æ','ø','å',]
+
+    opt = ["argparse",
+           "scripts",
+           "globals",
+           "status_entries",
+           "parse_args",
+           "update_status",
+           "display_status",
+           "parse_args",
+           "unit_tests",
+           "split",
+           "train_DNN",
+           "test"]
+
+    sel = terminal.scroll_select('A Title About The List', opt)
