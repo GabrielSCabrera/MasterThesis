@@ -36,7 +36,7 @@ reset: clean
 	@ rm -f -r ~/Documents/MasterThesis/data/DNN_models_relpath/
 
 push: clean
-	@ echo "Updating master branch"
+	@ echo "Updating Master Branch"
 	@ git add .
 	@ git commit -m "Auto-Backup"
 	@ git push
