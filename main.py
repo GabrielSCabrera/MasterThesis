@@ -56,14 +56,9 @@ def display_status():
             status += f'{format.I(entry)} > '
     return status + '\n'
 
-"""MAIN SCRIPT"""
+"""SCRIPT PROCEDURES"""
 
-args = parse_args()
-
-if args.unit_tests is True:
-    tests.run_tests()
-
-if args.split is True:
+def procedure_split():
 
     terminal.reset_screen()
 
@@ -269,7 +264,7 @@ if args.split is True:
     file_io.save_split(savename, X_train, X_test, y_train, y_test)
     print(format.B('Saved to ') + format.I(f'{config.split_bins_relpath}{savename}.npz'))
 
-if args.train_DNN is True:
+def procedure_train_DNN():
 
     terminal.reset_screen()
 
@@ -326,6 +321,19 @@ if args.train_DNN is True:
     model.fit(X_train, y_train)
 
     model.save(savename)
+
+"""MAIN SCRIPT"""
+
+args = parse_args()
+
+if args.unit_tests is True:
+    tests.run_tests()
+
+if args.split is True:
+    procedure_split()
+
+if args.train_DNN is True:
+    procedure_train_DNN()
 
 if args.test is True:
 
