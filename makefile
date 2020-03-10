@@ -1,9 +1,9 @@
 main:
-	@ echo "Running main script"
+	@ echo "Running Main Script"
 	@ python3 ./main.py
 
 clean:
-	@ echo "Cleaning __pycache__"
+	@ echo "Removing '_pycache__' Directories"
 	@ rm -f -r ./scripts/__pycache__/
 	@ rm -f -r ./scripts/frontend/__pycache__/
 	@ rm -f -r ./scripts/frontend/visualization/__pycache__/
@@ -14,11 +14,11 @@ clean:
 	@ rm -f -r ./scripts/backend/utils/__pycache__/
 
 test:
-	@ echo "Running test script"
+	@ echo "Running Test Script"
 	@ python3 ./main.py --test
 
 unit_tests:
-	@ echo "Running unit tests"
+	@ echo "Running Unit Tests"
 	@ python3 ./main.py --unit_tests
 
 split:
@@ -30,7 +30,7 @@ train_DNN:
 	@ python3 ./main.py --train_DNN
 
 reset: clean
-	@ echo "Removing all saved data and generated directories"
+	@ echo "Removing All Saved Data and Generated Directories"
 	@ rm -f -r ~/Documents/MasterThesis/results/
 	@ rm -f -r ~/Documents/MasterThesis/data/split_bins/
 	@ rm -f -r ~/Documents/MasterThesis/data/DNN_models_relpath/
