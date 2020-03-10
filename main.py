@@ -108,6 +108,15 @@ def procedure_split():
         update_status('Split')
     print(display_status())
 
+    rem_zeros = select.select_bool('Remove Arrays Containing All Zeros?')
+    if rem_zeros is True:
+        update_status(f'Removing Zero-Arrays')
+    else:
+        update_status(f'Keeping Zero-Arrays')
+
+    terminal.reset_screen()
+    print(display_status())
+
     if selection == '2-D':
 
         options = ['Columns (Vertical)', 'Slices (Horizontal)']
@@ -260,9 +269,14 @@ def procedure_split():
         raise Exception('Unexpected Error')
 
     X_train, X_test, y_train, y_test = split_dataset
+
+    if rem_zeros is True:
+        X_train, X_test, y_train, y_test =\
+        filter.remove_empty(X_train, X_test, y_train, y_test)
+
     print(format.B('Saving Segments'))
     file_io.save_split(savename, X_train, X_test, y_train, y_test)
-    print(format.B('Saved to ') + format.I(f'{config.split_bins_relpath}{savename}.npz'))
+    print(format.B('Saved to ') + format.I(f'{config.split_bins_relpath}{savename}'))
 
 def procedure_train_DNN():
 
@@ -300,27 +314,41 @@ def procedure_train_DNN():
     update_status(f'Save As \'{savename}\'')
     print(display_status())
 
-    print(format.B("Loading Split Data"))
-
     X_train, X_test, y_train, y_test =\
     file_io.load_split(label = split_file)
-
-    print(format.B("Reshaping Data"))
 
     X_train, X_test, y_train, y_test =\
     reshape.reshape_1D(X_train, X_test, y_train, y_test)
 
-    print(format.B("Resizing Data"))
+    # X_train, X_test, y_train, y_test =\
+    # convert.float64(X_train, X_test, y_train, y_test)
 
-    X_train, X_test, y_train, y_test =\
-    convert.float64(X_train, X_test, y_train, y_test)
+    layers = select.select_int_list('Select a Layer Configuration')
 
-    layers = (512, 256, 128, 64)
-    model = DNN.Model(hidden_layer_sizes = layers)
+    terminal.reset_screen()
+    update_status(f'Layer Config {layers}')
+    print(display_status())
+
+    model = DNN.Model(hidden_layer_sizes = tuple(layers), verbose = True)
 
     model.fit(X_train, y_train)
 
     model.save(savename)
+
+    score_DNN(model, X_train, X_test, y_train, y_test)
+
+def score_DNN(model, X_train, X_test, y_train, y_test):
+
+    terminal.reset_screen()
+    print(display_status())
+
+    print(format.B("Checking Accuracy"))
+
+    train_score = str(model.score(X_train, y_train))
+    test_score = str(model.score(X_test, y_test))
+
+    print(f'Training Set Score: ' + format.I(train_score))
+    print(f'Testing Set Score:  ' + format.I(test_score))
 
 """MAIN SCRIPT"""
 
@@ -337,26 +365,29 @@ if args.train_DNN is True:
 
 if args.test is True:
 
-    alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
-             'q','r','s','t','u','v','w','x','y','z','æ','ø','å']
+    # alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
+    #          'q','r','s','t','u','v','w','x','y','z','æ','ø','å']
+    #
+    # opt = ["argparse",
+    #        "scripts",
+    #        "globals",
+    #        "status_entries",
+    #        "parse_args",
+    #        "update_status",
+    #        "display_status",
+    #        "parse_args",
+    #        "unit_tests",
+    #        "split",
+    #        "train_DNN",
+    #        "test"]
+    #
+    # # sel = terminal.scroll_select('A Title About The List', opt)
+    # # print('Selection: ', sel)
+    #
+    # # files = file_io.list_files(config.DNN_models_relpath, config.DNN_model_extension)
+    # files = file_io.list_files(config.split_bins_relpath, '.npz')
+    # sel = select.scroll_select('Select a File', list(files.keys()))
+    # print(f'Selected {sel}: {files[sel]}')
 
-    opt = ["argparse",
-           "scripts",
-           "globals",
-           "status_entries",
-           "parse_args",
-           "update_status",
-           "display_status",
-           "parse_args",
-           "unit_tests",
-           "split",
-           "train_DNN",
-           "test"]
-
-    # sel = terminal.scroll_select('A Title About The List', opt)
-    # print('Selection: ', sel)
-
-    # files = file_io.list_files(config.DNN_models_relpath, config.DNN_model_extension)
-    files = file_io.list_files(config.split_bins_relpath, '.npz')
-    sel = select.scroll_select('Select a File', list(files.keys()))
-    print(f'Selected {sel}: {files[sel]}')
+    out = select.select_int_list('title')
+    print(out)

@@ -4,6 +4,7 @@ from .format import B, I
 from . import terminal
 import numpy as np
 import time
+import re
 
 def select(title, options):
     print(B(title), end = '\n\n')
@@ -150,7 +151,6 @@ def select_bool(title):
             print('\rInvalid Selection!', end = '')
             time.sleep(1.5)
     print(f'\r> {I(selection)}')
-    print('–'*40, end = '\n\n')
     if selection.lower() == 'y':
         return True
     elif selection.lower() == 'n':
@@ -162,6 +162,33 @@ def select_str(title):
     print(B(title))
     selection = input('> ')
     return selection
+
+def select_int_list(title):
+
+    print(B(title))
+    print(f'Expects {I("space-separated")} integers\n')
+
+    msg = clear_line() + cursor_up() + '\rInvalid input format'
+
+    while True:
+        print(f'\r> {clear_line()}', end = '')
+        val = input()
+        val = re.sub('[ ]+', ' ', val)
+        if not re.match(r'^[\d ]+$', val):
+            print(msg, end = '')
+            time.sleep(2)
+            continue
+        try:
+            val = val.split(' ')
+            int_val = list(map(int, val))
+        except:
+            print(msg, end = '')
+            time.sleep(2)
+            continue
+        else:
+            break
+
+    return int_val
 
 def confirm_overwrite(filename, path, extension = None):
     files = file_io.list_files(path, extension)
