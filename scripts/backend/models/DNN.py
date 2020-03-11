@@ -7,14 +7,12 @@ from ..config import fields
 
 class Model:
 
-    def __init__(self, **kwargs):
+    def __init__(self, model = None, **kwargs):
         kwargs = parsers.kwarg_parser(fields.DNN_kwargs, kwargs)
-        if kwargs['model'] is None:
-            model_kwargs = kwargs.copy()
-            del model_kwargs['model']
-            self.model = MLPClassifier(**model_kwargs)
+        if model is None:
+            self.model = MLPClassifier(**kwargs)
         else:
-            self.model = kwargs['model']
+            self.model = model
 
     def fit(self, X_train, y_train):
         params = {
@@ -41,4 +39,4 @@ def load(label):
     if config.DNN_model_extension not in path:
         path += config.DNN_model_extension
     model = pickle.load(open(path, 'rb'))
-    return DNN(model = model)
+    return Model(model = model)

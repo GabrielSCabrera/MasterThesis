@@ -18,7 +18,10 @@ def parse_args():
                   'X_test, y_train, y_test.')
 
     help_train_DNN = ('Create and train a model based on a previously split and '
-                  'saved dataset.')
+                      'saved dataset.')
+
+    help_score_DNN = ('Load a previously saved model and split dataset and '
+                      'print the training and testing accuracy.')
 
     parser = argparse.ArgumentParser(description = argparse_desc)
 
@@ -26,6 +29,7 @@ def parse_args():
     parser.add_argument('--test', action='store_true', help = 'Runs the latest test script')
     parser.add_argument('--split', action='store_true', help = help_split)
     parser.add_argument('--train_DNN', action='store_true', help = help_train_DNN)
+    parser.add_argument('--score_DNN', action='store_true', help = help_score_DNN)
 
     return parser.parse_args()
 
@@ -337,6 +341,54 @@ def procedure_train_DNN():
 
     score_DNN(model, X_train, X_test, y_train, y_test)
 
+def procedure_score_DNN():
+
+    terminal.reset_screen()
+
+    files = file_io.list_files(config.split_bins_relpath, '.npz')
+
+    if not files:
+        msg = (f'{format.B("No Split-Data Files to Load")}\n'
+               f'Run script with flag {format.I("--split")} to split a dataset '
+               f'into {format.I("training")} and {format.I("testing")} sets, '
+               'and save the results.')
+        print(msg)
+        exit()
+
+    split_file = select.scroll_select('Select a File for Training',
+                                      list(files.keys()))
+
+    update_status(f'Load Split Data \'{split_file}\'')
+
+    terminal.reset_screen()
+    print(display_status())
+
+    files = file_io.list_files(config.DNN_models_relpath, '.dnn')
+
+    if not files:
+        msg = (f'{format.B("No Model Files to Load")}\n'
+               f'Run script with flag {format.I("--train_DNN")} to train a '
+               f'model and save it to file.')
+        print(msg)
+        exit()
+
+    model_file = select.scroll_select('Select a Model to Load',
+                                      list(files.keys()))
+
+    update_status(f'Load Model \'{model_file}\'')
+
+    X_train, X_test, y_train, y_test =\
+    file_io.load_split(label = split_file)
+
+    X_train, X_test, y_train, y_test =\
+    reshape.reshape_1D(X_train, X_test, y_train, y_test)
+
+    terminal.reset_screen()
+    print(display_status())
+
+    model = DNN.load(model_file)
+    score = score_DNN(model, X_train, X_test, y_train, y_test)
+
 def score_DNN(model, X_train, X_test, y_train, y_test):
 
     terminal.reset_screen()
@@ -363,8 +415,10 @@ if args.split is True:
 if args.train_DNN is True:
     procedure_train_DNN()
 
-if args.test is True:
+if args.score_DNN is True:
+    procedure_score_DNN()
 
+if args.test is True:
     # alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
     #          'q','r','s','t','u','v','w','x','y','z','æ','ø','å']
     #
@@ -388,6 +442,7 @@ if args.test is True:
     # files = file_io.list_files(config.split_bins_relpath, '.npz')
     # sel = select.scroll_select('Select a File', list(files.keys()))
     # print(f'Selected {sel}: {files[sel]}')
-
-    out = select.select_int_list('title')
-    print(out)
+    #
+    # out = select.select_int_list('title')
+    # print(out)
+    pass

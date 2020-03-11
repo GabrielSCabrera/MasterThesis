@@ -29,6 +29,10 @@ train_DNN:
 	@ echo "Training Multilayer Perceptron"
 	@ python3 ./main.py --train_DNN
 
+score_DNN:
+	@ echo "Scoring Saved Model"
+	@ python3 ./main.py --score_DNN
+
 reset: clean
 	@ echo "Removing All Saved Data and Generated Directories"
 	@ rm -f -r ~/Documents/MasterThesis/results/

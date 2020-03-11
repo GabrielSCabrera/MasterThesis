@@ -22,7 +22,6 @@ DNN_kwargs = {
               'epsilon'               : 1E-8,
               'n_iter_no_change'      : 10,
               'max_fun'               : 15E3,
-              'model'                 : None
              }
 
 ANSI_keys = [
