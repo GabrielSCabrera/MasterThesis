@@ -46,6 +46,8 @@ def extract_clusters(dataset, min_cluster_size = 1):
 
     # Iterating through each time-step of given dataset
     for n, (frame, fail) in enumerate(zip(dataset, fail_times)):
+        print(frame.size)
+        exit()
         msg = f'\rFRAME [{n+1}/{len(dataset)}]'
         tot_iter = frame.size
         groups = jit_extract_frame(frame, min_cluster_size, msg, tot_iter)
