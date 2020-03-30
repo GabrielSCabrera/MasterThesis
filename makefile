@@ -33,6 +33,10 @@ score_DNN:
 	@ echo "Scoring Saved Model"
 	@ python3 ./main.py --score_DNN
 
+cluster:
+	@ echo "Extracting Clusters"
+	@ python3 ./main.py --cluster
+
 reset: clean
 	@ echo "Removing All Saved Data and Generated Directories"
 	@ rm -f -r ~/Documents/MasterThesis/results/

@@ -23,6 +23,9 @@ def parse_args():
     help_score_DNN = ('Load a previously saved model and split dataset and '
                       'print the training and testing accuracy.')
 
+    help_cluster = ('Load a previously saved model and split dataset and '
+                      'print the training and testing accuracy.')
+
     parser = argparse.ArgumentParser(description = argparse_desc)
 
     parser.add_argument('--unit_tests', action='store_true', help = 'Runs all unit tests')
@@ -30,6 +33,7 @@ def parse_args():
     parser.add_argument('--split', action='store_true', help = help_split)
     parser.add_argument('--train_DNN', action='store_true', help = help_train_DNN)
     parser.add_argument('--score_DNN', action='store_true', help = help_score_DNN)
+    parser.add_argument('--cluster', action='store_true', help = help_cluster)
 
     return parser.parse_args()
 
@@ -402,6 +406,43 @@ def score_DNN(model, X_train, X_test, y_train, y_test):
     print(f'Training Set Score: ' + format.I(train_score))
     print(f'Testing Set Score:  ' + format.I(test_score))
 
+def procedure_cluster():
+
+    terminal.reset_screen()
+
+    choices = config.labels
+    label = select.select('Choose a Dataset', choices)
+    dataset = config.bins[label]
+    dims = dataset.dims
+    split_dataset = None
+
+    update_status(label)
+
+    while True:
+        terminal.reset_screen()
+        print(display_status())
+        savename = select.select_str('Save As')
+        if not savename.strip():
+            continue
+        if '.npz' not in savename:
+            savename += '.npz'
+        sel = select.confirm_overwrite(savename, config.clusters_relpath,
+                                       '.npz')
+        if sel is True:
+            break
+
+    terminal.reset_screen()
+    update_status(f'Save As \'{savename}\'')
+    print(display_status())
+
+    test_size = select.select_float('Test Size', [0.05, 0.9])
+
+    terminal.reset_screen()
+    update_status(f'Train {100*(1-test_size):g}% & Test {100*(test_size):g}%')
+    print(display_status())
+
+    cluster.extract_clusters(dataset)
+
 """MAIN SCRIPT"""
 
 args = parse_args()
@@ -419,30 +460,9 @@ if args.score_DNN is True:
     procedure_score_DNN()
 
 if args.test is True:
-    # alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
-    #          'q','r','s','t','u','v','w','x','y','z','æ','ø','å']
-    #
-    # opt = ["argparse",
-    #        "scripts",
-    #        "globals",
-    #        "status_entries",
-    #        "parse_args",
-    #        "update_status",
-    #        "display_status",
-    #        "parse_args",
-    #        "unit_tests",
-    #        "split",
-    #        "train_DNN",
-    #        "test"]
-    #
-    # # sel = terminal.scroll_select('A Title About The List', opt)
-    # # print('Selection: ', sel)
-    #
-    # # files = file_io.list_files(config.DNN_models_relpath, config.DNN_model_extension)
-    # files = file_io.list_files(config.split_bins_relpath, '.npz')
-    # sel = select.scroll_select('Select a File', list(files.keys()))
-    # print(f'Selected {sel}: {files[sel]}')
-    #
-    # out = select.select_int_list('title')
-    # print(out)
-    pass
+    label = 'M8_1'
+    dataset = config.bins[label]
+    cluster.extract_clusters(dataset)
+
+if args.cluster is True:
+    procedure_cluster()

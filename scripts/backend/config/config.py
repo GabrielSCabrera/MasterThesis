@@ -14,6 +14,7 @@ results_path        =   storage_path  + 'results/'
 bins_relpath        =   data_path     + 'bins/'
 split_bins_relpath  =   data_path     + 'split_bins/'
 DNN_models_relpath  =   data_path     + 'DNN_models/'
+clusters_relpath    =   data_path     + 'clusters/'
 
 plot_2D_relpath     =   results_path  + 'img_2D/'
 plot_3D_relpath     =   results_path  + 'img_3D/'
@@ -33,6 +34,9 @@ if not os.path.isdir(split_bins_relpath):
 
 if not os.path.isdir(DNN_models_relpath):
     os.mkdir(DNN_models_relpath)
+
+if not os.path.isdir(clusters_relpath):
+    os.mkdir(clusters_relpath)
 
 if not os.path.isdir(plot_2D_relpath):
     os.mkdir(plot_2D_relpath)
