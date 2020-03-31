@@ -118,7 +118,7 @@ class Binfo():
             else:
                 data = self._process_bin(index)
                 data = np.where(data == 1)
-                return data
+                return np.array(data).T
 
         elif isinstance(index, (slice, np.ndarray)):
                 indices = self.dummy_arr[index]
@@ -126,7 +126,7 @@ class Binfo():
                 for idx in indices:
                     data = self._process_bin(idx)
                     data = np.where(data == 1)
-                    data_array.append(data)
+                    data_array.append(np.array(data).T)
                 return data_array
         else:
             msg = (f'\n\nInvalid key passed to Binfo.__getitem__\n\tExpects '
@@ -158,7 +158,7 @@ class Binfo():
         for idx in indices:
             data = self._process_bin(idx)
             data = np.where(data == 1)
-            yield data
+            yield np.array(data).T
 
     def get_fail_times(self):
         """
