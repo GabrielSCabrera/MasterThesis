@@ -99,6 +99,12 @@ class Binfo():
                    f'{type(index)}')
             raise TypeError(msg)
 
+    def __str__(self):
+        '''
+            Returns the label of the current instance
+        '''
+        return self.label
+
     def _process_bin(self, index):
         data = self.bin_dir.open(self.bins[index], 'r')
         data = np.frombuffer(data.read(), dtype = np.uint8)

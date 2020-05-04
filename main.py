@@ -451,7 +451,19 @@ if args.unit_tests is True:
     tests.run_tests()
 
 if args.split is True:
-    procedure_split()
+    preset = defaults.split_defaults
+    config_info = format.config_info(preset)
+    msg = f'{config_info}\nUse default configuration?'
+    if select.select_bool(msg):
+        X_train, X_test, y_train, y_test = split_2D.test_train_split(**preset)
+        X_train, X_test, y_train, y_test =\
+        filter.remove_empty(X_train, X_test, y_train, y_test)
+        savename = 'default'
+        print(format.B('Saving Segments'))
+        file_io.save_split(savename, X_train, X_test, y_train, y_test)
+        print(format.B('Saved to ') + format.I(f'{config.split_bins_relpath}{savename}'))
+    else:
+        procedure_split()
 
 if args.train_DNN is True:
     procedure_train_DNN()

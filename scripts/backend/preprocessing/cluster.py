@@ -61,7 +61,6 @@ def jit_make_groups(frame, min_cluster_size, msg, comp_dirs):
                                 connected[smallest-2].append(l)
 
     # SORTING GROUPS
-
     groups = np.zeros(len(connected), dtype = np.int64)
     for i in range(2, label+3):
         for c in connected:
@@ -97,25 +96,48 @@ def jit_make_groups(frame, min_cluster_size, msg, comp_dirs):
                 if frame[i,j,k] > 0:
                     frame[i,j,k] = groups[frame[i,j,k]-2]
 
-    return len(group_map)
+    return frame
 
-def get_indices(frame, min_cluster_size, msg, comp_dirs):
-    N_groups = jit_make_groups(frame, min_cluster_size, msg, comp_dirs)
-    print(N_groups)
-    exit()
+def filter_clusters(frame, min_cluster_size):
+    '''
+        Removes clusters of size < min_cluster_size
+    '''
+    maximum = np.max(frame)
+    new_groups = np.zeros(maximum, dtype = np.int64)
+    removed = np.zeros(maximum, dtype = np.uint8)
+    label = 1
+    # Setting values to zero
+    for n in range(maximum):
+        new_groups[n] = label
+        if np.sum(np.equal(frame, n+1)) < min_cluster_size:
+            removed[n] = 1
+            frame[frame == n+1] = 0
+        else:
+            label += 1
+
+    # Redefining groups
+    for n,i in enumerate(new_groups):
+        if removed[n] == 0:
+            frame[frame == n+1] = i
+    return frame
+
+def get_indices(frame, min_cluster_size, msg, comp_dirs, savename):
+    frame = jit_make_groups(frame, min_cluster_size, msg, comp_dirs)
+    frame = filter_clusters(frame, min_cluster_size)
+    maximum = np.max(frame)
     groups = []
-    for i in range(N_groups):
-        groups.append(list(np.array(np.where(frame == i)).T))
+    for i in range(maximum):
+        groups.append(np.array(np.where(frame == i)).T)
+    return groups
 
-# @nb.njit(cache = True)
-def extract_clusters(dataset, min_cluster_size = 1):
+def extract_clusters(dataset, min_cluster_size = 5, savename):
     '''
         min_cluster_size: int >= 1
     '''
 
     clusters = []
-
     fail_times = dataset.fail_times
+    # os.mkdir(config.clusters_relpath)
 
     x,y,z = np.meshgrid([-1,0,1], [-1,0,1], [-1,0,1])
     x = x.flatten(); y = y.flatten(); z = z.flatten();
@@ -124,14 +146,11 @@ def extract_clusters(dataset, min_cluster_size = 1):
 
     # Iterating through each time-step of given dataset
     for n, (frame, fail) in enumerate(zip(dataset, fail_times)):
-        frame = frame.copy()
+        #TODO Save arrays to file in each iteration instead of keeping in RAM
+        low, high = 500, 600
+        frame = frame.copy()[low:high,low:high,low:high]
         msg = f'FRAME [{n+1}/{len(dataset)}]'
         groups = get_indices(frame, min_cluster_size, msg, comp_dirs)
         clusters.append({'fail':fail, 'groups':groups})
 
-# np.random.seed(1)
-# data = np.random.randint(0, 3, (5,5,5))
-# data[data > 1] = 0
-#
-# get_indices(data, 1, 'Testing')
-# # print(data)
+    print(clusters)
