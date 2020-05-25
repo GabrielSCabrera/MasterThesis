@@ -67,7 +67,7 @@ class Binfo():
 
     def __next__(self):
         self.index -= 1
-        if self.index == 0:
+        if self.index == -1:
             self.index = len(self.bins)
             raise StopIteration
         else:

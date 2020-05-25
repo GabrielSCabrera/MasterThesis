@@ -3,11 +3,11 @@ import numpy as np
 import shutil
 import os
 
-from .. import utils
 from .. import config
+from .. import utils
 
 @nb.njit(cache = True)
-def jit_make_groups(frame, min_cluster_size, msg, comp_dirs):
+def jit_make_groups(frame, min_cluster_size, msg1, msg2, comp_dirs):
     '''
         Numba accelerated function to extract groups of ones from a 3-D binary
         numpy array.  Uses the Hoshen–Kopelman algorithm:
@@ -20,7 +20,7 @@ def jit_make_groups(frame, min_cluster_size, msg, comp_dirs):
     label = 0
     connected = [[2]]
 
-    strings = utils.jit_tools.jit_loading_bar_print(msg, perc)
+    strings = utils.jit_tools.jit_loading_bar_print(msg1, perc)
     print(strings[0])
     print(perc)
     print(strings[1])
@@ -31,10 +31,10 @@ def jit_make_groups(frame, min_cluster_size, msg, comp_dirs):
         for j in range(frame.shape[1]):
             for k in range(frame.shape[2]):
                 count += 1
-                new_perc = int(100*count/tot_iter)
+                new_perc = int(100*count/frame.size)
                 if new_perc > perc:
                     perc = new_perc
-                    strings = utils.jit_tools.jit_loading_bar_print(msg, perc)
+                    strings = utils.jit_tools.jit_loading_bar_print(msg1, perc)
                     print(strings[0])
                     print(perc)
                     print(strings[1])
@@ -83,31 +83,47 @@ def jit_make_groups(frame, min_cluster_size, msg, comp_dirs):
     for i in range(len(groups)):
         groups[i] = group_map[groups[i]]
 
+    count = 0
+    perc = 0
+    strings = utils.jit_tools.jit_loading_bar_print(msg2, perc)
+    print(strings[0])
+    print(perc)
+    print(strings[1])
+
     # SECOND PASS (GROUPING)
     for i in range(frame.shape[0]):
         for j in range(frame.shape[1]):
             for k in range(frame.shape[2]):
                 count += 1
-                new_perc = int(100*count/tot_iter)
+                new_perc = int(100*count/frame.size)
                 if new_perc > perc:
                     perc = new_perc
-                    strings = utils.jit_tools.jit_loading_bar_print(msg, perc)
+                    strings = utils.jit_tools.jit_loading_bar_print(msg2, perc)
                     print(strings[0])
                     print(perc)
                     print(strings[1])
                 if frame[i,j,k] > 0:
                     frame[i,j,k] = groups[frame[i,j,k]-2]
 
-    return frame
+    maximum = np.max(frame)
+    return frame, maximum
 
-def filter_clusters(frame, min_cluster_size):
+def filter_clusters(frame, maximum, min_cluster_size, msg):
     '''
         Removes clusters of size < min_cluster_size
     '''
-    maximum = np.max(frame)
     new_groups = np.zeros(maximum, dtype = np.int64)
     removed = np.zeros(maximum, dtype = np.uint8)
     label = 1
+
+    count = 0
+    perc = 0
+    msg3 = msg.format(3)
+    strings = utils.jit_tools.jit_loading_bar_print(msg3, perc)
+    print(strings[0])
+    print(perc)
+    print(strings[1])
+
     # Setting values to zero
     for n in range(maximum):
         new_groups[n] = label
@@ -116,27 +132,94 @@ def filter_clusters(frame, min_cluster_size):
             frame[frame == n+1] = 0
         else:
             label += 1
+        count += 1
+        new_perc = int(100*count/maximum)
+        if new_perc > perc:
+            perc = new_perc
+            strings = utils.jit_tools.jit_loading_bar_print(msg3, perc)
+            print(strings[0])
+            print(perc)
+            print(strings[1])
+
+    count = 0
+    perc = 0
+    msg4 = msg.format(4)
+    strings = utils.jit_tools.jit_loading_bar_print(msg4, perc)
+    print(strings[0])
+    print(perc)
+    print(strings[1])
 
     # Redefining groups
     for n,i in enumerate(new_groups):
         if removed[n] == 0:
             frame[frame == n+1] = i
+        count += 1
+        new_perc = int(100*count/maximum)
+        if new_perc > perc:
+            perc = new_perc
+            strings = utils.jit_tools.jit_loading_bar_print(msg4, perc)
+            print(strings[0])
+            print(perc)
+            print(strings[1])
+
     return frame
 
-def get_indices(frame, min_cluster_size, msg, comp_dirs, path, idx, mac_fail):
-    frame = jit_make_groups(frame, min_cluster_size, msg, comp_dirs)
-    frame = filter_clusters(frame, min_cluster_size)
-    maximum = np.max(frame)
-    groups = []
+def direct_to_file(path, idx, mac_fail, frame, maximum, msg):
+    '''
+        Parses through each element in 'frame' and saves points to their
+        respective files.
+
+        Replacement for np.where, which raises a MemoryError.
+    '''
+    files = []
     for i in range(maximum):
-        cluster_path = path + config.cluster_dir_labels.format(idx) + '/'
+        cluster_path = path + config.cluster_dir_labels.format(idx+i) + '/'
         os.mkdir(cluster_path)
-        np.save(cluster_path + config.cluster_data,
-                np.array(np.where(frame == i)).T)
-        with open(cluster_path + config.cluster_metadata, 'w+') as outfile:
-            outfile.write(f'Tmf={mac_fail}')
-        idx += 1
+        files.append(open(cluster_path + config.cluster_data, 'w+'))
+        files[-1].write(f'Tmf={mac_fail}\nPoints=')
+
+    count = 0
+    perc = 0
+    msg5 = msg.format(5)
+    strings = utils.jit_tools.jit_loading_bar_print(msg5, perc)
+    print(strings[0])
+    print(perc)
+    print(strings[1])
+
+    for i in range(frame.shape[0]):
+        for j in range(frame.shape[1]):
+            for k in range(frame.shape[2]):
+                if frame[i,j,k] != 0:
+                    files[frame[i,j,k]-1].write(f'\n{i:d},{j:d},{k:d}')
+                count += 1
+                new_perc = int(100*count/frame.size)
+                if new_perc > perc:
+                    perc = new_perc
+                    strings = utils.jit_tools.jit_loading_bar_print(msg5, perc)
+                    print(strings[0])
+                    print(perc)
+                    print(strings[1])
+
+    return idx + maximum
+
+def get_indices(frame, min_cluster_size, msg, comp_dirs, path, idx, mac_fail):
+    msg1 = msg.format(1)
+    msg2 = msg.format(2)
+    frame, maximum = jit_make_groups(frame, min_cluster_size, msg1, msg2, comp_dirs)
+    if maximum > 0:
+        frame = filter_clusters(frame, maximum, min_cluster_size, msg)
+        idx = direct_to_file(path, idx, mac_fail, frame, maximum, msg)
     return idx
+    # maximum = np.max(frame)
+    # for i in range(maximum):
+        # cluster_path = path + config.cluster_dir_labels.format(idx) + '/'
+        # os.mkdir(cluster_path)
+        # np.save(cluster_path + config.cluster_data,
+        #         np.array(np.where(frame == i)).T)
+        # with open(cluster_path + config.cluster_metadata, 'w+') as outfile:
+        #     outfile.write(f'Tmf={mac_fail}')
+        # idx += 1
+    # return idx + maximum
 
 def extract_clusters(dataset, savename, min_cluster_size = 5):
     '''
@@ -159,10 +242,10 @@ def extract_clusters(dataset, savename, min_cluster_size = 5):
 
     # Iterating through each time-step of given dataset
     for n, (frame, mac_fail) in enumerate(zip(dataset, fail_times)):
-        # low, high = 500, 600
+        # low, high = 510, 590
         # frame = frame.copy()[low:high,low:high,low:high]
-        msg = f'FRAME [{n+1}/{len(dataset)}]'
+        msg = 'STEP [{:d}/5] ' + f'FRAME [{n+1}/{len(dataset)}]'
         frame_new = frame.copy()
         idx = get_indices(frame_new, min_cluster_size, msg, comp_dirs, path,
                           idx, mac_fail)
-        np.delete(frame_new)
+        # np.delete(frame_new)
