@@ -473,8 +473,9 @@ if args.score_DNN is True:
 
 if args.test is True:
     label = 'M8_1'
+    savename = 'test_clusters'
     dataset = config.bins[label]
-    cluster.extract_clusters(dataset)
+    cluster.extract_clusters(dataset, savename)
 
 if args.cluster is True:
     procedure_cluster()

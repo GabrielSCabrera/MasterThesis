@@ -20,6 +20,9 @@ plot_2D_relpath     =   results_path  + 'img_2D/'
 plot_3D_relpath     =   results_path  + 'img_3D/'
 
 DNN_model_extension     =   '.dnn'
+cluster_dir_labels      =   'CL{:03d}'
+cluster_metadata        =   'CL_metadata.dat'
+cluster_data            =   'CL_data.npy'
 
 if not os.path.isdir(bins_relpath):
     msg = ('Missing required directory: \'/Documents/MasterThesis/data/bins/\''

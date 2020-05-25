@@ -1,5 +1,7 @@
 import numba as nb
 import numpy as np
+import shutil
+import os
 
 from .. import utils
 from .. import config
@@ -121,36 +123,46 @@ def filter_clusters(frame, min_cluster_size):
             frame[frame == n+1] = i
     return frame
 
-def get_indices(frame, min_cluster_size, msg, comp_dirs, savename):
+def get_indices(frame, min_cluster_size, msg, comp_dirs, path, idx, mac_fail):
     frame = jit_make_groups(frame, min_cluster_size, msg, comp_dirs)
     frame = filter_clusters(frame, min_cluster_size)
     maximum = np.max(frame)
     groups = []
     for i in range(maximum):
-        groups.append(np.array(np.where(frame == i)).T)
-    return groups
+        cluster_path = path + config.cluster_dir_labels.format(idx) + '/'
+        os.mkdir(cluster_path)
+        np.save(cluster_path + config.cluster_data,
+                np.array(np.where(frame == i)).T)
+        with open(cluster_path + config.cluster_metadata, 'w+') as outfile:
+            outfile.write(f'Tmf={mac_fail}')
+        idx += 1
+    return idx
 
-def extract_clusters(dataset, min_cluster_size = 5, savename):
+def extract_clusters(dataset, savename, min_cluster_size = 5):
     '''
         min_cluster_size: int >= 1
     '''
 
     clusters = []
     fail_times = dataset.fail_times
-    # os.mkdir(config.clusters_relpath)
+    path = config.clusters_relpath + savename + '/'
+
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    os.mkdir(path)
+    idx = 0
 
     x,y,z = np.meshgrid([-1,0,1], [-1,0,1], [-1,0,1])
-    x = x.flatten(); y = y.flatten(); z = z.flatten();
+    x = x.flatten(); y = y.flatten(); z = z.flatten()
     comp_dirs = np.array([x,y,z]).T
     comp_dirs = np.delete(comp_dirs, 13, axis = 0)
 
     # Iterating through each time-step of given dataset
-    for n, (frame, fail) in enumerate(zip(dataset, fail_times)):
-        #TODO Save arrays to file in each iteration instead of keeping in RAM
-        low, high = 500, 600
-        frame = frame.copy()[low:high,low:high,low:high]
+    for n, (frame, mac_fail) in enumerate(zip(dataset, fail_times)):
+        # low, high = 500, 600
+        # frame = frame.copy()[low:high,low:high,low:high]
         msg = f'FRAME [{n+1}/{len(dataset)}]'
-        groups = get_indices(frame, min_cluster_size, msg, comp_dirs)
-        clusters.append({'fail':fail, 'groups':groups})
-
-    print(clusters)
+        frame_new = frame.copy()
+        idx = get_indices(frame_new, min_cluster_size, msg, comp_dirs, path,
+                          idx, mac_fail)
+        np.delete(frame_new)
