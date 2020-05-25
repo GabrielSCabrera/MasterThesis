@@ -48,3 +48,7 @@ push: clean
 	@ git add .
 	@ git commit -m "Auto-Backup"
 	@ git push
+
+pull: clean
+	@ echo "Pulling from Master Branch"
+	@ git pull
