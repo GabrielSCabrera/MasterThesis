@@ -182,7 +182,7 @@ def direct_to_file(path, idx, mac_fail, frame, maximum, msg):
     count = 0
     perc = 0
     msg5 = msg.format(5)
-    strings = utils.jit_tools.jit_loading_bar_print(msg5, count_perc[1])
+    strings = utils.jit_tools.jit_loading_bar_print(msg5, perc)
     print(strings[0])
     print(perc)
     print(strings[1])
@@ -209,15 +209,12 @@ def direct_to_file(path, idx, mac_fail, frame, maximum, msg):
 def get_indices(frame, min_cluster_size, msg, comp_dirs, path, idx, mac_fail):
     msg1 = msg.format(1)
     msg2 = msg.format(2)
-    t0 = time()
     frame, maximum = jit_make_groups(frame, min_cluster_size, msg1, msg2, comp_dirs)
     if maximum > 0:
         frame = filter_clusters(frame, maximum, min_cluster_size, msg)
         t2 = time()
         idx = direct_to_file(path, idx, mac_fail, frame, maximum, msg)
         t3 = time()
-    t1 = time()
-    print(t1-t0, '\n')
     return idx
 
 def extract_clusters(dataset, savename, min_cluster_size = 5):
@@ -241,8 +238,8 @@ def extract_clusters(dataset, savename, min_cluster_size = 5):
 
     # Iterating through each time-step of given dataset
     for n, (frame, mac_fail) in enumerate(zip(dataset, fail_times)):
-        # low, high = 510, 590
-        # frame = frame.copy()[low:high,low:high,low:high]
+        low, high = 510, 590
+        frame = frame.copy()[low:high,low:high,low:high]
         msg = 'STEP [{:d}/5] ' + f'FRAME [{n+1}/{len(dataset)}]'
         frame_new = frame.copy()
         idx = get_indices(frame_new, min_cluster_size, msg, comp_dirs, path,
