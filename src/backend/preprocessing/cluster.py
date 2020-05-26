@@ -238,8 +238,8 @@ def extract_clusters(dataset, savename, min_cluster_size = 5):
 
     # Iterating through each time-step of given dataset
     for n, (frame, mac_fail) in enumerate(zip(dataset, fail_times)):
-        low, high = 510, 590
-        frame = frame.copy()[low:high,low:high,low:high]
+        # low, high = 510, 590
+        # frame = frame.copy()[low:high,low:high,low:high]
         msg = 'STEP [{:d}/5] ' + f'FRAME [{n+1}/{len(dataset)}]'
         frame_new = frame.copy()
         idx = get_indices(frame_new, min_cluster_size, msg, comp_dirs, path,
