@@ -1,9 +1,11 @@
 from .terminal import clear_line, reset_screen, cursor_up, get_key_press
+from termios import tcflush, TCIFLUSH
 from ..preprocessing import file_io
 from .format import B, I
 from . import terminal
 import numpy as np
 import time
+import sys
 import re
 
 def select(title, options):
@@ -24,6 +26,7 @@ def select(title, options):
         else:
             print('\rInvalid Selection!', end = '')
             time.sleep(1.5)
+            tcflush(sys.stdin, TCIFLUSH)
     selection = options[int(key)-1]
     print(f'\r> {I(selection)}')
     print('–'*40, end = '\n\n')

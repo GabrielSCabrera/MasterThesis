@@ -1,4 +1,5 @@
 from .binfo import Binfo
+from pathlib import Path
 import numpy as np
 import os
 
@@ -6,18 +7,18 @@ seed = 1337
 
 np.random.seed(seed)
 
-storage_path = os.path.expanduser("~") + '/Documents/MasterThesis/'
+storage_path = Path.home() / 'Documents' / 'MasterThesis'
 
-data_path           =   storage_path  + 'data/'
-results_path        =   storage_path  + 'results/'
+data_path           =   storage_path  / 'data'
+results_path        =   storage_path  / 'results'
 
-bins_relpath        =   data_path     + 'bins/'
-split_bins_relpath  =   data_path     + 'split_bins/'
-DNN_models_relpath  =   data_path     + 'DNN_models/'
-clusters_relpath    =   data_path     + 'clusters/'
+bins_relpath        =   data_path     / 'bins'
+split_bins_relpath  =   data_path     / 'split_bins'
+DNN_models_relpath  =   data_path     / 'DNN_models'
+clusters_relpath    =   data_path     / 'clusters'
 
-plot_2D_relpath     =   results_path  + 'img_2D/'
-plot_3D_relpath     =   results_path  + 'img_3D/'
+plot_2D_relpath     =   results_path  / 'img_2D'
+plot_3D_relpath     =   results_path  / 'img_3D'
 
 DNN_model_extension     =   '.dnn'
 cluster_dir_labels      =   'CL{:03d}'
@@ -49,10 +50,10 @@ if not os.path.isdir(plot_3D_relpath):
 labels = ['M8_1', 'M8_2', 'MONZ5', 'WG04']  # Names of datasets
 
 bin_dirs = {
-            'M8_1'  :   f'{bins_relpath}M8_1_bins',
-            'M8_2'  :   f'{bins_relpath}M8_2_bins',
-            'MONZ5' :   f'{bins_relpath}MONZ5_bins',
-            'WG04'  :   f'{bins_relpath}WG04_bins'
+            'M8_1'  :   bins_relpath / 'M8_1_bins',
+            'M8_2'  :   bins_relpath / 'M8_2_bins',
+            'MONZ5' :   bins_relpath / 'MONZ5_bins',
+            'WG04'  :   bins_relpath / 'WG04_bins'
            }
 
 bin_dims = {

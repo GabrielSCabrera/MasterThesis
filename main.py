@@ -4,7 +4,7 @@ import time
 import sys
 import os
 
-from scripts import *
+from src import *
 
 globals()['status_entries'] = []
 
@@ -284,7 +284,7 @@ def procedure_split():
 
     print(format.B('Saving Segments'))
     file_io.save_split(savename, X_train, X_test, y_train, y_test)
-    print(format.B('Saved to ') + format.I(f'{config.split_bins_relpath}{savename}'))
+    print(format.B('Saved to ') + format.I(config.split_bins_relpath / savename))
 
 def procedure_train_DNN():
 
@@ -424,10 +424,7 @@ def procedure_cluster():
         savename = select.select_str('Save As')
         if not savename.strip():
             continue
-        if '.npz' not in savename:
-            savename += '.npz'
-        sel = select.confirm_overwrite(savename, config.clusters_relpath,
-                                       '.npz')
+        sel = select.confirm_overwrite(savename, config.clusters_relpath)
         if sel is True:
             break
 
@@ -435,13 +432,15 @@ def procedure_cluster():
     update_status(f'Save As \'{savename}\'')
     print(display_status())
 
-    test_size = select.select_float('Test Size', [0.05, 0.9])
+    min_cluster_size = select.select_int('Minimum Cluster Size', [1, 1000])
 
     terminal.reset_screen()
-    update_status(f'Train {100*(1-test_size):g}% & Test {100*(test_size):g}%')
+    update_status(f'Min. Cluster Size {min_cluster_size}')
     print(display_status())
 
-    cluster.extract_clusters(dataset)
+    print(format.B('Performing Extraction\n'))
+    cluster.extract_clusters(dataset, savename, min_cluster_size)
+    print(format.B('Saved to ') + format.I(config.clusters_relpath / savename))
 
 """MAIN SCRIPT"""
 
@@ -472,10 +471,8 @@ if args.score_DNN is True:
     procedure_score_DNN()
 
 if args.test is True:
-    label = 'M8_1'
     savename = 'test_clusters'
-    dataset = config.bins[label]
-    cluster.extract_clusters(dataset, savename)
+    clusters = Clusters.Clusters(savename)
 
 if args.cluster is True:
     procedure_cluster()

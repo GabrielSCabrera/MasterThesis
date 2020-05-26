@@ -1,3 +1,4 @@
+from time import time
 import numba as nb
 import numpy as np
 import shutil
@@ -173,15 +174,15 @@ def direct_to_file(path, idx, mac_fail, frame, maximum, msg):
     '''
     files = []
     for i in range(maximum):
-        cluster_path = path + config.cluster_dir_labels.format(idx+i) + '/'
+        cluster_path = path / config.cluster_dir_labels.format(idx+i)
         os.mkdir(cluster_path)
-        files.append(open(cluster_path + config.cluster_data, 'w+'))
+        files.append(open(cluster_path / config.cluster_data, 'w+'))
         files[-1].write(f'Tmf={mac_fail}\nPoints=')
 
     count = 0
     perc = 0
     msg5 = msg.format(5)
-    strings = utils.jit_tools.jit_loading_bar_print(msg5, perc)
+    strings = utils.jit_tools.jit_loading_bar_print(msg5, count_perc[1])
     print(strings[0])
     print(perc)
     print(strings[1])
@@ -200,26 +201,24 @@ def direct_to_file(path, idx, mac_fail, frame, maximum, msg):
                     print(perc)
                     print(strings[1])
 
+    for f in files:
+        f.close()
+
     return idx + maximum
 
 def get_indices(frame, min_cluster_size, msg, comp_dirs, path, idx, mac_fail):
     msg1 = msg.format(1)
     msg2 = msg.format(2)
+    t0 = time()
     frame, maximum = jit_make_groups(frame, min_cluster_size, msg1, msg2, comp_dirs)
     if maximum > 0:
         frame = filter_clusters(frame, maximum, min_cluster_size, msg)
+        t2 = time()
         idx = direct_to_file(path, idx, mac_fail, frame, maximum, msg)
+        t3 = time()
+    t1 = time()
+    print(t1-t0, '\n')
     return idx
-    # maximum = np.max(frame)
-    # for i in range(maximum):
-        # cluster_path = path + config.cluster_dir_labels.format(idx) + '/'
-        # os.mkdir(cluster_path)
-        # np.save(cluster_path + config.cluster_data,
-        #         np.array(np.where(frame == i)).T)
-        # with open(cluster_path + config.cluster_metadata, 'w+') as outfile:
-        #     outfile.write(f'Tmf={mac_fail}')
-        # idx += 1
-    # return idx + maximum
 
 def extract_clusters(dataset, savename, min_cluster_size = 5):
     '''
@@ -228,7 +227,7 @@ def extract_clusters(dataset, savename, min_cluster_size = 5):
 
     clusters = []
     fail_times = dataset.fail_times
-    path = config.clusters_relpath + savename + '/'
+    path = config.clusters_relpath / savename
 
     if os.path.exists(path):
         shutil.rmtree(path)
@@ -248,4 +247,3 @@ def extract_clusters(dataset, savename, min_cluster_size = 5):
         frame_new = frame.copy()
         idx = get_indices(frame_new, min_cluster_size, msg, comp_dirs, path,
                           idx, mac_fail)
-        # np.delete(frame_new)

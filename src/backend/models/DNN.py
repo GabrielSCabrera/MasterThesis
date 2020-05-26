@@ -29,7 +29,7 @@ class Model:
         return self.model.score(**params)
 
     def save(self, label):
-        path = config.DNN_models_relpath + f'/{label}'
+        path = config.DNN_models_relpath / label
         if config.DNN_model_extension not in path:
             path += config.DNN_model_extension
         pickle.dump(self.model, open(path, 'wb'))

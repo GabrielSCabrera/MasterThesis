@@ -4,14 +4,14 @@ main:
 
 clean:
 	@ echo "Removing '_pycache__' Directories"
-	@ rm -f -r ./scripts/__pycache__/
-	@ rm -f -r ./scripts/frontend/__pycache__/
-	@ rm -f -r ./scripts/frontend/visualization/__pycache__/
-	@ rm -f -r ./scripts/backend/__pycache__/
-	@ rm -f -r ./scripts/backend/config/__pycache__/
-	@ rm -f -r ./scripts/backend/models/__pycache__/
-	@ rm -f -r ./scripts/backend/preprocessing/__pycache__/
-	@ rm -f -r ./scripts/backend/utils/__pycache__/
+	@ rm -f -r ./src/__pycache__/
+	@ rm -f -r ./src/frontend/__pycache__/
+	@ rm -f -r ./src/frontend/visualization/__pycache__/
+	@ rm -f -r ./src/backend/__pycache__/
+	@ rm -f -r ./src/backend/config/__pycache__/
+	@ rm -f -r ./src/backend/models/__pycache__/
+	@ rm -f -r ./src/backend/preprocessing/__pycache__/
+	@ rm -f -r ./src/backend/utils/__pycache__/
 
 test:
 	@ echo "Running Test Script"
