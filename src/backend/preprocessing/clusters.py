@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 from time import time
 import numba as nb
 import numpy as np
@@ -43,7 +44,7 @@ def jit_make_groups(frame, min_cluster_size, msg1, msg2, comp_dirs):
                     smallest_label = label
                     labels = []
                     for l in range(len(comp_dirs)):
-                        new_idx = np.array([i,j,k])
+                        new_idx = np.array([i,j,k], config.cluster_uint_type)
                         new_idx += comp_dirs[l]
                         if 0 <= new_idx[0] < frame.shape[0] and\
                            0 <= new_idx[1] < frame.shape[1] and\
@@ -64,7 +65,7 @@ def jit_make_groups(frame, min_cluster_size, msg1, msg2, comp_dirs):
                                 connected[smallest-2].append(l)
 
     # SORTING GROUPS
-    groups = np.zeros(len(connected), dtype = np.int64)
+    groups = np.zeros(len(connected), dtype = config.cluster_uint_type)
     for i in range(2, label+3):
         for c in connected:
             if i in c:
@@ -113,8 +114,8 @@ def filter_clusters(frame, maximum, min_cluster_size, msg):
     '''
         Removes clusters of size < min_cluster_size
     '''
-    new_groups = np.zeros(maximum, dtype = np.int64)
-    removed = np.zeros(maximum, dtype = np.uint8)
+    new_groups = np.zeros(maximum, dtype = config.cluster_uint_type)
+    removed = np.zeros(maximum, dtype = config.cluster_uint_type)
     label = 1
 
     count = 0
@@ -173,11 +174,13 @@ def direct_to_file(path, idx, mac_fail, frame, maximum, msg):
         Replacement for np.where, which raises a MemoryError.
     '''
     files = []
+    label = config.cluster_metadata_labels['T_macroscopic_failure']
     for i in range(maximum):
         cluster_path = path / config.cluster_dir_labels.format(idx+i)
         os.mkdir(cluster_path)
         files.append(open(cluster_path / config.cluster_data, 'w+'))
-        files[-1].write(f'Tmf={mac_fail}\nPoints=')
+        with open(cluster_path / config.cluster_metadata, 'w+') as outfile:
+            outfile.write(f'{label}={mac_fail}')
 
     count = 0
     perc = 0
@@ -191,7 +194,7 @@ def direct_to_file(path, idx, mac_fail, frame, maximum, msg):
         for j in range(frame.shape[1]):
             for k in range(frame.shape[2]):
                 if frame[i,j,k] != 0:
-                    files[frame[i,j,k]-1].write(f'\n{i:d},{j:d},{k:d}')
+                    files[frame[i,j,k]-1].write(f'{i:d},{j:d},{k:d}\n')
                 count += 1
                 new_perc = int(100*count/frame.size)
                 if new_perc > perc:
@@ -221,7 +224,6 @@ def extract_clusters(dataset, savename, min_cluster_size = 5):
     '''
         min_cluster_size: int >= 1
     '''
-
     clusters = []
     fail_times = dataset.fail_times
     path = config.clusters_relpath / savename
@@ -233,13 +235,13 @@ def extract_clusters(dataset, savename, min_cluster_size = 5):
 
     x,y,z = np.meshgrid([-1,0,1], [-1,0,1], [-1,0,1])
     x = x.flatten(); y = y.flatten(); z = z.flatten()
-    comp_dirs = np.array([x,y,z]).T
+    comp_dirs = np.array([x,y,z], dtype = config.cluster_uint_type).T
     comp_dirs = np.delete(comp_dirs, 13, axis = 0)
 
     # Iterating through each time-step of given dataset
     for n, (frame, mac_fail) in enumerate(zip(dataset, fail_times)):
-        # low, high = 510, 590
-        # frame = frame.copy()[low:high,low:high,low:high]
+        low, high = 510, 550
+        frame = frame.copy()[low:high,low:high,low:high]
         msg = 'STEP [{:d}/5] ' + f'FRAME [{n+1}/{len(dataset)}]'
         frame_new = frame.copy()
         idx = get_indices(frame_new, min_cluster_size, msg, comp_dirs, path,

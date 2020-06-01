@@ -9,20 +9,29 @@ np.random.seed(seed)
 
 storage_path = Path.home() / 'Documents' / 'MasterThesis'
 
-data_path           =   storage_path  / 'data'
-results_path        =   storage_path  / 'results'
+data_path               =       storage_path  / 'data'
+results_path            =       storage_path  / 'results'
 
-bins_relpath        =   data_path     / 'bins'
-split_bins_relpath  =   data_path     / 'split_bins'
-DNN_models_relpath  =   data_path     / 'DNN_models'
-clusters_relpath    =   data_path     / 'clusters'
+bins_relpath            =       data_path     / 'bins'
+split_bins_relpath      =       data_path     / 'split_bins'
+DNN_models_relpath      =       data_path     / 'DNN_models'
+clusters_relpath        =       data_path     / 'clusters'
 
-plot_2D_relpath     =   results_path  / 'img_2D'
-plot_3D_relpath     =   results_path  / 'img_3D'
+plot_2D_relpath         =       results_path  / 'img_2D'
+plot_3D_relpath         =       results_path  / 'img_3D'
 
-DNN_model_extension     =   '.dnn'
-cluster_dir_labels      =   'CL{:03d}'
-cluster_data            =   'CL_data.dat'
+DNN_model_extension     =       '.dnn'
+cluster_dir_labels      =       'CL{:05d}'
+cluster_data            =       'CL_data.csv'
+cluster_metadata        =       'CL_metadata.dat'
+
+cluster_metadata_labels =       {
+                                 'T_macroscopic_failure':'T_mf',
+                                 'Center_position':'R_c',
+                                 'Maximum_radius':'R_max'
+                                }
+
+cluster_uint_type       =       np.uint16
 
 if not os.path.isdir(bins_relpath):
     msg = ('Missing required directory: \'/Documents/MasterThesis/data/bins/\''

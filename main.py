@@ -4,6 +4,7 @@ import time
 import sys
 import os
 
+print('\033[m')
 from src import *
 
 globals()['status_entries'] = []
@@ -439,7 +440,7 @@ def procedure_cluster():
     print(display_status())
 
     print(format.B('Performing Extraction\n'))
-    cluster.extract_clusters(dataset, savename, min_cluster_size)
+    clusters.extract_clusters(dataset, savename, min_cluster_size)
     print(format.B('Saved to ') + format.I(config.clusters_relpath / savename))
 
 """MAIN SCRIPT"""
@@ -471,8 +472,8 @@ if args.score_DNN is True:
     procedure_score_DNN()
 
 if args.test is True:
-    savename = 'test_clusters'
-    clusters = Clusters.Clusters(savename)
+    savename = 'test2'
+    cluster = Cluster.Cluster(savename)
 
 if args.cluster is True:
     procedure_cluster()
