@@ -181,7 +181,6 @@ def direct_to_file(path, idx, mac_fail, frame, maximum, msg):
         files.append(open(cluster_path / config.cluster_data, 'w+'))
         with open(cluster_path / config.cluster_metadata, 'w+') as outfile:
             outfile.write(f'{label}={mac_fail}')
-
     count = 0
     perc = 0
     msg5 = msg.format(5)

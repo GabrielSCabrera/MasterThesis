@@ -472,7 +472,7 @@ if args.score_DNN is True:
     procedure_score_DNN()
 
 if args.test is True:
-    savename = 'test2'
+    savename = 'test'
     cluster = Cluster.Cluster(savename)
 
 if args.cluster is True:
