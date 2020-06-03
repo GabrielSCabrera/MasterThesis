@@ -15,7 +15,7 @@ class Cluster:
                     /src/backend/preprocessing/clusters.py
         '''
         self.path = config.clusters_relpath / filename
-        self.data = tuple(self.path.glob('*'))
+        data = tuple(self.path.glob('*'))
 
         # Finding expected prefix and number of digits in directory names
         pat1 = r'(.*)\{:0(\d{1})d\}'
@@ -23,11 +23,11 @@ class Cluster:
         self.prefix = matches[0]
         self.N_digs = int(matches[1])
 
-        self.verify_integrity()
-        self.clusters = self.map_clusters()
+        self.verify_integrity(data)
+        self.clusters = self.map_clusters(data)
+        self.get_metadata()
 
-
-    def verify_integrity(self):
+    def verify_integrity(self, data):
         '''
             Confirms that each directory contains the expected files and
             file contents.
@@ -38,7 +38,7 @@ class Cluster:
         numbers = []
 
         # Confirming that each directory is correctly labeled
-        for f in self.data:
+        for f in data:
             path = f.parts[-1]
             pat2 = f'.*{self.prefix}\d{{{self.N_digs}}}'
             if len(re.findall(pat2, path)) != 1:
@@ -47,12 +47,12 @@ class Cluster:
             numbers.append(int(re.findall(pat3, path)[0]))
 
         msg = 'Non-sequential directories discovered, data likely corrupted.'
-        if sorted(numbers) != list(range(0, len(self.data), 1)):
+        if sorted(numbers) != list(range(0, len(data), 1)):
             raise FileNotFoundError(msg)
 
         # Confirming that each directory contains expected files
         msg = 'Missing datafile {}.'
-        for f in self.data:
+        for f in data:
             datafiles = []
             for i in f.glob('*'):
                 datafiles.append(i.parts[-1])
@@ -63,21 +63,71 @@ class Cluster:
                 expected = f / config.cluster_metadata
                 raise FileNotFoundError(msg.format(format.I(expected)))
 
-    def map_clusters(self):
+    def map_clusters(self, data):
         '''
             Creates a dict that can be used to identify clusters and manipulate
             their contents.
         '''
         clusters = {}
-        for f in self.data:
+        for f in data:
             pat = f'.*{self.prefix}(\d{{{self.N_digs}}})'
-            label = int(re.findall(pat, f.parts[-1])[0])
-            print(label)
-
+            key = int(re.findall(pat, f.parts[-1])[0])
+            clusters[key] = {'dir_path':f}
+            clusters[key]['data_path'] = f / config.cluster_data
+            clusters[key]['metadata_path'] = f / config.cluster_metadata
         return clusters
 
-    def parse_data(self):
+    def save_metadata(self):
         '''
-            Generator that parses through each cluster's data.
+            Saves the metadata to each respective file
         '''
-        pass
+        for k,v in self.clusters.items():
+            with open(v['metadata_path'], 'a') as outfile:
+                pass
+        raise NotImplementedError()
+
+    def get_metadata(self):
+        '''
+            Extracts pre-existing metadata from each cluster directory
+        '''
+        labels =\
+        {v['key']:k for k,v in config.cluster_metadata_labels.items()}
+        for k,v in self.clusters.items():
+            with open(v['metadata_path'], 'r') as infile:
+                for line in infile.readlines():
+                    line = line.split('=')
+                    key = labels[line[0]]
+                    val_type = config.cluster_metadata_labels[key]['type']
+                    if val_type == 'float':
+                        val = float(line[1])
+                    elif 'array_' in val_type:
+                        N = int(val_type.split('_')[1])
+                        val = np.zeros(N)
+                        elements = line[1].split(',')
+                        for n,i in enumerate(elements):
+                            val[n] = float(i)
+                    self.clusters[k][key] = val
+
+    def get_means(self):
+        '''
+            Calculates the mean coordinate of each cluster and saves the data
+            to file
+        '''
+        for k,v in self.clusters.items():
+            path = v['data_path']
+            mean = np.zeros(3)
+            total = 0
+            with open(path, 'r') as infile:
+                for line in infile.readlines():
+                    line = line.split(',')
+                    for i in range(3):
+                        mean[i] += float(line[i])
+                    total += 1
+            mean /= total
+            self.clusters[k]['Mean_position'] = mean
+
+    def get_centers(self):
+        '''
+            Calculates the center of each cluster and saves the data to file
+        '''
+        raise NotImplementedError()

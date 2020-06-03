@@ -174,7 +174,7 @@ def direct_to_file(path, idx, mac_fail, frame, maximum, msg):
         Replacement for np.where, which raises a MemoryError.
     '''
     files = []
-    label = config.cluster_metadata_labels['T_macroscopic_failure']
+    label = config.cluster_metadata_labels['T_macroscopic_failure']['key']
     for i in range(maximum):
         cluster_path = path / config.cluster_dir_labels.format(idx+i)
         os.mkdir(cluster_path)

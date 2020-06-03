@@ -26,9 +26,12 @@ cluster_data            =       'CL_data.csv'
 cluster_metadata        =       'CL_metadata.dat'
 
 cluster_metadata_labels =       {
-                                 'T_macroscopic_failure':'T_mf',
-                                 'Center_position':'R_c',
-                                 'Maximum_radius':'R_max'
+                                 'T_macroscopic_failure':
+                                    {'key':'T_mf', 'type':'float'},
+                                 'Center_position':
+                                    {'key':'R_c', 'type':'array_3'},
+                                 'Mean_position':
+                                    {'key':'R_m', 'type':'array_3'},
                                 }
 
 cluster_uint_type       =       np.uint16

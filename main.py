@@ -474,6 +474,7 @@ if args.score_DNN is True:
 if args.test is True:
     savename = 'test'
     cluster = Cluster.Cluster(savename)
+    cluster.get_means()
 
 if args.cluster is True:
     procedure_cluster()
