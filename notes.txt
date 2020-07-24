@@ -1,0 +1,34 @@
+Data Manager (Object Oriented)
+Data Splitter
+Split Data Saving to File
+Clustering Algorithm (Hoshen–Kopelman algorithm) with Size Filter
+Cluster Saving to File (In Progress)
+Data Preprocessing (Removing Trivial Data)
+Kernel Filters (In Progress)
+Direct Neural Network (Issues With Testing)
+Visualization Tools (2-D & 3-D)
+Rudimentary Unit Tests (Partially Complete)
+
+Local, server with 32 cores, njord infratructure
+
+Include with features for post analysis
+
+Position in space
+Predict Distance to Failure
+Calculate distance metrics
+Use set of distances to create features
+Use these features in XGBoost
+Try and Get reasonable R2 values
+Which features best predict distance to failure
+Make one model with all data from all experiments
+Make models with subsets of data
+Differences between clustering in rock types with feature importances, eyeball analysis (homogeneity of fractures?)
+Noise filters?
+Directional Filters (Sobel? 30 degrees More-Coulomb Theory orientation of maximum coulomb stress (shear stress/normal stress) only close to failure (earlier in loading fractures are vertical))
+
+Get ellipsoids
+Describe work so far in the data/method section
+Background Sections
+Look for papers
+200, 300 minimum cluster, or 500 for marble
+Every time I read a paper, write ten line summary: purpose, method, result, citation + link
