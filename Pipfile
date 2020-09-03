@@ -11,6 +11,10 @@ scikit-learn = "*"
 pandas = "*"
 xgboost = "*"
 shap = "*"
+matplotlib = "*"
+imageio = "*"
+imageio-ffmpeg = "*"
+mayavi = "*"
 
 [requires]
 python_version = "3.8"

@@ -1,6 +1,5 @@
-from multiprocessing import Pool
+from numba import njit
 from time import time
-import numba as nb
 import numpy as np
 import shutil
 import os
@@ -8,7 +7,7 @@ import os
 from .. import config
 from .. import utils
 
-@nb.njit(cache = True)
+@njit(cache = True)
 def jit_make_groups(frame, min_cluster_size, msg1, msg2, comp_dirs):
     '''
         Numba accelerated function to extract groups of ones from a 3-D binary

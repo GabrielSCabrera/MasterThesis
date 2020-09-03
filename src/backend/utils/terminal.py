@@ -12,7 +12,7 @@ def clear_line():
     return '\033[0K'
 
 def reset_screen():
-    print('\033[2J\033[H', end = '\r')
+    print('\033[1J\033[2J\033[3J\033[H', end = '')
 
 def cursor_up():
     return '\033[1A'

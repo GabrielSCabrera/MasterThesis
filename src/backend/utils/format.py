@@ -1,14 +1,19 @@
+from typing import Dict
 import re
 
-def B(string):
-    '''Bold String Formatter'''
+def B(string:str) -> str:
+    '''
+        Bold String Formatter
+    '''
     return f'\033[1m{string}\033[m'
 
-def I(string):
-    '''Italic String Formatter'''
+def I(string:str) -> str:
+    '''
+        Italic String Formatter
+    '''
     return f'\033[3m{string}\033[m'
 
-def config_info(defaults):
+def config_info(defaults:Dict[str,str]) -> str:
     max_len = max(map(len, defaults.keys())) + 1
     max_len += len(B(''))
     title = 'DEFAULTS'
@@ -20,3 +25,10 @@ def config_info(defaults):
         out += f'\n{B(key):>{max_len}s}\t{I(value)}'
     out += '\n'
     return out
+
+def clean_str(string:str) -> str:
+    '''
+        Removes all ANSI escape sequences from given string.
+    '''
+    pat = r'(\033\[)[0-?]*[ -\/]*[@-~]'
+    return re.sub(pat, '', string)

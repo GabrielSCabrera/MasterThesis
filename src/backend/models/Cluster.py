@@ -1,9 +1,10 @@
-from ..utils import format
 from pathlib import Path
-from .. import config
 import numpy as np
 import os
 import re
+
+from ..utils import format
+from .. import config
 
 class Cluster:
 

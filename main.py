@@ -11,30 +11,58 @@ globals()['status_entries'] = []
 
 def parse_args():
 
-    argparse_desc = ('Runs various aspects of the rock fracture analysis '
-                     'depending on the sequence of included command-line '
-                     'arguments.')
+    argparse_desc = (
+        'Runs various aspects of the rock fracture analysis depending on the '
+        'sequence of included command-line arguments.'
+    )
 
-    help_split = ('Splits and saves the dataset into four arrays: X_train, '
-                  'X_test, y_train, y_test.')
+    help_split = (
+        'Splits and saves the dataset into four arrays: X_train, X_test, '
+        'y_train, y_test.'
+    )
 
-    help_train_DNN = ('Create and train a model based on a previously split and '
-                      'saved dataset.')
+    help_train_DNN = (
+        'Create and train a model based on a previously split and saved '
+        'dataset.'
+    )
 
-    help_score_DNN = ('Load a previously saved model and split dataset and '
-                      'print the training and testing accuracy.')
+    help_score_DNN = (
+        'Load a previously saved model and split dataset and print the training'
+        ' and testing accuracy.'
+    )
 
-    help_cluster = ('Load a previously saved model and split dataset and '
-                      'print the training and testing accuracy.')
+    help_cluster = (
+        'Load a previously saved model and split dataset and print the training'
+        ' and testing accuracy.'
+    )
+
+    help_delden = (
+        'Perform analyses on the given experiments using density data.'
+    )
 
     parser = argparse.ArgumentParser(description = argparse_desc)
 
-    parser.add_argument('--unit_tests', action='store_true', help = 'Runs all unit tests')
-    parser.add_argument('--test', action='store_true', help = 'Runs the latest test script')
-    parser.add_argument('--split', action='store_true', help = help_split)
-    parser.add_argument('--train_DNN', action='store_true', help = help_train_DNN)
-    parser.add_argument('--score_DNN', action='store_true', help = help_score_DNN)
-    parser.add_argument('--cluster', action='store_true', help = help_cluster)
+    parser.add_argument(
+        '--unit_tests', action='store_true', help = 'Runs all unit tests'
+    )
+    parser.add_argument(
+        '--test', action='store_true', help = 'Runs the latest test script'
+    )
+    parser.add_argument(
+        '--split', action='store_true', help = help_split
+    )
+    parser.add_argument(
+        '--train_DNN', action='store_true', help = help_train_DNN
+    )
+    parser.add_argument(
+        '--score_DNN', action='store_true', help = help_score_DNN
+    )
+    parser.add_argument(
+        '--cluster', action='store_true', help = help_cluster
+    )
+    parser.add_argument(
+        '--delden', action='store_true', help = help_delden
+    )
 
     return parser.parse_args()
 
@@ -329,9 +357,6 @@ def procedure_train_DNN():
     X_train, X_test, y_train, y_test =\
     reshape.reshape_1D(X_train, X_test, y_train, y_test)
 
-    # X_train, X_test, y_train, y_test =\
-    # convert.float64(X_train, X_test, y_train, y_test)
-
     layers = select.select_int_list('Select a Layer Configuration')
 
     terminal.reset_screen()
@@ -443,6 +468,14 @@ def procedure_cluster():
     clusters.extract_clusters(dataset, savename, min_cluster_size)
     print(format.B('Saved to ') + format.I(config.clusters_relpath / savename))
 
+def procedure_delden():
+
+    terminal.reset_screen()
+    delden = DelDensity.DelDensity()
+    delden.grid_search(itermax = 10)
+    delden.save()
+
+
 """MAIN SCRIPT"""
 
 args = parse_args()
@@ -472,9 +505,15 @@ if args.score_DNN is True:
     procedure_score_DNN()
 
 if args.test is True:
-    savename = 'test'
-    cluster = Cluster.Cluster(savename)
-    cluster.get_means()
+
+    delden = DelDensity.DelDensity()
+    delden.set_experiments(*groups.delden_exps['full'])
+    delden.set_features(*groups.delden_groups['full'])
+    delden.set_training_label('del_den')
+    delden.set_verbose(True)
 
 if args.cluster is True:
     procedure_cluster()
+
+if args.delden is True:
+    procedure_delden()
