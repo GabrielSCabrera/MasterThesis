@@ -25,6 +25,10 @@ plot_2D_relpath = results_path / "img_2D"
 plot_3D_relpath = results_path / "img_3D"
 delden_relpath = results_path / "delden"
 
+matlab_data_relpath = data_path / "matlab"
+matlab_results_relpath = results_path / "matlab"
+matlab_img_relpath = matlab_results_relpath / "img"
+
 delden_pred_str = "del_den"
 delden_savename = "delden_results.dat"
 delden_datafile = "damage_{}_s25.txt"
@@ -59,6 +63,9 @@ density_data_relpath.mkdir(exist_ok=True)
 plot_2D_relpath.mkdir(exist_ok=True)
 plot_3D_relpath.mkdir(exist_ok=True)
 delden_relpath.mkdir(exist_ok=True)
+matlab_data_relpath.mkdir(exist_ok=True)
+matlab_results_relpath.mkdir(exist_ok=True)
+matlab_img_relpath.mkdir(exist_ok=True)
 
 labels = ["M8_1", "M8_2", "MONZ5", "WG04"]  # Names of datasets
 
