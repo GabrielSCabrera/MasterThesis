@@ -1,6 +1,7 @@
 from .terminal import clear_line, reset_screen, cursor_up, get_key_press
 from termios import tcflush, TCIFLUSH
 from ..preprocessing import file_io
+from datetime import datetime
 from .format import B, I
 from . import terminal
 import numpy as np
@@ -200,3 +201,21 @@ def confirm_overwrite(filename, path, extension = None):
         title = B('Overwrite File ') + I(f'{filename}') + '?'
         return select_bool(title)
     return True
+
+def create_unique_name(prefix:str = None, suffix:str = None) -> str:
+    '''
+        Generate a filename using the current date and time
+    '''
+    if prefix is None:
+        prefix = ''
+    elif prefix[-1] != '_':
+        prefix += '_'
+
+    if suffix is None:
+        suffix = ''
+    elif suffix[0] != '_':
+        suffix = '_' + suffix
+
+    datetime_str = f'{datetime.now():%m_%d_%Y_%H_%M_%S_%f}'
+    filename = f'{prefix}{datetime_str}{suffix}'
+    return filename

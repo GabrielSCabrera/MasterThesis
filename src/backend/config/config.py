@@ -30,10 +30,14 @@ matlab_results_relpath = results_path / "matlab"
 matlab_img_relpath = matlab_results_relpath / "img"
 
 delden_pred_str = "del_den"
-delden_savename = "delden_results.dat"
+delden_savename = "delden_results"
 delden_datafile = "damage_{}_s25.txt"
 delden_xgb_obj = "reg:squarederror"
 delden_cv_folds = 10
+delden_train_data = "y_train.dat"
+delden_test_data = "y_test.dat"
+delden_train_pred_data = "y_train_pred.dat"
+delden_test_pred_data = "y_test_pred.dat"
 
 DNN_model_extension = ".dnn"
 cluster_dir_labels = "CL{:05d}"

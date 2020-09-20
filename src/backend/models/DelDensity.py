@@ -16,12 +16,15 @@ import numpy as np
 from ..config.defaults import delden_xgb_gridsearch_defaults as xgb_def
 from ..config.groups import delden_groups, delden_exps
 from ..config.config import n_jobs as delden_n_jobs
+from ..utils.select import create_unique_name
 from ..utils.format import B, I, clean_str
 from ..utils.terminal import reset_screen
 from ..config.labels import delden_labels
 from ..config.config import (
     density_data_relpath, delden_relpath, delden_pred_str, delden_savename,
-    delden_datafile, delden_xgb_obj, delden_cv_folds, term_width
+    delden_datafile, delden_xgb_obj, delden_cv_folds, term_width,
+    delden_train_data, delden_test_data, delden_train_pred_data,
+    delden_test_pred_data
 )
 
 warnings.simplefilter(action = "ignore", category = Warning)
@@ -72,6 +75,10 @@ class DelDensity:
         self.is_trained = False
         self.scores_arr = []
         self.imps = [[]]
+        self.y_train = []
+        self.y_test = []
+        self.y_train_pred = []
+        self.y_test_pred = []
 
     def set_experiments(self, *labels:Tuple[str]):
         '''
@@ -233,7 +240,7 @@ class DelDensity:
         self.reset()
         if self.verb:
             reset_screen()
-            print(self)
+            print(self.__str__())
 
         if objective is None:
             objective = delden_xgb_obj
@@ -261,10 +268,14 @@ class DelDensity:
             best_estimator = grid_search.best_estimator_
 
             y_train_pred = best_estimator.predict(X_train)
+            self.y_train.append(list(y_train))
+            self.y_train_pred.append(list(y_train_pred))
             rmse_train = np.sqrt(mean_squared_error(y_train, y_train_pred))
             r2_train = r2_score(y_train, y_train_pred)
 
             y_test_pred = best_estimator.predict(X_test)
+            self.y_test.append(list(y_test))
+            self.y_test_pred.append(list(y_test_pred))
             rmse_test = np.sqrt(mean_squared_error(y_test, y_test_pred))
             r2_test = r2_score(y_test, y_test_pred)
 
@@ -293,10 +304,14 @@ class DelDensity:
                 print(self._str_scores())
 
         self.is_trained = True
+        self.y_train = np.array(self.y_train)
+        self.y_test = np.array(self.y_test)
+        self.y_train_pred = np.array(self.y_train_pred)
+        self.y_test_pred = np.array(self.y_test_pred)
 
     def save(self, filename:str = None):
         '''
-            Saves the results to file.
+            Saves the results as a set of files, into a new directory.
         '''
         if not self.is_trained:
             msg = (
@@ -306,8 +321,11 @@ class DelDensity:
             raise RuntimeError(msg)
 
         if filename is None:
-            filename = delden_savename
+            filename = create_unique_name(prefix = delden_savename)
         save_path = self.save_directory / filename
+        save_path.mkdir(exist_ok = True)
+
+        scores_path = save_path / 'scores.txt'
 
         out_str = (
             f'Model Saved {datetime.now()}\n\n'
@@ -321,8 +339,26 @@ class DelDensity:
         out_str += f'\n\nREFERENCE MATERIAL\n'
         out_str += f'{clean_str(clean_str(self._str_features()))}\n\n'
 
-        with open(save_path, 'w+') as outfile:
+        with open(scores_path, 'w+') as outfile:
             outfile.write(out_str)
+
+        y_train_path = save_path / 'y_train.csv'
+        y_test_path = save_path / 'y_test.csv'
+
+        y_train_pred_path = save_path / 'y_train_pred.csv'
+        y_test_pred_path = save_path / 'y_test_pred.csv'
+
+        with open(y_train_path, 'w+') as outfile:
+            outfile.write(self._fmt_array_out(self.y_train))
+
+        with open(y_test_path, 'w+') as outfile:
+            outfile.write(self._fmt_array_out(self.y_test))
+
+        with open(y_train_pred_path, 'w+') as outfile:
+            outfile.write(self._fmt_array_out(self.y_train_pred))
+
+        with open(y_test_pred_path, 'w+') as outfile:
+            outfile.write(self._fmt_array_out(self.y_test_pred))
 
     # PRIVATE METHODS
 
@@ -419,6 +455,17 @@ class DelDensity:
             parameters['max_depth'] = max_depth
 
         return parameters
+
+    def _fmt_array_out(self, arr:np.ndarray):
+        '''
+            Formats a 2-D numpy array for saving to file.
+        '''
+        out = ''
+        for row in arr:
+            for i in row:
+                out += f'{i:f},'
+            out = out[:-1] + '\n'
+        return out
 
     @staticmethod
     def _tabulate(cols:Tuple[str], fmt:Tuple[str], data:np.ndarray) -> str:
