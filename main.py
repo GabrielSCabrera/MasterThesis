@@ -472,7 +472,7 @@ def procedure_delden():
 
     terminal.reset_screen()
     delden = DelDensity.DelDensity()
-    delden.grid_search(itermax = 10)
+    delden.grid_search(itermax = 16)
     delden.save()
 
 

@@ -216,6 +216,6 @@ def create_unique_name(prefix:str = None, suffix:str = None) -> str:
     elif suffix[0] != '_':
         suffix = '_' + suffix
 
-    datetime_str = f'{datetime.now():%m_%d_%Y_%H_%M_%S_%f}'
+    datetime_str = f'{datetime.now():%Y-%m-%d %H:%M:%S.%f}'
     filename = f'{prefix}{datetime_str}{suffix}'
     return filename

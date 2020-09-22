@@ -1,22 +1,32 @@
-directory = "delden_results_09_20_2020_11_20_07_153648";
-[y_train, y_test, y_train_pred, y_test_pred] = utils.load_from_delden(directory);
+directory = "delden_results_2020-09-22 01:48:12.813915";
+[y_train, y_test, y_train_pred, y_test_pred, scores] = utils.load_from_delden(directory);
 N_plots = height(y_train);
 
-closest_square = ceil(sqrt(N_plots));
+closest_square = ceil(sqrt(double(N_plots)));
+
 fig = figure();
 for i = 1:N_plots
-  ax = subplot(closest_square, closest_square, i);
-  axes(ax)
+  r2_train = table2array(scores(i,1));
+  r2_test = table2array(scores(i,2));
+  format_spec = '$R^2$ Train $ = %.2f$, $R^2$ Test $ = %.2f$';
+  title_string = sprintf(format_spec, r2_train, r2_test);
   a = str2double(rmmissing(table2array(y_train(i,:))));
   b = str2double(rmmissing(table2array(y_train_pred(i,:))));
-  c = rmmissing(table2array(y_test(i,:)));
-  d = rmmissing(table2array(y_test_pred(i,:)));
-  line1 = plot(a, b, 'b.');
-  hold on
-  line2 = plot(c, d, 'r.');
+  c = str2double(rmmissing(table2array(y_test(i,:))));
+  d = str2double(rmmissing(table2array(y_test_pred(i,:))));
   diag_ac = [min([min(a), min(c)]), max([max(a), max(c)])];
-  diag_bd= [min([min(b), min(d)]), max([max(b), max(d)])];
-  plot(diag_ac, diag_bd, 'k:');
+  diag_bd = [min([min(b), min(d)]), max([max(b), max(d)])];
+
+  ax = subplot(closest_square, closest_square, i);
+  axes(ax);
+  line1 = plot(a, b, 'bx', 'MarkerSize', 4);
+  xlim(diag_ac);
+  ylim(diag_bd);
+  title(title_string, 'Interpreter', 'latex', 'Units', 'normalized', 'Position', [0.5, -0.2, 0]);
+  ax.FontSize = 5;
+  hold on
+  line2 = plot(c, d, 'r.', 'MarkerSize', 8);
+  line3 = plot([-100 100], [-100, 100], 'k:');
   hold off
 end
 
@@ -26,41 +36,63 @@ han.XLabel.Visible ='on';
 han.YLabel.Visible ='on';
 ylabel(han,'Predicted Values');
 xlabel(han,'Expected Values');
-title(han,'Distribution of Expected vs. Predicted Values of Fracture Densities');
-
-hL = legend([line1, line2],{'Training Data','Testing Data'});
-newPosition = [0.2 0.01 0.05 0.05];
+title_obj = title(han,'Expected vs. Predicted Values of Fracture Densities');
+titlePos = get(title_obj , 'position');
+titlePos(1) = 0.45;
+titlePos(2) = 1.02;
+set(title_obj, 'position' , titlePos);
+hL = legend([line1, line2, line3],{'Training Data','Testing Data','$f(x) = x$'}, 'Interpreter', 'latex');
+newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
 
 utils.save_plot(fig, "delden_results.png");
+utils.save_plot(fig, "delden_results.pdf");
 
 for i = 1:N_plots
-  ax = subplot(closest_square, closest_square, i);
-  axes(ax)
+  r2_train = table2array(scores(i,1));
+  r2_test = table2array(scores(i,2));
+  format_spec = '$R^2$ Train $ = %.2f$, $R^2$ Test $ = %.2f$';
+  title_string = sprintf(format_spec, r2_train, r2_test);
   a = str2double(rmmissing(table2array(y_train(i,:))));
   b = str2double(rmmissing(table2array(y_train_pred(i,:))));
-  c = rmmissing(table2array(y_test(i,:)));
-  d = rmmissing(table2array(y_test_pred(i,:)));
-  line1 = loglog(a, b, 'b.');
+  c = str2double(rmmissing(table2array(y_test(i,:))));
+  d = str2double(rmmissing(table2array(y_test_pred(i,:))));
+  diag_x = [min([min(a(a > 0)), min(c(c > 0))]) max([max(a(a > 0)), max(c(c > 0))])];
+  diag_y = [min([min(b(b > 0)), min(d(d > 0))]) max([max(b(b > 0)), max(d(d > 0))])];
+  diag_line = linspace(-100, 100, 5E3);
+
+  ax = subplot(closest_square, closest_square, i);
+  axes(ax);
+
+  line1 = loglog(a, b, 'bx', 'MarkerSize', 4);
+  xlim([diag_x(1) diag_x(2)]);
+  ylim([diag_y(1) diag_y(2)]);
+  title(title_string, 'Interpreter', 'latex', 'Units', 'normalized', 'Position', [0.5, -0.2, 0]);
+  ax.FontSize = 5;
   hold on
-  line2 = loglog(c, d, 'r.');
-  diag_x = linspace(min([min(a(a > 0)), min(c(c > 0))]), max([max(a(a > 0)), max(c(c > 0))]), 1E3);
-  diag_y = linspace(min([min(b(b > 0)), min(d(d > 0))]), max([max(b(b > 0)), max(d(d > 0))]), 1E3);
-  loglog(diag_x, diag_y, 'k:');
+  line2 = loglog(c, d, 'r.', 'MarkerSize', 8);
+  line3 = loglog(diag_x, diag_y, 'k:');
+  line3 = loglog(diag_line, diag_line, 'k:');
   hold off
 end
 han = axes(fig,'visible','off');
 han.Title.Visible ='on';
 han.XLabel.Visible ='on';
 han.YLabel.Visible ='on';
-ylabel(han,'Predicted Values');
-xlabel(han,'Expected Values');
-title(han,'Distribution of Expected vs. Predicted Values of Fracture Densities (Logarithmic)');
-
-hL = legend([line1, line2],{'Training Data','Testing Data'});
-newPosition = [0.2 0.01 0.05 0.05];
+ylabel(han,'$\log($ Predicted Values $)$', 'Interpreter', 'latex');
+xlabel(han,'$\log($ Expected Values $)$', 'Interpreter', 'latex');
+title_obj = title(han,'Expected vs. Predicted Values of Fracture Densities (Log)');
+titlePos = get(title_obj , 'position');
+titlePos(1) = 0.4;
+titlePos(2) = 1.02;
+set(title_obj, 'position' , titlePos);
+hL = legend([line1, line2, line3],{'Training Data','Testing Data','$f(x) = x$'}, 'Interpreter', 'latex');
+newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
 
 utils.save_plot(fig, "delden_results_log.png");
+utils.save_plot(fig, "delden_results_log.pdf");
+
+exit
