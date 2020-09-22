@@ -444,6 +444,7 @@ def procedure_cluster():
     terminal.reset_screen()
 
     choices = config.labels
+    backend.binfo.Binfo.load_data()
     label = select.select('Choose a Dataset', choices)
     dataset = config.bins[label]
     dims = dataset.dims
@@ -505,6 +506,7 @@ if args.unit_tests is True:
     tests.run_tests()
 
 if args.split is True:
+    backend.binfo.Binfo.load_data()
     preset = defaults.split_defaults
     config_info = format.config_info(preset)
     msg = f'{config_info}\nUse default configuration?'
