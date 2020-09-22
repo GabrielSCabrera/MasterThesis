@@ -40,6 +40,10 @@ def parse_args():
         'Perform analyses on the given experiments using density data.'
     )
 
+    help_delden_all = (
+        'Perform analyses on the all experiments using density data.'
+    )
+
     parser = argparse.ArgumentParser(description = argparse_desc)
 
     parser.add_argument(
@@ -62,6 +66,9 @@ def parse_args():
     )
     parser.add_argument(
         '--delden', action='store_true', help = help_delden
+    )
+    parser.add_argument(
+        '--delden-all', action='store_true', help = help_delden_all
     )
 
     return parser.parse_args()
@@ -475,6 +482,20 @@ def procedure_delden():
     delden.grid_search(itermax = 16)
     delden.save()
 
+def procedure_delden_all():
+
+    terminal.reset_screen()
+    directory = backend.utils.select.create_unique_name(prefix = 'combined')
+    path = backend.config.delden_relpath / directory
+    path.mkdir(exist_ok = True)
+    length = len(backend.groups.delden_exps['all'])
+    for n,i in enumerate(backend.groups.delden_exps['all']):
+        title = backend.utils.format.B(f'EXPERIMENT {i} ')
+        title += backend.utils.format.I(f'({n+1}/{length})')
+        delden = DelDensity.DelDensity(save_dir = path, title = title)
+        delden.set_experiments(i)
+        delden.grid_search(itermax = 3)
+        delden.save(filename = i)
 
 """MAIN SCRIPT"""
 
@@ -517,3 +538,6 @@ if args.cluster is True:
 
 if args.delden is True:
     procedure_delden()
+
+if args.delden_all is True:
+    procedure_delden_all()

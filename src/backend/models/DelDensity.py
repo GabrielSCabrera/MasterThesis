@@ -34,7 +34,8 @@ class DelDensity:
     # CONSTRUCTOR
 
     def __init__(
-    self, data_dir:Path = None, save_dir:Path = None, verbose:bool = True):
+    self, data_dir:Path = None, save_dir:Path = None, title:str = None,
+    verbose:bool = True):
         '''
             Returns a new instance of class DelDensity
         '''
@@ -48,8 +49,12 @@ class DelDensity:
         else:
             self.save_dir = save_dir
 
-        self.exps = delden_exps['full']
-        self.feats = delden_groups['full']
+        if title is None:
+            title = 'MODEL'
+        self.title = title
+
+        self.exps = delden_exps['all']
+        self.feats = delden_groups['all']
         self.pred_str = delden_pred_str
         self.verb = verbose
 
@@ -89,14 +94,19 @@ class DelDensity:
             Select the experiments whose data will be used for training.
         '''
         self.reset()
-        self.exps = tuple(labels)
-        for exp in self.exps:
-            if exp not in delden_exps['full']:
+        exps = []
+        for exp in labels:
+            if exp in delden_exps.keys():
+                exps.extend(delden_exps[exp])
+            elif exp not in delden_exps['all']:
                 msg = (
                     f'Unrecognized experiment `{exp}` passed to method '
                     f'`set_experiments`.'
                 )
                 raise ValueError(msg)
+            else:
+                exps.append(exp)
+        self.exps = tuple(set(exps))
 
     def set_features(self, *labels:Tuple[str]):
         '''
@@ -105,7 +115,7 @@ class DelDensity:
         self.reset()
         self.feats = tuple(labels)
         for feature in self.feats:
-            if feature not in delden_groups['full']:
+            if feature not in delden_groups['all']:
                 msg = (
                     f'Unrecognized feature `{feature}` passed to method '
                     f'`set_features`.'
@@ -215,7 +225,6 @@ class DelDensity:
             such as the included experiments and features.  Also contains
             training/testing results if the model is trained/tested.
         '''
-        title = 'MODEL'
 
         out_str = self._str_features()
 
@@ -223,7 +232,7 @@ class DelDensity:
             out_str += '\n\n' + self._str_scores()
             out_str += '\n\n' + self._str_importances()
 
-        return f'{title}\n\n{out_str}'
+        return f'{self.title}\n\n{out_str}'
 
     # TRAINING
 
@@ -308,6 +317,7 @@ class DelDensity:
 
             if self.verb:
                 reset_screen()
+                print(self.title, end = '\n\n')
                 print(self._str_importances(ignored) + '\n')
                 print(self._str_scores())
 
@@ -337,6 +347,7 @@ class DelDensity:
 
         out_str = (
             f'Model Saved {datetime.now()}\n\n'
+            f'EXPERIMENT FILES: {self._str_experiments()}\n\n'
             f'SCORES:\n{clean_str(self._str_scores())}\n\n'
             f'IMPORTANCES (VALUES OF ZERO OMITTED):'
         )
@@ -448,6 +459,26 @@ class DelDensity:
         for i,j,k,l in iterator:
             out += f'{i:f},{j:f},{k:f},{l:f}\n'
         return out[:-1]
+
+    def _str_experiments(self) -> str:
+        '''
+            Lists the experiments being used as training/testing data.
+        '''
+        if len(self.exps) == 1:
+            return f'{self.exps[0]}.'
+        elif len(self.exps) == 2:
+            return f'{self.exps[0]} and {self.exps[1]}.'
+        else:
+            out = ''
+            for n, exp in enumerate(self.exps):
+                out += f'{exp}'
+                if n < len(self.exps)-2:
+                    out += ', '
+                elif n == len(self.exps)-2:
+                    out += ', and '
+                else:
+                    out += '.'
+            return out
 
     def _preprocess(self, train_size_max:float) -> pd.DataFrame:
         '''

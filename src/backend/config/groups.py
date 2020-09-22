@@ -2,7 +2,7 @@
 
 delden_groups = {}
 
-delden_groups['full'] = [
+delden_groups['all'] = [
     "glob_den", "sigd", "ep", "del_f", "del_sig", "del_ep", "den_p10",
     "den_p20", "den_p30", "den_p40", "den_p50", "den_mean", "den_p60",
     "den_p70", "den_p80", "den_p90", "den_max", "den_sum", "den_std",
@@ -46,18 +46,18 @@ delden_groups['curr'] = [
 
 delden_exps = {}
 
-delden_exps['full'] = [
+delden_exps['all'] = [
     "M8_1", "M8_2", "MONZ3", "MONZ4", "MONZ5", "WG01", "WG02", "WG04"
 ]
-delden_exps['exp1s'] = [
+delden_exps['M8'] = [
     "M8_1", "M8_2"
 ]
-delden_exps['exp2s'] = [
+delden_exps['MONZ'] = [
     "MONZ3", "MONZ4", "MONZ5"
 ]
-delden_exps['exp3s'] = [
+delden_exps['WG'] = [
     "WG01", "WG02", "WG04"
 ]
-delden_exps['exp4s'] = [
+delden_exps['MONZ-WG'] = [
     "MONZ3", "MONZ4", "MONZ5", "WG01", "WG02", "WG04"
 ]
