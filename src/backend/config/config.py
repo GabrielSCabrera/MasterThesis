@@ -53,12 +53,12 @@ cluster_metadata_labels = {
 
 cluster_uint_type = np.uint16
 
-if not os.path.isdir(bins_relpath):
-    msg = (
-        "Missing required directory: '/Documents/MasterThesis/data/bins/'"
-        f".  Dataset required in this location."
-    )
-    raise IOError(msg)
+# if not os.path.isdir(bins_relpath):
+#     msg = (
+#         "Missing required directory: '/Documents/MasterThesis/data/bins/'"
+#         f".  Dataset required in this location."
+#     )
+#     raise IOError(msg)
 
 results_path.mkdir(exist_ok=True)
 split_bins_relpath.mkdir(exist_ok=True)
