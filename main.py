@@ -479,6 +479,13 @@ def procedure_cluster():
 def procedure_delden():
 
     terminal.reset_screen()
+
+    title = 'How many experiments to run?'
+    val_range = [0, 100]
+    N_experiments = select.select_int(title, val_range)
+
+    terminal.reset_screen()
+
     delden = DelDensity.DelDensity()
     delden.grid_search(itermax = 16)
     delden.save()
@@ -486,6 +493,13 @@ def procedure_delden():
 def procedure_delden_all():
 
     terminal.reset_screen()
+
+    title = 'How many experiments to run?'
+    val_range = [0, 100]
+    N_experiments = select.select_int(title, val_range)
+
+    terminal.reset_screen()
+
     directory = backend.utils.select.create_unique_name(prefix = 'combined')
     path = backend.config.delden_relpath / directory
     path.mkdir(exist_ok = True)
@@ -495,7 +509,7 @@ def procedure_delden_all():
         title += backend.utils.format.I(f'({n+1}/{length})')
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(i)
-        delden.grid_search(itermax = 3)
+        delden.grid_search(itermax = N_experiments)
         delden.save(filename = i)
 
 """MAIN SCRIPT"""
