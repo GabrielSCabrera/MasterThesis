@@ -38,6 +38,6 @@ def format_bytes(b:int) -> str:
     step = 1024
     for prefix in ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'):
         if b < step:
-            return f'{b:.2g}{prefix}'
+            return f'{b:.0f}{prefix}'
         b /= step
     return f'{b}B'
