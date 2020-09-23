@@ -6,7 +6,7 @@ seed = 1337
 
 np.random.seed(seed)
 
-n_jobs = 8
+n_jobs = 32
 term_width = 79
 
 storage_path = Path.home() / "Documents" / "MasterThesis"
