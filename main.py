@@ -44,6 +44,10 @@ def parse_args():
         'Perform analyses on the all experiments using density data.'
     )
 
+    help_sync = (
+        'Synchronizes the local data with the complete dataset collection.'
+    )
+
     parser = argparse.ArgumentParser(description = argparse_desc)
 
     parser.add_argument(
@@ -69,6 +73,9 @@ def parse_args():
     )
     parser.add_argument(
         '--delden-all', action='store_true', help = help_delden_all
+    )
+    parser.add_argument(
+        '--sync', action='store_true', help = help_sync
     )
 
     return parser.parse_args()
@@ -324,6 +331,9 @@ def procedure_split():
 
 def procedure_train_DNN():
 
+    BucketManager.download('bins')
+    backend.binfo.Binfo.load_data()
+
     terminal.reset_screen()
 
     files = file_io.list_files(config.split_bins_relpath, '.npz')
@@ -380,6 +390,8 @@ def procedure_train_DNN():
 
 def procedure_score_DNN():
 
+    BucketManager.download('bins')
+    backend.binfo.Binfo.load_data()
     terminal.reset_screen()
 
     files = file_io.list_files(config.split_bins_relpath, '.npz')
@@ -442,9 +454,11 @@ def score_DNN(model, X_train, X_test, y_train, y_test):
 def procedure_cluster():
 
     terminal.reset_screen()
+    BucketManager.download('bins')
+    backend.binfo.Binfo.load_data()
+    terminal.reset_screen()
 
     choices = config.labels
-    backend.binfo.Binfo.load_data()
     label = select.select('Choose a Dataset', choices)
     dataset = config.bins[label]
     dims = dataset.dims
@@ -478,6 +492,7 @@ def procedure_cluster():
 
 def procedure_delden():
 
+    BucketManager.download('density_data')
     terminal.reset_screen()
 
     title = 'How many experiments to run?'
@@ -492,25 +507,40 @@ def procedure_delden():
 
 def procedure_delden_all():
 
+    BucketManager.download('density_data')
     terminal.reset_screen()
 
     title = 'How many experiments to run?'
     val_range = [0, 100]
     N_experiments = select.select_int(title, val_range)
+    # exps = backend.groups.delden_exps['all']
+    exps = ['WG02',]
+
+    gridsearch_params = {
+        "colsample_bytree": [0.6, 0.7, 0.8, 0.9, 1.0],
+        "alpha":            [0, 1, 2, 3],
+        "learning_rate":    [0.01, 0.5, 0.1, 0.2],
+        "n_estimators":     [200, 300, 400],
+        "max_depth":        [4, 5, 6, 7]
+    }
 
     terminal.reset_screen()
 
     directory = backend.utils.select.create_unique_name(prefix = 'combined')
     path = backend.config.delden_relpath / directory
     path.mkdir(exist_ok = True)
-    length = len(backend.groups.delden_exps['all'])
-    for n,i in enumerate(backend.groups.delden_exps['all']):
+    length = len(exps)
+    for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(i)
-        delden.grid_search(itermax = N_experiments)
+        delden.grid_search(itermax = N_experiments, **gridsearch_params)
         delden.save(filename = i)
+
+def procedure_sync():
+
+    BucketManager.sync()
 
 """MAIN SCRIPT"""
 
@@ -520,6 +550,7 @@ if args.unit_tests is True:
     tests.run_tests()
 
 if args.split is True:
+    BucketManager.download('bins')
     backend.binfo.Binfo.load_data()
     preset = defaults.split_defaults
     config_info = format.config_info(preset)
@@ -536,18 +567,15 @@ if args.split is True:
         procedure_split()
 
 if args.train_DNN is True:
+    BucketManager.download('bins')
     procedure_train_DNN()
 
 if args.score_DNN is True:
     procedure_score_DNN()
 
 if args.test is True:
-
-    delden = DelDensity.DelDensity()
-    delden.set_experiments(*groups.delden_exps['full'])
-    delden.set_features(*groups.delden_groups['full'])
-    delden.set_training_label('del_den')
-    delden.set_verbose(True)
+    # BucketManager.sync()
+    BucketManager.download('density_data', force = True)
 
 if args.cluster is True:
     procedure_cluster()
@@ -557,3 +585,6 @@ if args.delden is True:
 
 if args.delden_all is True:
     procedure_delden_all()
+
+if args.sync is True:
+    procedure_sync()

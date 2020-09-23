@@ -10,11 +10,21 @@ n_jobs = 8
 term_width = 79
 
 storage_path = Path.home() / "Documents" / "MasterThesis"
+hidden_path = Path.home() / ".MasterThesis"
+credentials_path = hidden_path / "credentials"
+
+data_url_root = Path(
+    r"storage.googleapis.com/gsc_thesis"
+)
+data_url = data_url_root / "data"
+bins_url = data_url / "bins"
+density_data_url = data_url / "density_data"
 
 data_path = storage_path / "data"
 results_path = storage_path / "results"
 
 bins_relpath = data_path / "bins"
+input_txts_relpath = data_path / "input_txts"
 split_bins_relpath = data_path / "split_bins"
 DNN_models_relpath = data_path / "DNN_models"
 clusters_relpath = data_path / "clusters"
@@ -70,5 +80,8 @@ delden_relpath.mkdir(exist_ok=True)
 matlab_data_relpath.mkdir(exist_ok=True)
 matlab_results_relpath.mkdir(exist_ok=True)
 matlab_img_relpath.mkdir(exist_ok=True)
+hidden_path.mkdir(exist_ok=True)
+credentials_path.mkdir(exist_ok=True)
+input_txts_relpath.mkdir(exist_ok=True)
 
 labels = ["M8_1", "M8_2", "MONZ5", "WG04"]  # Names of datasets

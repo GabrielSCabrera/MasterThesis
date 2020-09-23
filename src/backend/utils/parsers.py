@@ -27,3 +27,17 @@ def kwarg_parser(fields, kwargs):
             kwargs[key] = value
 
     return kwargs
+
+def format_bytes(b:int) -> str:
+    '''
+        Given a value in bytes, will convert it to whatever order of magnitude
+        needed for compactness (e.g. b=1024 should return `1 KB`)
+
+        Inspired by https://stackoverflow.com/a/52379087
+    '''
+    step = 1024
+    for prefix in ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'):
+        if b < step:
+            return f'{b:.2g}{prefix}'
+        b /= step
+    return f'{b}B'

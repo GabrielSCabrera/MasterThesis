@@ -88,6 +88,7 @@ class DelDensity:
         self.rmse_train = []
         self.r2_test = []
         self.rmse_test = []
+        self.best_models = []
 
     def set_experiments(self, *labels:Tuple[str]):
         '''
@@ -279,6 +280,7 @@ class DelDensity:
             X_train, X_test, y_train, y_test = self._preprocess(train_size_max)
             grid_search.fit(X_train, y_train)
             best_estimator = grid_search.best_estimator_
+            self.best_models.append(best_estimator)
 
             y_train_pred = best_estimator.predict(X_train)
             self.y_train.append(list(y_train))
