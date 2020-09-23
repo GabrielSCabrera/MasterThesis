@@ -1,4 +1,4 @@
-from mayavi import mlab
+# from mayavi import mlab
 import numpy as np
 import imageio
 import os
