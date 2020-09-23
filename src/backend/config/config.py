@@ -62,6 +62,7 @@ cluster_metadata_labels = {
 
 cluster_uint_type = np.uint16
 
+data_path.mkdir(exist_ok=True)
 bins_relpath.mkdir(exist_ok=True)
 results_path.mkdir(exist_ok=True)
 split_bins_relpath.mkdir(exist_ok=True)
