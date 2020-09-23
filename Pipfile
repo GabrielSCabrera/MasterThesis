@@ -14,7 +14,6 @@ shap = "*"
 matplotlib = "*"
 imageio = "*"
 imageio-ffmpeg = "*"
-mayavi = "*"
 google-cloud-storage = "*"
 
 [requires]

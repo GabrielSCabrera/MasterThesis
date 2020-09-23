@@ -1,6 +1,6 @@
 main:
 	@ echo "Running Main Script"
-	@ python3 ./main.py
+	@ python3.8 ./main.py
 
 clean:
 	@ echo "Removing '_pycache__' Directories"
@@ -13,29 +13,9 @@ clean:
 	@ rm -f -r ./src/backend/preprocessing/__pycache__/
 	@ rm -f -r ./src/backend/utils/__pycache__/
 
-test:
+install:
 	@ echo "Running Test Script"
-	@ python3 ./main.py --test
-
-unit_tests:
-	@ echo "Running Unit Tests"
-	@ python3 ./main.py --unit_tests
-
-split:
-	@ echo "Splitting Datasets and Saving"
-	@ python3 ./main.py --split
-
-train_DNN:
-	@ echo "Training Multilayer Perceptron"
-	@ python3 ./main.py --train_DNN
-
-score_DNN:
-	@ echo "Scoring Saved Model"
-	@ python3 ./main.py --score_DNN
-
-cluster:
-	@ echo "Extracting Clusters"
-	@ python3 ./main.py --cluster
+	@ python3.8 ./main.py --sync
 
 reset: clean
 	@ echo "Removing All Saved Data and Generated Directories"

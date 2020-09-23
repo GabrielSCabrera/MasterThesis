@@ -9,7 +9,8 @@ np.random.seed(seed)
 n_jobs = 32
 term_width = 79
 
-storage_path = Path.home() / "Documents" / "MasterThesis"
+documents_path = Path.home() / "Documents" /
+storage_path = documents_path / "MasterThesis"
 hidden_path = Path.home() / ".MasterThesis"
 credentials_path = hidden_path / "credentials"
 
@@ -62,6 +63,7 @@ cluster_metadata_labels = {
 
 cluster_uint_type = np.uint16
 
+documents_path.mkdir(exist_ok=True)
 data_path.mkdir(exist_ok=True)
 bins_relpath.mkdir(exist_ok=True)
 results_path.mkdir(exist_ok=True)
