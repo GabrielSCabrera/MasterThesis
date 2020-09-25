@@ -1,4 +1,4 @@
-directory = "combined_2020-09-25 01:08:47.825881";
+directory = "combined_2020-09-25 10:46:46.366144";
 [scores] = utils.load_from_combined(directory);
 N_experiments = height(scores);
 avg_idx = 2;

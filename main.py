@@ -571,6 +571,9 @@ def procedure_sync():
 
     BucketManager.sync()
 
+def procedure_force_sync():
+    BucketManager.sync(force = True)
+
 def procedure_delden_combine():
 
     terminal.reset_screen()

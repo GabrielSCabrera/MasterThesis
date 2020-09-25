@@ -19,7 +19,7 @@ class BucketManager:
     credentials_active = False
 
     @classmethod
-    def sync(cls, verbose:bool = True) -> None:
+    def sync(cls, verbose:bool = True, force:bool = False) -> None:
         '''
             Synchronizes the local filesystem with the remote filesystem
             without overwriting already downloaded data.
@@ -27,11 +27,11 @@ class BucketManager:
         local_files = cls._inspect_files_local()
         remote_files = cls._inspect_files_remote()
 
-        if local_files != remote_files:
+        if local_files != remote_files or force:
             for i in remote_files:
                 condition = i not in local_files.keys() or local_files[i] != remote_files[i]
                 if verbose:
-                    if i not in local_files.keys():
+                    if i not in local_files.keys() or force:
                         size = f'[{format_bytes(remote_files[i])}]'
                         msg = B(f'Downloading File {size:>8s}: ') + I(str(i))
                         print(msg)
@@ -39,7 +39,7 @@ class BucketManager:
                         size = f'[{format_bytes(remote_files[i])}]'
                         msg = B(f'   Updating File {size:>8s}: ') + I(str(i))
                         print(msg)
-                if condition:
+                if condition or force:
                     remote_path = 'https://' + str(config.data_url / i)
                     local_path = config.data_path / i
                     with open(local_path, 'wb+') as outfile:

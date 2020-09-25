@@ -49,7 +49,6 @@ classdef utils
       main_path = strcat(storage, directory);
       scores_path = strcat(main_path, "/scores.csv");
 
-      opts = detectImportOptions(scores_path);
       scores = readtable(scores_path, 'ReadRowNames',true);
     end
 
