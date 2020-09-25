@@ -13,6 +13,16 @@ clean:
 	@ rm -f -r ./src/backend/preprocessing/__pycache__/
 	@ rm -f -r ./src/backend/utils/__pycache__/
 
+install:
+	@ echo "Installing Package"
+	@ pipenv install
+	@ pipenv run python3.8 ./main.py --install
+	@ pipenv shell
+
+uninstall:
+	@ echo "Uninstalling Package Data"
+	@ python3.8 ./main.py --uninstall
+
 sync:
 	@ echo "Synchronizing Data"
 	@ python3.8 ./main.py --sync

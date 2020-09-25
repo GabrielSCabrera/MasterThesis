@@ -1,8 +1,9 @@
+from shutil import rmtree
 
 from ..utils.terminal import B, I, reset_screen
+from ..utils.BucketManager import BucketManager
 from ..utils.parsers import format_bytes
 from ..utils.select import select_bool
-from shutil import rmtree
 from . import config
 
 def uninstall(verbose:bool = True):
@@ -54,3 +55,20 @@ def uninstall(verbose:bool = True):
         # Deleting User Files
         if config.hidden_path.exists():
             rmtree(config.hidden_path)
+
+def install(verbose:bool = True):
+    '''
+        Is called from makefile when user wishes to install the install the
+        pipenv and download experiment data from the cloud.
+    '''
+    msg = (
+        "Installer downloads data files and installs the pipenv."
+    )
+    msg = B(msg)
+
+    reset_screen()
+    print(msg)
+    selection = select_bool("Proceed with download & installation?")
+
+    if selection:
+        BucketManager.sync(force = True)
