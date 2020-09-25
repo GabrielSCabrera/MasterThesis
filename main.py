@@ -60,6 +60,10 @@ def parse_args():
         'Synchronizes the local data with the complete dataset collection.'
     )
 
+    help_uninstall = (
+        'Removes downloaded data files, experiments, and all processed files.'
+    )
+
     parser = argparse.ArgumentParser(description = argparse_desc)
 
     parser.add_argument(
@@ -94,6 +98,9 @@ def parse_args():
     )
     parser.add_argument(
         '--delden-combine', action='store_true', help = help_delden_combine
+    )
+    parser.add_argument(
+        '--uninstall', action='store_true', help = help_uninstall
     )
 
     return parser.parse_args()
@@ -607,6 +614,8 @@ def procedure_delden_combine():
     print(format.B('Selected Experiment: ') + format.I(selection))
     parsers.combine_deldensity_results(selection)
 
+def procedure_uninstall():
+    backend.uninstall.uninstall()
 
 """MAIN SCRIPT"""
 
@@ -660,3 +669,6 @@ if args.force_sync is True:
 
 if args.delden_combine is True:
     procedure_delden_combine()
+
+if args.uninstall is True:
+    procedure_uninstall()

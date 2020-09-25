@@ -4,3 +4,4 @@ from . import defaults
 from . import fields
 from . import groups
 from . import labels
+from . import uninstall

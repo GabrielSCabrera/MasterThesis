@@ -67,6 +67,8 @@ cluster_metadata_labels = {
 cluster_uint_type = np.uint16
 
 documents_path.mkdir(exist_ok=True)
+storage_path.mkdir(exist_ok=True)
+hidden_path.mkdir(exist_ok=True)
 data_path.mkdir(exist_ok=True)
 bins_relpath.mkdir(exist_ok=True)
 results_path.mkdir(exist_ok=True)
@@ -80,7 +82,6 @@ delden_relpath.mkdir(exist_ok=True)
 matlab_data_relpath.mkdir(exist_ok=True)
 matlab_results_relpath.mkdir(exist_ok=True)
 matlab_img_relpath.mkdir(exist_ok=True)
-hidden_path.mkdir(exist_ok=True)
 credentials_path.mkdir(exist_ok=True)
 input_txts_relpath.mkdir(exist_ok=True)
 
