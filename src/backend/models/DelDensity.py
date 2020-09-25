@@ -2,7 +2,10 @@ from typing import List, Tuple, Dict
 from datetime import datetime
 from textwrap import wrap
 from pathlib import Path
+from io import StringIO
 import warnings
+import sys
+import os
 
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
@@ -26,8 +29,6 @@ from ..config.config import (
     delden_train_data, delden_test_data, delden_train_pred_data,
     delden_test_pred_data, delden_scores_data
 )
-
-warnings.simplefilter(action = "ignore", category = Warning)
 
 class DelDensity:
 
@@ -324,10 +325,6 @@ class DelDensity:
                 print(self._str_scores())
 
         self.is_trained = True
-        self.y_train = np.array(self.y_train)
-        self.y_test = np.array(self.y_test)
-        self.y_train_pred = np.array(self.y_train_pred)
-        self.y_test_pred = np.array(self.y_test_pred)
 
     def save(self, filename:str = None):
         '''
@@ -495,9 +492,8 @@ class DelDensity:
             df[self.feats] = scaler.fit_transform(df[self.feats].values)
             data = data.append(df, ignore_index = True)
 
-        X = data.drop(self.pred_str, axis=1)
+        X = data.drop(self.pred_str, axis = 1)
         y = data[self.pred_str]
-
         train_size = np.random.uniform(0, 1, len(data))
         train_size = np.sum(train_size <= train_size_max) / len(train_size)
         return train_test_split(X, y, train_size = train_size)

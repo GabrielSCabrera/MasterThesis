@@ -13,9 +13,13 @@ clean:
 	@ rm -f -r ./src/backend/preprocessing/__pycache__/
 	@ rm -f -r ./src/backend/utils/__pycache__/
 
-install:
-	@ echo "Running Test Script"
+sync:
+	@ echo "Synchronizing Data"
 	@ python3.8 ./main.py --sync
+
+force-sync:
+	@ echo "Force Synchronizing Data"
+	@ python3.8 ./main.py --force-sync
 
 reset: clean
 	@ echo "Removing All Saved Data and Generated Directories"

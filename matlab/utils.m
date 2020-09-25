@@ -39,6 +39,20 @@ classdef utils
       scores = readtable(scores_path, opts);
     end
 
+    function [scores] = load_from_combined(directory)
+      % Reads the data from a set of .csv files and returns its values as
+      % matrices
+      arguments
+        directory string
+      end
+      storage = "~/Documents/MasterThesis/results/delden/";
+      main_path = strcat(storage, directory);
+      scores_path = strcat(main_path, "/scores.csv");
+
+      opts = detectImportOptions(scores_path);
+      scores = readtable(scores_path, 'ReadRowNames',true);
+    end
+
     function [] = save_plot(H, filename)
       arguments
         H
@@ -47,6 +61,9 @@ classdef utils
       storage = "~/Documents/MasterThesis/results/matlab/img/";
       file_path = strcat(storage, filename);
       saveas(H, file_path);
+      msg = 'Saved Plot to Path:';
+      disp(msg);
+      disp(file_path);
     end
 
   end

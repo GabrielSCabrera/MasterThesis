@@ -9,7 +9,8 @@ np.random.seed(seed)
 n_jobs = 32
 term_width = 79
 
-documents_path = Path.home() / "Documents" /
+# MAIN DIRECTORIES
+documents_path = Path.home() / "Documents"
 storage_path = documents_path / "MasterThesis"
 hidden_path = Path.home() / ".MasterThesis"
 credentials_path = hidden_path / "credentials"
@@ -24,6 +25,7 @@ density_data_url = data_url / "density_data"
 data_path = storage_path / "data"
 results_path = storage_path / "results"
 
+# SUBDIRECTORIES
 bins_relpath = data_path / "bins"
 input_txts_relpath = data_path / "input_txts"
 split_bins_relpath = data_path / "split_bins"
@@ -39,6 +41,7 @@ matlab_data_relpath = data_path / "matlab"
 matlab_results_relpath = results_path / "matlab"
 matlab_img_relpath = matlab_results_relpath / "img"
 
+# FILES
 delden_pred_str = "del_den"
 delden_savename = "delden_results"
 delden_datafile = "damage_{}_s25.txt"
