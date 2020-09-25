@@ -494,8 +494,12 @@ class DelDensity:
 
         X = data.drop(self.pred_str, axis = 1)
         y = data[self.pred_str]
+        min_len = 2.0/len(X)
+        max_len = 1.0 - min_len
+
         train_size = np.random.uniform(0, 1, len(data))
         train_size = np.sum(train_size <= train_size_max) / len(train_size)
+        train_size = min(max_len, max(min_len, train_size))
         return train_test_split(X, y, train_size = train_size)
 
     def _gridsearch_params(
