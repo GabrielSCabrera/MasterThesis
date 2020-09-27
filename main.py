@@ -569,7 +569,7 @@ def procedure_delden_all():
         title += backend.utils.format.I(f'({n+1}/{length})')
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(i)
-        delden.grid_search(itermax = N_experiments)#, **gridsearch_params)
+        delden.grid_search(itermax = N_experiments, **gridsearch_params)
         delden.save(filename = i)
 
     parsers.combine_deldensity_results(path)
