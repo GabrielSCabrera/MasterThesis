@@ -45,6 +45,11 @@ def parse_args():
         'Perform analyses on the all experiments using density data.'
     )
 
+    help_delden_groups = (
+        'Perform analyses on the all experiments using density data, combining '
+        'experiments containing identical rock types.'
+    )
+
     help_sync = (
         'Synchronizes the local data with the complete dataset collection, but '
         'only if the local files are of a different size than those hosted '
@@ -93,6 +98,9 @@ def parse_args():
     )
     parser.add_argument(
         '--delden-all', action='store_true', help = help_delden_all
+    )
+    parser.add_argument(
+        '--delden-groups', action='store_true', help = help_delden_groups
     )
     parser.add_argument(
         '--sync', action='store_true', help = help_sync
@@ -549,11 +557,11 @@ def procedure_delden_all():
     # exps = ['WG04',]
 
     gridsearch_params = {
-        "colsample_bytree": [0.6, 0.7, 0.8, 0.9, 1.0],
-        "alpha":            [0, 1, 2, 3],
-        "learning_rate":    [0.01, 0.5, 0.1, 0.2],
-        "n_estimators":     [200, 300, 400],
-        "max_depth":        [4, 5, 6, 7]
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [25, 50, 100, 150],
+        "max_depth":        [3, 5, 7, 9]
     }
 
     terminal.reset_screen()
@@ -561,16 +569,54 @@ def procedure_delden_all():
     directory = backend.utils.select.create_unique_name(prefix = 'combined')
     path = backend.config.delden_relpath / directory
     path.mkdir(exist_ok = True)
-    with open(path / 'experiments.txt', 'w+') as outfile:
-        outfile.write(','.join(exps))
     length = len(exps)
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(i)
-        delden.grid_search(itermax = N_experiments, **gridsearch_params)
+        delden.grid_search(
+            itermax = N_experiments, train_size_range = [0.7, 0.8],
+            **gridsearch_params)
         delden.save(filename = i)
+
+    parsers.combine_deldensity_results(path)
+
+def procedure_delden_groups():
+
+    BucketManager.download('density_data')
+    terminal.reset_screen()
+
+    title = 'How many experiments to run?'
+    val_range = [0, 100]
+    N_experiments = select.select_int(title, val_range)
+    opts = backend.groups.delden_exps
+    exps = [opts['WG'], opts['M8'], opts['MONZ']]
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [25, 50, 100, 150],
+        "max_depth":        [3, 5, 7, 9],
+    }
+
+    terminal.reset_screen()
+
+    directory = backend.utils.select.create_unique_name(prefix = 'combined')
+    path = backend.config.delden_relpath / directory
+    path.mkdir(exist_ok = True)
+    length = len(exps)
+    for n,i in enumerate(exps):
+        title = backend.utils.format.B(f'EXPERIMENTS {", ".join(i)} ')
+        title += backend.utils.format.I(f'({n+1}/{length})')
+        delden = DelDensity.DelDensity(save_dir = path, title = title)
+        delden.set_experiments(*i)
+        delden.grid_search(
+            itermax = N_experiments, train_size_range = [0.7, 0.8],
+            **gridsearch_params
+        )
+        delden.save(filename = '_'.join(i))
 
     parsers.combine_deldensity_results(path)
 
@@ -673,6 +719,9 @@ if args.delden is True:
 
 if args.delden_all is True:
     procedure_delden_all()
+
+if args.delden_groups is True:
+    procedure_delden_groups()
 
 if args.sync is True:
     procedure_sync()

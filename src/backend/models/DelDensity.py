@@ -7,9 +7,9 @@ import warnings
 import sys
 import os
 
+from sklearn.preprocessing import RobustScaler, StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
-from sklearn.preprocessing import RobustScaler
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 import xgboost as xgb
@@ -33,7 +33,6 @@ from ..config.config import (
 class DelDensity:
 
     # CONSTRUCTOR
-
     def __init__(
     self, data_dir:Path = None, save_dir:Path = None, title:str = None,
     verbose:bool = True):
@@ -71,7 +70,6 @@ class DelDensity:
         self.imps_fmt = ['s', 'd', 'd', '.2f']
 
     # SETTERS
-
     def reset(self):
         '''
             Resets the DelDensity instance, and removes all training/testing
@@ -159,7 +157,6 @@ class DelDensity:
             raise IOError(msg)
 
     # GETTERS
-
     @property
     def experiments(self) -> Tuple[str]:
         '''
@@ -237,12 +234,12 @@ class DelDensity:
         return f'{self.title}\n\n{out_str}'
 
     # TRAINING
-
     def grid_search(
-    self, itermax:int = 10, train_size_max:float = 0.8, objective:str = None,
-    colsample_bytree:List[float] = None, alpha:List[float] = None,
-    learning_rate:List[float] = None, n_estimators:List[float] = None,
-    max_depth:List[float] = None, n_jobs:int = None, cv:int = None):
+    self, itermax:int = 10, train_size_range:Tuple[float] = [0.7, 0.8],
+    objective:str = None, colsample_bytree:List[float] = None,
+    alpha:List[float] = None, learning_rate:List[float] = None,
+    n_estimators:List[float] = None, max_depth:List[float] = None,
+    n_jobs:int = None, cv:int = None):
         '''
             Performs a grid search over the given parameters:
 
@@ -272,30 +269,35 @@ class DelDensity:
             colsample_bytree, alpha, learning_rate, n_estimators, max_depth
         )
 
-        grid_search = GridSearchCV(
-            estimator = estimator, param_grid = param_grid, cv = cv,
-            n_jobs = n_jobs
-        )
-
         for i in range(itermax):
-            X_train, X_test, y_train, y_test = self._preprocess(train_size_max)
+            grid_search = GridSearchCV(
+                estimator = estimator, param_grid = param_grid, cv = cv,
+                n_jobs = n_jobs
+            )
+
+            X_train, X_test, y_train, y_test = \
+            self._preprocess(train_size_range)
             grid_search.fit(X_train, y_train)
             best_estimator = grid_search.best_estimator_
             self.best_models.append(best_estimator)
 
             y_train_pred = best_estimator.predict(X_train)
-            self.y_train.append(list(y_train))
-            self.y_train_pred.append(list(y_train_pred))
             rmse_train = np.sqrt(mean_squared_error(y_train, y_train_pred))
             r2_train = r2_score(y_train, y_train_pred)
+
+            y_test_pred = best_estimator.predict(X_test)
+            rmse_test = np.sqrt(mean_squared_error(y_test, y_test_pred))
+            r2_test = r2_score(y_test, y_test_pred)
+            print(y_test, y_test_pred)
+            exit()
+
+            self.y_train.append(list(y_train))
+            self.y_train_pred.append(list(y_train_pred))
             self.r2_train.append(r2_train)
             self.rmse_train.append(rmse_train)
 
-            y_test_pred = best_estimator.predict(X_test)
             self.y_test.append(list(y_test))
             self.y_test_pred.append(list(y_test_pred))
-            rmse_test = np.sqrt(mean_squared_error(y_test, y_test_pred))
-            r2_test = r2_score(y_test, y_test_pred)
             self.r2_test.append(r2_test)
             self.rmse_test.append(rmse_test)
 
@@ -384,7 +386,6 @@ class DelDensity:
             outfile.write(self._str_scores_out())
 
     # PRIVATE METHODS
-
     @staticmethod
     def _read_data(data_path:Path) -> pd.DataFrame:
         '''
@@ -479,7 +480,7 @@ class DelDensity:
                     out += '.'
             return out
 
-    def _preprocess(self, train_size_max:float) -> pd.DataFrame:
+    def _preprocess(self, train_size_range:Tuple[float]) -> pd.DataFrame:
         '''
             Reads all experiment data and returns a set of scaled & split
             DataFrames.
@@ -489,17 +490,16 @@ class DelDensity:
             path = self.data_dir / delden_datafile.format(exp)
             df = self._read_data(path)
             scaler = RobustScaler()
-            df[self.feats] = scaler.fit_transform(df[self.feats].values)
+            # scaler = StandardScaler()
             data = data.append(df, ignore_index = True)
+        data[:] = scaler.fit_transform(data[:].values)
 
-        X = data.drop(self.pred_str, axis = 1)
-        y = data[self.pred_str]
-        min_len = 2.0/len(X)
-        max_len = 1.0 - min_len
+        X = np.array(data.drop(self.pred_str, axis = 1))
+        y = np.array(data[self.pred_str])
 
-        train_size = np.random.uniform(0, 1, len(data))
-        train_size = np.sum(train_size <= train_size_max) / len(train_size)
-        train_size = min(max_len, max(min_len, train_size))
+        scale = train_size_range[1] - train_size_range[0]
+        shift = train_size_range[0]
+        train_size = np.random.random()*scale + shift
         return train_test_split(X, y, train_size = train_size)
 
     def _gridsearch_params(
