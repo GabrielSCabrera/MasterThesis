@@ -288,8 +288,6 @@ class DelDensity:
             y_test_pred = best_estimator.predict(X_test)
             rmse_test = np.sqrt(mean_squared_error(y_test, y_test_pred))
             r2_test = r2_score(y_test, y_test_pred)
-            print(y_test, y_test_pred)
-            exit()
 
             self.y_train.append(list(y_train))
             self.y_train_pred.append(list(y_train_pred))
