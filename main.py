@@ -555,12 +555,20 @@ def procedure_delden_all():
     N_experiments = select.select_int(title, val_range)
     exps = backend.groups.delden_exps['all']
 
+    # gridsearch_params = {
+    #     "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+    #     "alpha":            [0, 0.001, 0.01, 0.1],
+    #     "learning_rate":    [0.01, 0.05, 0.1, 0.5],
+    #     "n_estimators":     [25, 50, 100, 150],
+    #     "max_depth":        [3, 5, 7, 9]
+    # }
+
     gridsearch_params = {
-        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "colsample_bytree": np.arange(0.1, 1.0, 0.1),
         "alpha":            [0, 0.001, 0.01, 0.1],
-        "learning_rate":    [0.01, 0.05, 0.1, 0.5],
-        "n_estimators":     [25, 50, 100, 150],
-        "max_depth":        [3, 5, 7, 9]
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [5, 10, 25, 50, 100, 150, 250, 500],
+        "max_depth":        [1, 3, 5, 7, 9, 11, 13, 15, 17]
     }
 
     terminal.reset_screen()
@@ -576,7 +584,7 @@ def procedure_delden_all():
         delden.set_experiments(i)
         delden.grid_search(
             itermax = N_experiments, train_size_range = [0.7, 0.8],
-            # **gridsearch_params
+            **gridsearch_params
         )
         delden.save(filename = i)
 
@@ -630,7 +638,7 @@ def procedure_delden_groups():
         delden.set_experiments(*i)
         delden.grid_search(
             itermax = N_experiments, train_size_range = [0.7, 0.8],
-            # **gridsearch_params
+            **gridsearch_params
         )
         delden.save(filename = '-'.join(i))
 
