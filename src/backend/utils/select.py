@@ -1,13 +1,18 @@
-from .terminal import clear_line, reset_screen, cursor_up, get_key_press
 from termios import tcflush, TCIFLUSH
-from ..preprocessing import file_io
 from datetime import datetime
-from .format import B, I
-from . import terminal
-import numpy as np
+from pathlib import Path
 import time
 import sys
 import re
+import os
+
+import numpy as np
+
+from .terminal import clear_line, reset_screen, cursor_up, get_key_press
+from ..preprocessing import file_io
+from .format import B, I
+from ..config.config import delden_relpath
+from . import terminal
 
 def select(title, options):
     print(B(title), end = '\n\n')
@@ -219,3 +224,17 @@ def create_unique_name(prefix:str = None, suffix:str = None) -> str:
     datetime_str = f'{datetime.now():%Y-%m-%d %H:%M:%S.%f}'
     filename = f'{prefix}{datetime_str}{suffix}'
     return filename
+
+def run_matlab(script_relpath:str, variables:str = None):
+    '''
+        Runs a MATLAB script with the given initial conditions.
+    '''
+    print(f'\033[1mAttempting to run MATLAB script:\033[m', end = '\t')
+    print(f'\033[3m{script_relpath}\033[m')
+    try:
+        script = f"{variables} run(\'{script_relpath}\');"
+        cmd = f'matlab -nodisplay -nosplash -nodesktop -r "{script}"'
+        os.system(f'{cmd} > /dev/null')
+        print('\033[1mSuccessfully ran MATLAB script\033[m')
+    except:
+        print('\033[1mFailed to run MATLAB script\033[m')

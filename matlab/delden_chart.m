@@ -1,4 +1,4 @@
-directory = "delden_results_2020-09-22 01:48:12.813915";
+directory = "M8_1";
 [y_train, y_test, y_train_pred, y_test_pred, scores] = utils.load_from_delden(directory);
 N_plots = height(y_train);
 
@@ -14,8 +14,8 @@ for i = 1:N_plots
   b = str2double(rmmissing(table2array(y_train_pred(i,:))));
   c = str2double(rmmissing(table2array(y_test(i,:))));
   d = str2double(rmmissing(table2array(y_test_pred(i,:))));
-  diag_ac = [min([min(a), min(c)]), max([max(a), max(c)])];
-  diag_bd = [min([min(b), min(d)]), max([max(b), max(d)])];
+  diag_ac = [min([min(a), min(c)]) max([max(a), max(c)])];
+  diag_bd = [min([min(b), min(d)]) max([max(b), max(d)])];
 
   ax = subplot(closest_square, closest_square, i);
   axes(ax);
