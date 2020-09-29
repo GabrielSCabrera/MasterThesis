@@ -44,7 +44,8 @@ matlab_img_relpath = matlab_results_relpath / "img"
 # FILES
 delden_pred_str = "del_den"
 delden_savename = "delden_results"
-delden_datafile = "damage_{}_s25.txt"
+delden_datafile = "damage_{}_s25_d9.txt"
+# delden_datafile = "damage_{}_s25.txt"
 delden_xgb_obj = "reg:squarederror"
 delden_cv_folds = 10
 delden_train_data = "y_train.csv"

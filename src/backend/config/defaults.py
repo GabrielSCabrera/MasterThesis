@@ -9,6 +9,14 @@ delden_xgb_gridsearch_defaults = {
 }
 
 data_bucket_files = [
+    Path('density_data') / 'damage_WG02_s25_d9.txt',
+    Path('density_data') / 'damage_WG04_s25_d9.txt',
+    Path('density_data') / 'damage_MONZ4_s25_d9.txt',
+    Path('density_data') / 'damage_M8_2_s25_d9.txt',
+    Path('density_data') / 'damage_M8_1_s25_d9.txt',
+    Path('density_data') / 'damage_MONZ5_s25_d9.txt',
+    Path('density_data') / 'damage_MONZ3_s25_d9.txt',
+    Path('density_data') / 'damage_WG01_s25_d9.txt',
     Path('density_data') / 'damage_WG02_s25.txt',
     Path('density_data') / 'damage_WG04_s25.txt',
     Path('density_data') / 'damage_MONZ4_s25.txt',
@@ -37,5 +45,4 @@ data_bucket_files = [
     Path('input_txts') / 'WG04_3D_frac_full_a1000.txt',
     Path('input_txts') / 'M8_1_3D_frac_full_a500.txt',
     Path('input_txts') / 'M8_2_3D_frac_full_a2000.txt',
-
 ]

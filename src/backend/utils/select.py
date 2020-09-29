@@ -229,7 +229,7 @@ def run_matlab(script_relpath:str, variables:str = None):
     '''
         Runs a MATLAB script with the given initial conditions.
     '''
-    print(f'\033[1mAttempting to run MATLAB script:\033[m', end = '\t')
+    print(f'\033[1mAttempting to run MATLAB script:\033[m', end = ' ')
     print(f'\033[3m{script_relpath}\033[m')
     try:
         script = f"{variables} run(\'{script_relpath}\');"
