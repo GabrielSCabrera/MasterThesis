@@ -60,9 +60,9 @@ classdef utils
       storage = "~/Documents/MasterThesis/results/matlab/img/";
       file_path = strcat(storage, filename);
       saveas(H, file_path);
-      msg = 'Saved Plot to Path:';
-      disp(msg);
-      disp(file_path);
+      % msg = 'Saved Plot to Path:';
+      % disp(msg);
+      % disp(file_path);
     end
 
   end

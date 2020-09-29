@@ -1,4 +1,3 @@
-directory = "combined_2020-09-27 13:23:03.110084";
 [scores] = utils.load_from_combined(directory);
 N_experiments = height(scores);
 avg_idx = 2;
@@ -15,5 +14,5 @@ set(gca, 'xtick', xpoints, 'xticklabel', scores.Properties.RowNames);
 xlabel('Experiment (Rock Type Abbreviation)');
 ylabel('R^2 Average Score and Standard Deviation');
 grid();
-utils.save_plot(fig, "delden_compare.png");
+utils.save_plot(fig, save_name);
 exit();

@@ -554,7 +554,6 @@ def procedure_delden_all():
     val_range = [0, 100]
     N_experiments = select.select_int(title, val_range)
     exps = backend.groups.delden_exps['all']
-    # exps = ['WG04',]
 
     gridsearch_params = {
         "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
@@ -577,10 +576,24 @@ def procedure_delden_all():
         delden.set_experiments(i)
         delden.grid_search(
             itermax = N_experiments, train_size_range = [0.7, 0.8],
-            **gridsearch_params)
+            **gridsearch_params
+        )
         delden.save(filename = i)
 
     parsers.combine_deldensity_results(path)
+
+    try:
+        save_name = directory + '.png'
+        script_name = './matlab/delden_compare.m'
+        variables = f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        script = f"{variables} run(\'{script_name}\');"
+        cmd = f'matlab -nodisplay -nosplash -nodesktop -r "{script}"'
+        os.system(cmd)
+        print('\033[1mSaved MATLAB plot to path:\033[m')
+        out_path = backend.config.matlab_img_relpath / save_name
+        print(f'\033[3m{out_path}\033[m')
+    except:
+        print('\033[1mFailed to save MATLAB plots automatically.\033[m\n')
 
 def procedure_delden_groups():
 
@@ -616,9 +629,22 @@ def procedure_delden_groups():
             itermax = N_experiments, train_size_range = [0.7, 0.8],
             **gridsearch_params
         )
-        delden.save(filename = '_'.join(i))
+        delden.save(filename = '-'.join(i))
 
     parsers.combine_deldensity_results(path)
+
+    try:
+        save_name = directory + '.png'
+        script_name = './matlab/delden_compare.m'
+        variables = f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        script = f"{variables} run(\'{script_name}\');"
+        cmd = f'matlab -nodisplay -nosplash -nodesktop -r "{script}"'
+        os.system(cmd)
+        print('\033[1mSaved MATLAB plot to path:\033[m')
+        out_path = backend.config.matlab_img_relpath / save_name
+        print(f'\033[3m{out_path}\033[m')
+    except:
+        print('\033[1mFailed to save MATLAB plots automatically.\033[m\n')
 
 def procedure_sync():
 

@@ -339,7 +339,7 @@ class DelDensity:
 
         if filename is None:
             filename = create_unique_name(prefix = delden_savename)
-        save_path = self.save_directory / filename
+        save_path = self.save_dir / filename
         save_path.mkdir(exist_ok = True)
 
         summary_path = save_path / 'summary.txt'
