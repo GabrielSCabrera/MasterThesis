@@ -567,8 +567,8 @@ def procedure_delden_all():
         "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
         "alpha":            [0, 0.001, 0.01, 0.1],
         "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
-        "n_estimators":     [5, 10, 25, 50, 100, 150, 250, 500],
-        "max_depth":        [1, 3, 5, 7, 9, 11, 13, 15, 17]
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
     }
 
     terminal.reset_screen()
@@ -617,12 +617,20 @@ def procedure_delden_groups():
     opts = backend.groups.delden_exps
     exps = [opts['WG'], opts['M8'], opts['MONZ']]
 
+    # gridsearch_params = {
+    #     "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+    #     "alpha":            [0, 0.001, 0.01, 0.1],
+    #     "learning_rate":    [0.01, 0.05, 0.1, 0.5],
+    #     "n_estimators":     [25, 50, 100, 150],
+    #     "max_depth":        [3, 5, 7, 9],
+    # }
+
     gridsearch_params = {
         "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
         "alpha":            [0, 0.001, 0.01, 0.1],
-        "learning_rate":    [0.01, 0.05, 0.1, 0.5],
-        "n_estimators":     [25, 50, 100, 150],
-        "max_depth":        [3, 5, 7, 9],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
     }
 
     terminal.reset_screen()
