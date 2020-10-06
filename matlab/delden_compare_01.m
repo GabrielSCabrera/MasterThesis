@@ -10,6 +10,7 @@ std_arr = table2array(scores(:,std_idx));
 fig = errorbar(xpoints, avg_arr, std_arr, ':s', 'MarkerSize', 10, 'MarkerEdgeColor','red','MarkerFaceColor','white', 'LineStyle', 'none', 'LineWidth', 1);
 chunk = 0.1*(max(xpoints) - min(xpoints));
 xlim([min(xpoints) - chunk max(xpoints) + chunk]);
+ylim([0 1]);
 set(gca, 'xtick', xpoints, 'xticklabel', scores.Properties.RowNames);
 xlabel('Experiment (Rock Type Abbreviation)');
 ylabel('R^2 Average Score and Standard Deviation');

@@ -65,6 +65,10 @@ def parse_args():
         'Synchronizes the local data with the complete dataset collection.'
     )
 
+    help_matlab = (
+        'Runs a custom MATLAB script.'
+    )
+
     help_install = (
         'Downloads data files and installs the pipenv.'
     )
@@ -110,6 +114,9 @@ def parse_args():
     )
     parser.add_argument(
         '--delden-combine', action='store_true', help = help_delden_combine
+    )
+    parser.add_argument(
+        '--matlab', action='store_true', help = help_matlab
     )
     parser.add_argument(
         '--install', action='store_true', help = help_uninstall
@@ -718,6 +725,44 @@ def procedure_delden_combine():
     print(format.B('Selected Experiment: ') + format.I(selection))
     parsers.combine_deldensity_results(selection)
 
+def procedure_matlab():
+    directories = [
+        'combined_2020-10-06 07:39:50.711793',
+        'combined_2020-10-06 03:09:27.034176',
+    ]
+
+    for directory in directories:
+        save_name = directory + '_compare_01' + '.png'
+        backend.select.run_matlab(
+            script_relpath = './matlab/delden_compare_01.m',
+            variables = (
+                f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+            )
+        )
+
+        save_name = directory + '_hist_01' + '.png'
+        backend.select.run_matlab(
+            script_relpath = './matlab/delden_hist_01.m',
+            variables = (
+                f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+            )
+        )
+
+        save_name = directory + '_compare' + '.png'
+        backend.select.run_matlab(
+            script_relpath = './matlab/delden_compare.m',
+            variables = (
+                f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+            )
+        )
+        save_name = directory + '_hist' + '.png'
+        backend.select.run_matlab(
+            script_relpath = './matlab/delden_hist.m',
+            variables = (
+                f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+            )
+        )
+
 def procedure_install():
     backend.install.install()
 
@@ -779,6 +824,9 @@ if args.force_sync is True:
 
 if args.delden_combine is True:
     procedure_delden_combine()
+
+if args.matlab is True:
+    procedure_matlab()
 
 if args.install is True:
     procedure_install()

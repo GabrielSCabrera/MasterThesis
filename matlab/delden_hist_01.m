@@ -17,6 +17,7 @@ end
 set(gca, 'xtick', 1:cols, 'xticklabel', folders);
 scaler = 0.1;
 xlim([1-cols*scaler cols+cols*scaler]);
+ylim([0 1]);
 utils.save_plot(fig, save_name);
 hold off
 exit();
