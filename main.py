@@ -564,7 +564,7 @@ def procedure_delden_all():
     # }
 
     gridsearch_params = {
-        "colsample_bytree": np.arange(0.1, 1.0, 0.1),
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
         "alpha":            [0, 0.001, 0.01, 0.1],
         "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
         "n_estimators":     [5, 10, 25, 50, 100, 150, 250, 500],
