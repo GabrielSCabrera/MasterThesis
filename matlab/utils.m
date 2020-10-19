@@ -96,6 +96,113 @@ classdef utils
       end
     end
 
+    function [y_train_list, y_test_list, y_train_pred_list, y_test_pred_list, r2_train, r2_test, folders] = load_all_from_combined(directory)
+      % Reads the data from a set of .csv files and returns its values as
+      % matrices
+      arguments
+        directory string
+      end
+      R2_train_idx = 1;
+      R2_test_idx = 2;
+
+      storage = "~/Documents/MasterThesis/results/delden/";
+      main_path = strcat(storage, directory);
+      directory = dir(main_path);
+      folders = {directory([directory.isdir]).name};
+      folders = folders(~ismember(folders, {'.','..'}));
+      folder = sort(folders);
+
+      N_experiments = length(folders);
+      y_train_list = cell(N_experiments,0);
+      y_test_list = cell(N_experiments,0);
+      y_train_pred_list = cell(N_experiments,0);
+      y_test_pred_list = cell(N_experiments,0);
+
+      for i = 1:N_experiments
+        scores_path = strcat(main_path, "/");
+        scores_path = strcat(scores_path, folders(i));
+        train_path = strcat(scores_path, "/y_train.csv");
+        test_path = strcat(scores_path, "/y_test.csv");
+        train_pred_path = strcat(scores_path, "/y_train_pred.csv");
+        test_pred_path = strcat(scores_path, "/y_test_pred.csv");
+
+        opts = detectImportOptions(train_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
+        y_train = readtable(train_path, opts);
+        opts = detectImportOptions(test_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
+        y_test = readtable(test_path, opts);
+        opts = detectImportOptions(train_pred_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
+        y_train_pred = readtable(train_pred_path, opts);
+        opts = detectImportOptions(test_pred_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
+        y_test_pred = readtable(test_pred_path, opts);
+
+        y_train_list{i} = y_train;
+        y_test_list{i} = y_test;
+        y_train_pred_list{i} = y_train_pred;
+        y_test_pred_list{i} = y_test_pred;
+      end
+
+      scores_path = strcat(main_path, "/scores.csv");
+      scores = readtable(scores_path, 'ReadRowNames', true);
+      r2_train = table2array(scores(:, R2_train_idx));
+      r2_test = table2array(scores(:, R2_test_idx));
+    end
+
+    function [y_train_list, y_test_list, y_train_pred_list, y_test_pred_list, r2_train, r2_test, scores, folders] = load_best_from_combined(directory)
+      % Reads the data from a set of .csv files and returns its values as
+      % matrices
+      arguments
+        directory string
+      end
+      R2_train_idx = 1;
+      R2_test_idx = 2;
+
+      storage = "~/Documents/MasterThesis/results/delden/";
+      main_path = strcat(storage, directory);
+      directory = dir(main_path);
+      folders = {directory([directory.isdir]).name};
+      folders = folders(~ismember(folders, {'.','..'}));
+      folder = sort(folders);
+
+      N_experiments = length(folders);
+      y_train_list = cell(N_experiments,0);
+      y_test_list = cell(N_experiments,0);
+      y_train_pred_list = cell(N_experiments,0);
+      y_test_pred_list = cell(N_experiments,0);
+      scores = cell(N_experiments,0);
+
+      for i = 1:N_experiments
+        scores_path = strcat(main_path, "/");
+        scores_path = strcat(scores_path, folders(i));
+        train_path = strcat(scores_path, "/y_train.csv");
+        test_path = strcat(scores_path, "/y_test.csv");
+        train_pred_path = strcat(scores_path, "/y_train_pred.csv");
+        test_pred_path = strcat(scores_path, "/y_test_pred.csv");
+        scores_path = strcat(scores_path, "/scores.csv");
+
+        opts = detectImportOptions(train_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
+        y_train = readtable(train_path, opts);
+        opts = detectImportOptions(test_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
+        y_test = readtable(test_path, opts);
+        opts = detectImportOptions(train_pred_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
+        y_train_pred = readtable(train_pred_path, opts);
+        opts = detectImportOptions(test_pred_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
+        y_test_pred = readtable(test_pred_path, opts);
+        opts = detectImportOptions(scores_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
+        score = readtable(scores_path, opts);
+
+        y_train_list{i} = y_train;
+        y_test_list{i} = y_test;
+        y_train_pred_list{i} = y_train_pred;
+        y_test_pred_list{i} = y_test_pred;
+        scores{i} = score;
+      end
+
+      scores_path = strcat(main_path, "/scores.csv");
+      scores_comp = readtable(scores_path, 'ReadRowNames', true);
+      r2_train = table2array(scores_comp(:, R2_train_idx));
+      r2_test = table2array(scores_comp(:, R2_test_idx));
+    end
+
     function [] = save_plot(H, filename)
       arguments
         H

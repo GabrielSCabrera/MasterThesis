@@ -14,7 +14,7 @@ from .format import B, I
 from ..config.config import delden_relpath
 from . import terminal
 
-def select(title, options):
+def select(title:str, options):
     print(B(title), end = '\n\n')
     for n, option in enumerate(options):
         print(B(f"{n+1})") + '\t' + I(option))
@@ -38,7 +38,7 @@ def select(title, options):
     print('–'*40, end = '\n\n')
     return selection
 
-def scroll_select(title, options):
+def scroll_select(title:str, options):
     max_len = min(len(options), 9)
     opt_enum = [i+1 for i in range(len(options))]
 
@@ -76,7 +76,7 @@ def scroll_select(title, options):
         elif key == 'q':
             exit()
 
-def select_int(title, val_range):
+def select_int(title:str, val_range):
     '''
         val_range: list of two ints, with val_range[0] < val_range[1]
     '''
@@ -110,7 +110,7 @@ def select_int(title, val_range):
                 break
     return int(val)
 
-def select_float(title, val_range):
+def select_float(title:str, val_range):
     '''
         val_range: list of two floats, with val_range[0] < val_range[1]
     '''
@@ -144,7 +144,7 @@ def select_float(title, val_range):
                 break
     return float(val)
 
-def select_bool(title):
+def select_bool(title:str):
     print(B(title) + I(" [Y/n](q)"))
 
     while True:
@@ -167,12 +167,12 @@ def select_bool(title):
     else:
         raise Exception('Unexpected Error')
 
-def select_str(title):
+def select_str(title:str):
     print(B(title))
     selection = input('> ')
     return selection
 
-def select_int_list(title):
+def select_int_list(title:str):
 
     print(B(title))
     print(f'Expects {I("space-separated")} integers\n')
@@ -225,7 +225,7 @@ def create_unique_name(prefix:str = None, suffix:str = None) -> str:
     filename = f'{prefix}{datetime_str}{suffix}'
     return filename
 
-def run_matlab(script_relpath:str, variables:str = None):
+def run_matlab(script_relpath:str, variables:str = None, suppress:bool = True):
     '''
         Runs a MATLAB script with the given initial conditions.
     '''
@@ -234,7 +234,9 @@ def run_matlab(script_relpath:str, variables:str = None):
     try:
         script = f"{variables} run(\'{script_relpath}\');"
         cmd = f'matlab -nodisplay -nosplash -nodesktop -r "{script}"'
-        os.system(f'{cmd} > /dev/null')
+        if suppress:
+            cmd += ' > /dev/null'
+        os.system(cmd)
         print('\033[1mSuccessfully ran MATLAB script\033[m')
     except:
         print('\033[1mFailed to run MATLAB script\033[m')

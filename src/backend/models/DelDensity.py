@@ -7,7 +7,7 @@ import warnings
 import sys
 import os
 
-from sklearn.preprocessing import RobustScaler, StandardScaler
+from sklearn.preprocessing import RobustScaler, StandardScaler, MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error
@@ -239,7 +239,7 @@ class DelDensity:
     objective:str = None, colsample_bytree:List[float] = None,
     alpha:List[float] = None, learning_rate:List[float] = None,
     n_estimators:List[float] = None, max_depth:List[float] = None,
-    n_jobs:int = None, cv:int = None):
+    n_jobs:int = None, cv:int = None, log:bool = False):
         '''
             Performs a grid search over the given parameters:
 
@@ -276,7 +276,8 @@ class DelDensity:
             )
 
             X_train, X_test, y_train, y_test = \
-            self._preprocess(train_size_range)
+            self._preprocess(train_size_range, log = log)
+
             grid_search.fit(X_train, y_train)
             best_estimator = grid_search.best_estimator_
             self.best_models.append(best_estimator)
@@ -478,7 +479,8 @@ class DelDensity:
                     out += '.'
             return out
 
-    def _preprocess(self, train_size_range:Tuple[float]) -> pd.DataFrame:
+    def _preprocess(
+    self, train_size_range:Tuple[float], log:bool = False) -> pd.DataFrame:
         '''
             Reads all experiment data and returns a set of scaled & split
             DataFrames.
@@ -487,8 +489,11 @@ class DelDensity:
         for exp in self.exps:
             path = self.data_dir / delden_datafile.format(exp)
             df = self._read_data(path)
-            scaler = RobustScaler()
-            # scaler = StandardScaler()
+            if log:
+                scaler = MinMaxScaler()
+            else:
+                # scaler = RobustScaler()
+                scaler = StandardScaler()
             data = data.append(df, ignore_index = True)
         data[:] = scaler.fit_transform(data[:].values)
 
@@ -498,7 +503,30 @@ class DelDensity:
         scale = train_size_range[1] - train_size_range[0]
         shift = train_size_range[0]
         train_size = np.random.random()*scale + shift
+
+        if log:
+            X, y = self._logarithm(X, y)
+
         return train_test_split(X, y, train_size = train_size)
+
+    def _logarithm(
+    self, X:np.ndarray, y:np.ndarray) -> Tuple[np.ndarray]:
+        '''
+            Takes the training and testing sets, and converts all values to
+            their logarithms.  NaN values are removed.
+        '''
+        tol = 1E-16
+
+        X = np.log(X + tol)
+        y = np.log(y + tol)
+
+        c1 = np.all(np.isfinite(X), axis = 1)
+        idx = np.logical_and(c1, np.isfinite(y))
+
+        X = X[idx,:]
+        y = y[idx]
+
+        return X, y
 
     def _gridsearch_params(
     self, colsample_bytree:List[float] = None, alpha:List[float] = None,

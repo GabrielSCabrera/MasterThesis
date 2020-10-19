@@ -45,9 +45,20 @@ def parse_args():
         'Perform analyses on the all experiments using density data.'
     )
 
+    help_delden_all_log = (
+        'Perform analyses on the all experiments using density data.  '
+        'Begins by taking the logarithm of all values.'
+    )
+
     help_delden_groups = (
         'Perform analyses on the all experiments using density data, combining '
         'experiments containing identical rock types.'
+    )
+
+    help_delden_groups_log = (
+        'Perform analyses on the all experiments using density data, combining '
+        'experiments containing identical rock types.  '
+        'Begins by taking the logarithm of all values.'
     )
 
     help_sync = (
@@ -104,7 +115,14 @@ def parse_args():
         '--delden-all', action='store_true', help = help_delden_all
     )
     parser.add_argument(
+        '--delden-all-log', action='store_true', help = help_delden_all_log
+    )
+    parser.add_argument(
         '--delden-groups', action='store_true', help = help_delden_groups
+    )
+    parser.add_argument(
+        '--delden-groups-log', action='store_true',
+        help = help_delden_groups_log
     )
     parser.add_argument(
         '--sync', action='store_true', help = help_sync
@@ -153,6 +171,79 @@ def display_status():
         else:
             status += f'{format.I(entry)} > '
     return status + '\n'
+
+"""FUNCTIONS"""
+
+def save_plots_compare(directory:str, suppress:bool = True):
+    '''
+        Saves a variety of plots for the `compare` results of delden.
+    '''
+
+    save_name = directory + '_compare' + '.png'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delden_compare.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name = directory + '_hist' + '.png'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delden_hist.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name_1 = directory + '_chart_exps' + '.png'
+    save_name_2 = directory + '_chart_exps' + '.pdf'
+    save_name_3 = directory + '_chart_exps_log' + '.png'
+    save_name_4 = directory + '_chart_exps_log' + '.pdf'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delden_chart_exps.m',
+        variables = (
+            f"directory = \'{directory}\'; "
+            f"save_name_1 = \'{save_name_1}\'; "
+            f"save_name_2 = \'{save_name_2}\'; "
+            f"save_name_3 = \'{save_name_3}\'; "
+            f"save_name_4 = \'{save_name_4}\'; "
+        )
+    )
+
+    save_name_1 = directory + '_chart_exps_best' + '.png'
+    save_name_2 = directory + '_chart_exps_best' + '.pdf'
+    save_name_3 = directory + '_chart_exps_best_log' + '.png'
+    save_name_4 = directory + '_chart_exps_best_log' + '.pdf'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delden_chart_exps_best.m',
+        variables = (
+            f"directory = \'{directory}\'; "
+            f"save_name_1 = \'{save_name_1}\'; "
+            f"save_name_2 = \'{save_name_2}\'; "
+            f"save_name_3 = \'{save_name_3}\'; "
+            f"save_name_4 = \'{save_name_4}\'; "
+        )
+    )
+
+    save_name_1 = directory + '_chart_exps_worst' + '.png'
+    save_name_2 = directory + '_chart_exps_worst' + '.pdf'
+    save_name_3 = directory + '_chart_exps_worst_log' + '.png'
+    save_name_4 = directory + '_chart_exps_worst_log' + '.pdf'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delden_chart_exps_worst.m',
+        variables = (
+            f"directory = \'{directory}\'; "
+            f"save_name_1 = \'{save_name_1}\'; "
+            f"save_name_2 = \'{save_name_2}\'; "
+            f"save_name_3 = \'{save_name_3}\'; "
+            f"save_name_4 = \'{save_name_4}\'; "
+        )
+    )
 
 """SCRIPT PROCEDURES"""
 
@@ -562,14 +653,6 @@ def procedure_delden_all():
     N_experiments = select.select_int(title, val_range)
     exps = backend.groups.delden_exps['all']
 
-    # gridsearch_params = {
-    #     "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
-    #     "alpha":            [0, 0.001, 0.01, 0.1],
-    #     "learning_rate":    [0.01, 0.05, 0.1, 0.5],
-    #     "n_estimators":     [25, 50, 100, 150],
-    #     "max_depth":        [3, 5, 7, 9]
-    # }
-
     gridsearch_params = {
         "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
         "alpha":            [0, 0.001, 0.01, 0.1],
@@ -596,22 +679,53 @@ def procedure_delden_all():
         delden.save(filename = i)
 
     parsers.combine_deldensity_results(path)
+    save_plots_compare(directory)
 
-    save_name = directory + '_compare' + '.png'
-    backend.select.run_matlab(
-        script_relpath = './matlab/delden_compare.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
-        )
-    )
+def procedure_delden_all_log():
 
-    save_name = directory + '_hist' + '.png'
-    backend.select.run_matlab(
-        script_relpath = './matlab/delden_hist.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    BucketManager.download('density_data')
+    terminal.reset_screen()
+
+    title = 'How many experiments to run?'
+    val_range = [0, 100]
+    N_experiments = select.select_int(title, val_range)
+    exps = backend.groups.delden_exps['all']
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
+    }
+
+    gridsearch_params = {
+        "colsample_bytree": [0.7, 0.9],
+        "alpha":            [0.001, 0.01],
+        "learning_rate":    [0.01, 0.1],
+        "n_estimators":     [10, 25],
+        "max_depth":        [5, 7]
+    }
+
+    terminal.reset_screen()
+
+    directory = backend.utils.select.create_unique_name(prefix = 'combined')
+    path = backend.config.delden_relpath / directory
+    path.mkdir(exist_ok = True)
+    length = len(exps)
+    for n,i in enumerate(exps):
+        title = backend.utils.format.B(f'EXPERIMENT {i} ')
+        title += backend.utils.format.I(f'({n+1}/{length})')
+        delden = DelDensity.DelDensity(save_dir = path, title = title)
+        delden.set_experiments(i)
+        delden.grid_search(
+            itermax = N_experiments, train_size_range = [0.7, 0.8], log = True,
+            **gridsearch_params
         )
-    )
+        delden.save(filename = i)
+
+    parsers.combine_deldensity_results(path)
+    save_plots_compare(directory)
 
 def procedure_delden_groups():
 
@@ -623,14 +737,6 @@ def procedure_delden_groups():
     N_experiments = select.select_int(title, val_range)
     opts = backend.groups.delden_exps
     exps = [opts['WG'], opts['M8'], opts['MONZ']]
-
-    # gridsearch_params = {
-    #     "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
-    #     "alpha":            [0, 0.001, 0.01, 0.1],
-    #     "learning_rate":    [0.01, 0.05, 0.1, 0.5],
-    #     "n_estimators":     [25, 50, 100, 150],
-    #     "max_depth":        [3, 5, 7, 9],
-    # }
 
     gridsearch_params = {
         "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
@@ -658,22 +764,46 @@ def procedure_delden_groups():
         delden.save(filename = '-'.join(i))
 
     parsers.combine_deldensity_results(path)
+    save_plots_compare(directory)
 
-    save_name = directory + '_compare' + '.png'
-    backend.select.run_matlab(
-        script_relpath = './matlab/delden_compare.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
-        )
-    )
+def procedure_delden_groups_log():
 
-    save_name = directory + '_hist' + '.png'
-    backend.select.run_matlab(
-        script_relpath = './matlab/delden_hist.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    BucketManager.download('density_data')
+    terminal.reset_screen()
+
+    title = 'How many experiments to run?'
+    val_range = [0, 100]
+    N_experiments = select.select_int(title, val_range)
+    opts = backend.groups.delden_exps
+    exps = [opts['WG'], opts['M8'], opts['MONZ']]
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
+    }
+
+    terminal.reset_screen()
+
+    directory = backend.utils.select.create_unique_name(prefix = 'combined')
+    path = backend.config.delden_relpath / directory
+    path.mkdir(exist_ok = True)
+    length = len(exps)
+    for n,i in enumerate(exps):
+        title = backend.utils.format.B(f'EXPERIMENTS {", ".join(i)} ')
+        title += backend.utils.format.I(f'({n+1}/{length})')
+        delden = DelDensity.DelDensity(save_dir = path, title = title)
+        delden.set_experiments(*i)
+        delden.grid_search(
+            itermax = N_experiments, train_size_range = [0.7, 0.8], log = True,
+            **gridsearch_params
         )
-    )
+        delden.save(filename = '-'.join(i))
+
+    parsers.combine_deldensity_results(path)
+    save_plots_compare(directory)
 
 def procedure_sync():
 
@@ -801,8 +931,9 @@ if args.score_DNN is True:
     procedure_score_DNN()
 
 if args.test is True:
-    # BucketManager.sync()
-    BucketManager.download('density_data', force = True)
+
+    directory = 'combined_2020-10-06 03:09:27.034176'
+    save_plots_compare(directory)
 
 if args.cluster is True:
     procedure_cluster()
@@ -813,8 +944,14 @@ if args.delden is True:
 if args.delden_all is True:
     procedure_delden_all()
 
+if args.delden_all_log is True:
+    procedure_delden_all_log()
+
 if args.delden_groups is True:
     procedure_delden_groups()
+
+if args.delden_groups_log is True:
+    procedure_delden_groups_log()
 
 if args.sync is True:
     procedure_sync()
