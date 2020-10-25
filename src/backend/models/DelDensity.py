@@ -235,7 +235,7 @@ class DelDensity:
 
     # TRAINING
     def grid_search(
-    self, itermax:int = 10, train_size_range:Tuple[float] = [0.7, 0.8],
+    self, itermax:int = 10, train_size:Tuple[float] = 0.8,
     objective:str = None, colsample_bytree:List[float] = None,
     alpha:List[float] = None, learning_rate:List[float] = None,
     n_estimators:List[float] = None, max_depth:List[float] = None,
@@ -276,7 +276,7 @@ class DelDensity:
             )
 
             X_train, X_test, y_train, y_test = \
-            self._preprocess(train_size_range, log = log)
+            self._preprocess(train_size, log = log)
 
             grid_search.fit(X_train, y_train)
             best_estimator = grid_search.best_estimator_
@@ -480,7 +480,7 @@ class DelDensity:
             return out
 
     def _preprocess(
-    self, train_size_range:Tuple[float], log:bool = False) -> pd.DataFrame:
+    self, train_size:int, log:bool = False) -> pd.DataFrame:
         '''
             Reads all experiment data and returns a set of scaled & split
             DataFrames.
@@ -495,15 +495,11 @@ class DelDensity:
                 # scaler = RobustScaler()
                 scaler = StandardScaler()
             data = data.append(df, ignore_index = True)
-        data[:] = scaler.fit_transform(data[:].values)
-
+        # data[:] = scaler.fit_transform(data[:].values)
         X = np.array(data.drop(self.pred_str, axis = 1))
+        X = scaler.fit_transform(X)
+
         y = np.array(data[self.pred_str])
-
-        scale = train_size_range[1] - train_size_range[0]
-        shift = train_size_range[0]
-        train_size = np.random.random()*scale + shift
-
         if log:
             X, y = self._logarithm(X, y)
 
@@ -515,16 +511,12 @@ class DelDensity:
             Takes the training and testing sets, and converts all values to
             their logarithms.  NaN values are removed.
         '''
-        tol = 1E-16
-
-        X = np.log(X + tol)
-        y = np.log(y + tol)
-
-        c1 = np.all(np.isfinite(X), axis = 1)
-        idx = np.logical_and(c1, np.isfinite(y))
+        idx = y >= 0
 
         X = X[idx,:]
         y = y[idx]
+
+        y = np.log(y + 1E-16)
 
         return X, y
 

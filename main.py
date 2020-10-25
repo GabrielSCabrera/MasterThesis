@@ -673,7 +673,7 @@ def procedure_delden_all():
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(i)
         delden.grid_search(
-            itermax = N_experiments, train_size_range = [0.7, 0.8],
+            itermax = N_experiments, train_size = 0.8,
             **gridsearch_params
         )
         delden.save(filename = i)
@@ -699,14 +699,6 @@ def procedure_delden_all_log():
         "max_depth":        [1, 3, 5, 7, 9, 11]
     }
 
-    gridsearch_params = {
-        "colsample_bytree": [0.7, 0.9],
-        "alpha":            [0.001, 0.01],
-        "learning_rate":    [0.01, 0.1],
-        "n_estimators":     [10, 25],
-        "max_depth":        [5, 7]
-    }
-
     terminal.reset_screen()
 
     directory = backend.utils.select.create_unique_name(prefix = 'combined')
@@ -719,7 +711,7 @@ def procedure_delden_all_log():
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(i)
         delden.grid_search(
-            itermax = N_experiments, train_size_range = [0.7, 0.8], log = True,
+            itermax = N_experiments, train_size = 0.8, log = True,
             **gridsearch_params
         )
         delden.save(filename = i)
@@ -758,7 +750,7 @@ def procedure_delden_groups():
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(*i)
         delden.grid_search(
-            itermax = N_experiments, train_size_range = [0.7, 0.8],
+            itermax = N_experiments, train_size = 0.8,
             **gridsearch_params
         )
         delden.save(filename = '-'.join(i))
@@ -797,7 +789,7 @@ def procedure_delden_groups_log():
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(*i)
         delden.grid_search(
-            itermax = N_experiments, train_size_range = [0.7, 0.8], log = True,
+            itermax = N_experiments, train_size = 0.8, log = True,
             **gridsearch_params
         )
         delden.save(filename = '-'.join(i))
