@@ -673,7 +673,7 @@ def procedure_delden_all():
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(i)
         delden.grid_search(
-            itermax = N_experiments, train_size = 0.8,
+            itermax = N_experiments, train_size = 0.75,
             **gridsearch_params
         )
         delden.save(filename = i)
@@ -711,7 +711,7 @@ def procedure_delden_all_log():
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(i)
         delden.grid_search(
-            itermax = N_experiments, train_size = 0.8, log = True,
+            itermax = N_experiments, train_size = 0.75, log = True,
             **gridsearch_params
         )
         delden.save(filename = i)
@@ -750,7 +750,7 @@ def procedure_delden_groups():
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(*i)
         delden.grid_search(
-            itermax = N_experiments, train_size = 0.8,
+            itermax = N_experiments, train_size = 0.75,
             **gridsearch_params
         )
         delden.save(filename = '-'.join(i))
@@ -789,7 +789,7 @@ def procedure_delden_groups_log():
         delden = DelDensity.DelDensity(save_dir = path, title = title)
         delden.set_experiments(*i)
         delden.grid_search(
-            itermax = N_experiments, train_size = 0.8, log = True,
+            itermax = N_experiments, train_size = 0.75, log = True,
             **gridsearch_params
         )
         delden.save(filename = '-'.join(i))
