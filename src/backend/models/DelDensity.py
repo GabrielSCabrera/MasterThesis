@@ -489,11 +489,11 @@ class DelDensity:
         for exp in self.exps:
             path = self.data_dir / delden_datafile.format(exp)
             df = self._read_data(path)
-            if log:
-                scaler = MinMaxScaler()
-            else:
+            # if log:
+                # scaler = MinMaxScaler()
+            # else:
                 # scaler = RobustScaler()
-                scaler = StandardScaler()
+            scaler = StandardScaler()
             data = data.append(df, ignore_index = True)
         # data[:] = scaler.fit_transform(data[:].values)
         X = np.array(data.drop(self.pred_str, axis = 1))

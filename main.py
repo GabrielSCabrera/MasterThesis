@@ -1,3 +1,4 @@
+from pathlib import Path
 import numpy as np
 import argparse
 import time
@@ -59,6 +60,10 @@ def parse_args():
         'Perform analyses on the all experiments using density data, combining '
         'experiments containing identical rock types.  '
         'Begins by taking the logarithm of all values.'
+    )
+
+    help_delden_compare = (
+        'Compares two different sets of calculations and plots their results.'
     )
 
     help_sync = (
@@ -125,6 +130,10 @@ def parse_args():
         help = help_delden_groups_log
     )
     parser.add_argument(
+        '--delden-compare', action='store_true',
+        help = help_delden_compare
+    )
+    parser.add_argument(
         '--sync', action='store_true', help = help_sync
     )
     parser.add_argument(
@@ -174,12 +183,17 @@ def display_status():
 
 """FUNCTIONS"""
 
-def save_plots_compare(directory:str, suppress:bool = True):
+def save_plots_compare(directory:str, path:Path = None, suppress:bool = True):
     '''
         Saves a variety of plots for the `compare` results of delden.
     '''
 
-    save_name = directory + '_compare' + '.png'
+    if path is None:
+        path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    save_name = directory + '/compare' + '.png'
     backend.select.run_matlab(
         suppress = suppress,
         script_relpath = './matlab/delden_compare.m',
@@ -188,7 +202,16 @@ def save_plots_compare(directory:str, suppress:bool = True):
         )
     )
 
-    save_name = directory + '_hist' + '.png'
+    save_name = directory + '/compare_01' + '.png'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delden_compare_01.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name = directory + '/hist' + '.png'
     backend.select.run_matlab(
         suppress = suppress,
         script_relpath = './matlab/delden_hist.m',
@@ -197,10 +220,19 @@ def save_plots_compare(directory:str, suppress:bool = True):
         )
     )
 
-    save_name_1 = directory + '_chart_exps' + '.png'
-    save_name_2 = directory + '_chart_exps' + '.pdf'
-    save_name_3 = directory + '_chart_exps_log' + '.png'
-    save_name_4 = directory + '_chart_exps_log' + '.pdf'
+    save_name = directory + '/hist_01' + '.png'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delden_hist_01.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name_1 = directory + '/chart_exps' + '.png'
+    save_name_2 = directory + '/chart_exps' + '.pdf'
+    save_name_3 = directory + '/chart_exps_log' + '.png'
+    save_name_4 = directory + '/chart_exps_log' + '.pdf'
     backend.select.run_matlab(
         suppress = suppress,
         script_relpath = './matlab/delden_chart_exps.m',
@@ -213,10 +245,10 @@ def save_plots_compare(directory:str, suppress:bool = True):
         )
     )
 
-    save_name_1 = directory + '_chart_exps_best' + '.png'
-    save_name_2 = directory + '_chart_exps_best' + '.pdf'
-    save_name_3 = directory + '_chart_exps_best_log' + '.png'
-    save_name_4 = directory + '_chart_exps_best_log' + '.pdf'
+    save_name_1 = directory + '/chart_exps_best' + '.png'
+    save_name_2 = directory + '/chart_exps_best' + '.pdf'
+    save_name_3 = directory + '/chart_exps_best_log' + '.png'
+    save_name_4 = directory + '/chart_exps_best_log' + '.pdf'
     backend.select.run_matlab(
         suppress = suppress,
         script_relpath = './matlab/delden_chart_exps_best.m',
@@ -229,10 +261,10 @@ def save_plots_compare(directory:str, suppress:bool = True):
         )
     )
 
-    save_name_1 = directory + '_chart_exps_worst' + '.png'
-    save_name_2 = directory + '_chart_exps_worst' + '.pdf'
-    save_name_3 = directory + '_chart_exps_worst_log' + '.png'
-    save_name_4 = directory + '_chart_exps_worst_log' + '.pdf'
+    save_name_1 = directory + '/chart_exps_worst' + '.png'
+    save_name_2 = directory + '/chart_exps_worst' + '.pdf'
+    save_name_3 = directory + '/chart_exps_worst_log' + '.png'
+    save_name_4 = directory + '/chart_exps_worst_log' + '.pdf'
     backend.select.run_matlab(
         suppress = suppress,
         script_relpath = './matlab/delden_chart_exps_worst.m',
@@ -797,6 +829,34 @@ def procedure_delden_groups_log():
     parsers.combine_deldensity_results(path)
     save_plots_compare(directory)
 
+def procedure_delden_compare():
+
+    terminal.reset_screen()
+    directory_1 = 'All_1'
+    directory_2 = 'All_Log_2'
+    directory = f'compare_{directory_1}_{directory_2}'
+    path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    save_name = directory + '/compare' + '.png'
+    backend.select.run_matlab(
+        script_relpath = './matlab/delden_log_compare.m',
+        variables = (
+            f"directory_1 = \'{directory_1}\'; directory_2 = \'{directory_2}\';"
+            f" save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name = directory + '/compare_01' + '.png'
+    backend.select.run_matlab(
+        script_relpath = './matlab/delden_log_compare_01.m',
+        variables = (
+            f"directory_1 = \'{directory_1}\'; directory_2 = \'{directory_2}\';"
+            f" save_name = \'{save_name}\';"
+        )
+    )
+
 def procedure_sync():
 
     BucketManager.sync()
@@ -895,10 +955,10 @@ def procedure_uninstall():
 
 args = parse_args()
 
-if args.unit_tests is True:
+if args.unit_tests:
     tests.run_tests()
 
-if args.split is True:
+if args.split:
     BucketManager.download('bins')
     backend.binfo.Binfo.load_data()
     preset = defaults.split_defaults
@@ -915,50 +975,57 @@ if args.split is True:
     else:
         procedure_split()
 
-if args.train_DNN is True:
+if args.train_DNN:
     BucketManager.download('bins')
     procedure_train_DNN()
 
-if args.score_DNN is True:
+if args.score_DNN:
     procedure_score_DNN()
 
-if args.test is True:
+if args.test:
 
-    directory = 'combined_2020-10-06 03:09:27.034176'
-    save_plots_compare(directory)
+    directories = [
+        'All_1', 'Groups_1', 'All_Log_1', 'Groups_Log_1', 'All_Log_2',
+        'Groups_Log_2'
+    ]
+    for i in directories:
+        save_plots_compare(i, suppress = False)
 
-if args.cluster is True:
+if args.cluster:
     procedure_cluster()
 
-if args.delden is True:
+if args.delden:
     procedure_delden()
 
-if args.delden_all is True:
+if args.delden_all:
     procedure_delden_all()
 
-if args.delden_all_log is True:
+if args.delden_all_log:
     procedure_delden_all_log()
 
-if args.delden_groups is True:
+if args.delden_groups:
     procedure_delden_groups()
 
-if args.delden_groups_log is True:
+if args.delden_groups_log:
     procedure_delden_groups_log()
 
-if args.sync is True:
+if args.delden_compare:
+    procedure_delden_compare()
+
+if args.sync:
     procedure_sync()
 
-if args.force_sync is True:
+if args.force_sync:
     procedure_force_sync()
 
-if args.delden_combine is True:
+if args.delden_combine:
     procedure_delden_combine()
 
-if args.matlab is True:
+if args.matlab:
     procedure_matlab()
 
-if args.install is True:
+if args.install:
     procedure_install()
 
-if args.uninstall is True:
+if args.uninstall:
     procedure_uninstall()

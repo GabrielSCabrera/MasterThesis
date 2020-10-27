@@ -69,8 +69,12 @@ for i = 1:N_plots
   ax = subplot(closest_square, closest_square, i);
   axes(ax);
   line1 = plot(a, b, 'bx', 'MarkerSize', 4);
-  xlim(diag_ac);
-  ylim(diag_bd);
+  if diag_ac(1) < diag_ac(2)
+    xlim(diag_ac);
+  end
+  if diag_bd(1) < diag_bd(2)
+    ylim(diag_bd);
+  end
   title(title_string, 'Units', 'normalized', 'Position', [0.5, -0.2, 0]);
   ax.FontSize = 5;
   hold on
@@ -160,13 +164,19 @@ for i = 1:N_plots
   ax = subplot(closest_square, closest_square, i);
   axes(ax);
 
-  diag_x = [min([min(a(a > 0)), min(c(c > 0))]) max([max(a(a > 0)), max(c(c > 0))])];
-  diag_y = [min([min(b(b > 0)), min(d(d > 0))]) max([max(b(b > 0)), max(d(d > 0))])];
+  % diag_x = [min([min(a(a > 0)), min(c(c > 0))]) max([max(a(a > 0)), max(c(c > 0))])];
+  % diag_y = [min([min(b(b > 0)), min(d(d > 0))]) max([max(b(b > 0)), max(d(d > 0))])];
+  diag_x = [min([min(a), min(c)]) max([max(a), max(c)])];
+  diag_y = [min([min(b), min(d)]) max([max(b), max(d)])];
   diag_line = linspace(-100, 100, 5E3);
 
   line1 = loglog(a, b, 'bx', 'MarkerSize', 4);
-  xlim([diag_x(1) diag_x(2)]);
-  ylim([diag_y(1) diag_y(2)]);
+  if diag_x(1) < diag_x(2)
+    xlim([diag_x(1) diag_x(2)]);
+  end
+  if diag_y(1) < diag_y(2)
+    ylim([diag_y(1) diag_y(2)]);
+  end
   title(title_string, 'Units', 'normalized', 'Position', [0.5, -0.2, 0]);
   ax.FontSize = 5;
   hold on
