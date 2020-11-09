@@ -66,6 +66,10 @@ def parse_args():
         'Compares two different sets of calculations and plots their results.'
     )
 
+    help_delvol_all = (
+        'Perform analyses on the all experiments using delvol data.'
+    )
+
     help_sync = (
         'Synchronizes the local data with the complete dataset collection, but '
         'only if the local files are of a different size than those hosted '
@@ -132,6 +136,9 @@ def parse_args():
     parser.add_argument(
         '--delden-compare', action='store_true',
         help = help_delden_compare
+    )
+    parser.add_argument(
+        '--delvol-all', action='store_true', help = help_delvol_all
     )
     parser.add_argument(
         '--sync', action='store_true', help = help_sync
@@ -832,7 +839,7 @@ def procedure_delden_groups_log():
 def procedure_delden_compare():
 
     terminal.reset_screen()
-    directory_1 = 'All_1'
+    directory_1 = 'All_2'
     directory_2 = 'All_Log_2'
     directory = f'compare_{directory_1}_{directory_2}'
     path = backend.config.matlab_img_relpath
@@ -856,6 +863,43 @@ def procedure_delden_compare():
             f" save_name = \'{save_name}\';"
         )
     )
+
+def procedure_delvol_all():
+
+    BucketManager.download('delvol_data')
+    terminal.reset_screen()
+
+    title = 'How many experiments to run?'
+    val_range = [0, 100]
+    N_experiments = select.select_int(title, val_range)
+    exps = backend.groups.delvol_exps['all']
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
+    }
+
+    terminal.reset_screen()
+
+    directory = backend.utils.select.create_unique_name(prefix = 'combined')
+    path = backend.config.delvol_relpath / directory
+    path.mkdir(exist_ok = True)
+    length = len(exps)
+    for n,i in enumerate(exps):
+        title = backend.utils.format.B(f'EXPERIMENT {i} ')
+        title += backend.utils.format.I(f'({n+1}/{length})')
+        delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
+        delvol.set_experiments(i)
+        delvol.grid_search(
+            itermax = N_experiments, train_size = 0.75, **gridsearch_params
+        )
+        delvol.save(filename = i)
+
+    parsers.combine_delvol_results(path)
+    save_plots_compare(directory)
 
 def procedure_sync():
 
@@ -985,8 +1029,7 @@ if args.score_DNN:
 if args.test:
 
     directories = [
-        'All_1', 'Groups_1', 'All_Log_1', 'Groups_Log_1', 'All_Log_2',
-        'Groups_Log_2'
+        'All_2', 'Groups_2'
     ]
     for i in directories:
         save_plots_compare(i, suppress = False)
@@ -1011,6 +1054,9 @@ if args.delden_groups_log:
 
 if args.delden_compare:
     procedure_delden_compare()
+
+if args.delvol_all:
+    procedure_delvol_all()
 
 if args.sync:
     procedure_sync()

@@ -1,6 +1,5 @@
-"""In files damage_EXP_s25.txt"""
-
 delden_labels = {}
+delvol_labels = {}
 
 delden_labels["del_den"] = "Change in fracture density from this scan to the next."
 delden_labels["glob_den"] = "Current global fracture density."

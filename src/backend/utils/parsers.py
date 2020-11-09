@@ -118,3 +118,74 @@ def combine_deldensity_results(experiment:str, directory:Path = None) -> None:
     out = out[:-1]
     with open(path / filename, 'w+') as outfile:
         outfile.write(out)
+
+def combine_delvol_results(experiment:str, directory:Path = None) -> None:
+    '''
+        Takes results from a set of delvol experiments saved in a folder of
+        format `/combined_YYYY-MM-DD HH:MM:SS.XXXXXX`, which are by default
+        saved to `~/Documents/MasterThesis/results/delvol`.
+    '''
+    if directory is None:
+        directory = config.delvol_relpath
+
+    path = directory / experiment
+    temp = list(path.glob('*'))
+    experiments = []
+    for i in temp:
+        if i.is_dir():
+            experiments.append(i)
+
+    N_experiments = len(experiments)
+
+    avg_R2_train = np.zeros(N_experiments, dtype = np.float64)
+    avg_R2_test = np.zeros(N_experiments, dtype = np.float64)
+    avg_rmse_train = np.zeros(N_experiments, dtype = np.float64)
+    avg_rmse_test = np.zeros(N_experiments, dtype = np.float64)
+
+    std_R2_train = np.zeros(N_experiments, dtype = np.float64)
+    std_R2_test = np.zeros(N_experiments, dtype = np.float64)
+    std_rmse_train = np.zeros(N_experiments, dtype = np.float64)
+    std_rmse_test = np.zeros(N_experiments, dtype = np.float64)
+
+    for n,i in enumerate(experiments):
+
+        R2_train = []
+        R2_test = []
+        rmse_train = []
+        rmse_test = []
+        with open(i / 'scores.csv', 'r') as infile:
+            for line in infile:
+                scores = list(map(float, line.split(',')))
+                R2_train.append(scores[0])
+                R2_test.append(scores[1])
+                rmse_train.append(scores[2])
+                rmse_test.append(scores[3])
+
+        avg_R2_train[n] = np.mean(R2_train)
+        avg_R2_test[n] = np.mean(R2_test)
+        avg_rmse_train[n] = np.mean(rmse_train)
+        avg_rmse_test[n] = np.mean(rmse_test)
+
+        std_R2_train[n] = np.std(R2_train)
+        std_R2_test[n] = np.std(R2_test)
+        std_rmse_train[n] = np.std(rmse_train)
+        std_rmse_test[n] = np.std(rmse_test)
+
+    scores = np.zeros((N_experiments, 8))
+    for i in range(N_experiments):
+        scores[i] = np.array([
+            avg_R2_train[i], avg_R2_test[i], avg_rmse_train[i],
+            avg_rmse_test[i], std_R2_train[i], std_R2_test[i],
+            std_rmse_train[i], std_rmse_test[i]
+        ])
+
+    filename = 'scores.csv'
+    out = ''
+    for n,row in enumerate(scores):
+        out += f'{experiments[n].name},'
+        for i in row:
+            out += f'{i:f},'
+        out = out[:-1] + '\n'
+    out = out[:-1]
+    with open(path / filename, 'w+') as outfile:
+        outfile.write(out)

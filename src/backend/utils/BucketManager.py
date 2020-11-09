@@ -227,12 +227,24 @@ class BucketManager:
                 Path('input_txts') / 'WG04_3D_frac_full_a1000.txt',
                 Path('input_txts') / 'M8_1_3D_frac_full_a500.txt',
                 Path('input_txts') / 'M8_2_3D_frac_full_a2000.txt',
-            ]
+            ],
+            'delvol_data' : [
+                Path('delvol_data') / 'M8_1_3D_delvol_a3000_subv300.txt',
+                Path('delvol_data') / 'M8_2_3D_delvol_a3000_subv300.txt',
+                Path('delvol_data') / 'MONZ3_3D_delvol_a3000_subv300.txt',
+                Path('delvol_data') / 'MONZ4_3D_delvol_a3000_subv300.txt',
+                Path('delvol_data') / 'MONZ5_3D_delvol_a3000_subv300.txt',
+                Path('delvol_data') / 'WG01_3D_delvol_a3000_subv300.txt',
+                Path('delvol_data') / 'WG02_3D_delvol_a3000_subv300.txt',
+                Path('delvol_data') / 'WG04_3D_delvol_a3000_subv300.txt',
+            ],
         }
 
         datasets_local = {
             'density_data' : [config.density_data_relpath,],
             'bins' : [config.bins_relpath,],
+            'input_txts' : [config.input_txts_relpath,],
+            'delvol_data' : [config.delvol_data_relpath,],
         }
 
         local_files = cls._inspect_files_local(datasets_local[dataset])

@@ -21,6 +21,7 @@ data_url_root = Path(
 data_url = data_url_root / "data"
 bins_url = data_url / "bins"
 density_data_url = data_url / "density_data"
+denvolden_data_url = data_url / "delvol_data"
 
 data_path = storage_path / "data"
 results_path = storage_path / "results"
@@ -32,10 +33,12 @@ split_bins_relpath = data_path / "split_bins"
 DNN_models_relpath = data_path / "DNN_models"
 clusters_relpath = data_path / "clusters"
 density_data_relpath = data_path / "density_data"
+delvol_data_relpath = data_path / "delvol_data"
 
 plot_2D_relpath = results_path / "img_2D"
 plot_3D_relpath = results_path / "img_3D"
 delden_relpath = results_path / "delden"
+delvol_relpath = results_path / "delvol"
 
 matlab_data_relpath = data_path / "matlab"
 matlab_results_relpath = results_path / "matlab"
@@ -45,7 +48,6 @@ matlab_img_relpath = matlab_results_relpath / "img"
 delden_pred_str = "del_den"
 delden_savename = "delden_results"
 delden_datafile = "damage_{}_s25_d9.txt"
-# delden_datafile = "damage_{}_s25.txt"
 delden_xgb_obj = "reg:squarederror"
 delden_cv_folds = 10
 delden_train_data = "y_train.csv"
@@ -53,6 +55,17 @@ delden_test_data = "y_test.csv"
 delden_train_pred_data = "y_train_pred.csv"
 delden_test_pred_data = "y_test_pred.csv"
 delden_scores_data = "scores.csv"
+
+delvol_pred_str = "delv50"
+delvol_savename = "delden_results"
+delvol_datafile = "{}_3D_delvol_a3000_subv300.txt"
+delvol_xgb_obj = "reg:squarederror"
+delvol_cv_folds = 10
+delvol_train_data = "y_train.csv"
+delvol_test_data = "y_test.csv"
+delvol_train_pred_data = "y_train_pred.csv"
+delvol_test_pred_data = "y_test_pred.csv"
+delvol_scores_data = "scores.csv"
 
 DNN_model_extension = ".dnn"
 cluster_dir_labels = "CL{:05d}"
@@ -77,6 +90,8 @@ split_bins_relpath.mkdir(exist_ok=True)
 DNN_models_relpath.mkdir(exist_ok=True)
 clusters_relpath.mkdir(exist_ok=True)
 density_data_relpath.mkdir(exist_ok=True)
+delvol_data_relpath.mkdir(exist_ok=True)
+delvol_relpath.mkdir(exist_ok=True)
 plot_2D_relpath.mkdir(exist_ok=True)
 plot_3D_relpath.mkdir(exist_ok=True)
 delden_relpath.mkdir(exist_ok=True)
