@@ -1,4 +1,4 @@
-from pathlib import Path
+DelVolDensityfrom pathlib import Path
 import numpy as np
 import argparse
 import time
@@ -1094,7 +1094,7 @@ def procedure_delvol_all_log():
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
-        delvol = delvolsity.delvolsity(save_dir = path, title = title)
+        delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
         delvol.set_experiments(i)
         delvol.grid_search(
             itermax = N_experiments, train_size = 0.75, log = True,
@@ -1102,7 +1102,7 @@ def procedure_delvol_all_log():
         )
         delvol.save(filename = i)
 
-    parsers.combine_delvolsity_results(path)
+    parsers.combine_delden_results(path)
     save_plot_delvol(directory)
 
 def procedure_delvol_groups():
@@ -1133,7 +1133,7 @@ def procedure_delvol_groups():
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENTS {", ".join(i)} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
-        delvol = delvolsity.delvolsity(save_dir = path, title = title)
+        delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
         delvol.set_experiments(*i)
         delvol.grid_search(
             itermax = N_experiments, train_size = 0.75,
@@ -1141,7 +1141,7 @@ def procedure_delvol_groups():
         )
         delvol.save(filename = '-'.join(i))
 
-    parsers.combine_delvolsity_results(path)
+    parsers.combine_deldensity_results(path)
     save_plot_delvol(directory)
 
 def procedure_delvol_groups_log():
@@ -1172,7 +1172,7 @@ def procedure_delvol_groups_log():
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENTS {", ".join(i)} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
-        delvol = delvolsity.delvolsity(save_dir = path, title = title)
+        delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
         delvol.set_experiments(*i)
         delvol.grid_search(
             itermax = N_experiments, train_size = 0.75, log = True,
@@ -1180,7 +1180,7 @@ def procedure_delvol_groups_log():
         )
         delvol.save(filename = '-'.join(i))
 
-    parsers.combine_delvolsity_results(path)
+    parsers.combine_deldensity_results(path)
     save_plot_delvol(directory)
 
 def procedure_sync():
