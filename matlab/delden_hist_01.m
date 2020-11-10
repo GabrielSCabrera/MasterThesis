@@ -1,4 +1,4 @@
-[r2_train_scores, r2_test_scores, folders] = utils.load_R2_from_combined(directory);
+[r2_train_scores, r2_test_scores, folders] = delden_utils.load_R2_from_combined(directory);
 [rows, cols] = size(r2_train_scores);
 R2_train_idx = 1;
 R2_test_idx = 2;
@@ -18,6 +18,6 @@ set(gca, 'xtick', 1:cols, 'xticklabel', folders);
 scaler = 0.1;
 xlim([1-cols*scaler cols+cols*scaler]);
 ylim([0 1]);
-utils.save_plot(fig, save_name);
+delden_utils.save_plot(fig, save_name);
 hold off
 exit();

@@ -70,6 +70,22 @@ def parse_args():
         'Perform analyses on the all experiments using delvol data.'
     )
 
+    help_delvol_all_log = (
+        'Perform analyses on the all experiments using delvol data.  '
+        'Begins by taking the logarithm of all values.'
+    )
+
+    help_delvol_groups = (
+        'Perform analyses on the all experiments using delvol data, combining '
+        'experiments containing identical rock types.'
+    )
+
+    help_delvol_groups_log = (
+        'Perform analyses on the all experiments using delvol data, combining '
+        'experiments containing identical rock types.  '
+        'Begins by taking the logarithm of all values.'
+    )
+
     help_sync = (
         'Synchronizes the local data with the complete dataset collection, but '
         'only if the local files are of a different size than those hosted '
@@ -141,6 +157,16 @@ def parse_args():
         '--delvol-all', action='store_true', help = help_delvol_all
     )
     parser.add_argument(
+        '--delvol-all-log', action='store_true', help = help_delvol_all_log
+    )
+    parser.add_argument(
+        '--delvol-groups', action='store_true', help = help_delvol_groups
+    )
+    parser.add_argument(
+        '--delvol-groups-log', action='store_true',
+        help = help_delvol_groups_log
+    )
+    parser.add_argument(
         '--sync', action='store_true', help = help_sync
     )
     parser.add_argument(
@@ -190,7 +216,7 @@ def display_status():
 
 """FUNCTIONS"""
 
-def save_plots_compare(directory:str, path:Path = None, suppress:bool = True):
+def save_plot_delden(directory:str, path:Path = None, suppress:bool = True):
     '''
         Saves a variety of plots for the `compare` results of delden.
     '''
@@ -275,6 +301,100 @@ def save_plots_compare(directory:str, path:Path = None, suppress:bool = True):
     backend.select.run_matlab(
         suppress = suppress,
         script_relpath = './matlab/delden_chart_exps_worst.m',
+        variables = (
+            f"directory = \'{directory}\'; "
+            f"save_name_1 = \'{save_name_1}\'; "
+            f"save_name_2 = \'{save_name_2}\'; "
+            f"save_name_3 = \'{save_name_3}\'; "
+            f"save_name_4 = \'{save_name_4}\'; "
+        )
+    )
+
+def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
+    '''
+        Saves a variety of plots for the `compare` results of delvol.
+    '''
+
+    if path is None:
+        path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    save_name = directory + '/compare' + '.png'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_compare.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name = directory + '/compare_01' + '.png'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_compare_01.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name = directory + '/hist' + '.png'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_hist.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name = directory + '/hist_01' + '.png'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_hist_01.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name_1 = directory + '/chart_exps' + '.png'
+    save_name_2 = directory + '/chart_exps' + '.pdf'
+    save_name_3 = directory + '/chart_exps_log' + '.png'
+    save_name_4 = directory + '/chart_exps_log' + '.pdf'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_chart_exps.m',
+        variables = (
+            f"directory = \'{directory}\'; "
+            f"save_name_1 = \'{save_name_1}\'; "
+            f"save_name_2 = \'{save_name_2}\'; "
+            f"save_name_3 = \'{save_name_3}\'; "
+            f"save_name_4 = \'{save_name_4}\'; "
+        )
+    )
+
+    save_name_1 = directory + '/chart_exps_best' + '.png'
+    save_name_2 = directory + '/chart_exps_best' + '.pdf'
+    save_name_3 = directory + '/chart_exps_best_log' + '.png'
+    save_name_4 = directory + '/chart_exps_best_log' + '.pdf'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_chart_exps_best.m',
+        variables = (
+            f"directory = \'{directory}\'; "
+            f"save_name_1 = \'{save_name_1}\'; "
+            f"save_name_2 = \'{save_name_2}\'; "
+            f"save_name_3 = \'{save_name_3}\'; "
+            f"save_name_4 = \'{save_name_4}\'; "
+        )
+    )
+
+    save_name_1 = directory + '/chart_exps_worst' + '.png'
+    save_name_2 = directory + '/chart_exps_worst' + '.pdf'
+    save_name_3 = directory + '/chart_exps_worst_log' + '.png'
+    save_name_4 = directory + '/chart_exps_worst_log' + '.pdf'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_chart_exps_worst.m',
         variables = (
             f"directory = \'{directory}\'; "
             f"save_name_1 = \'{save_name_1}\'; "
@@ -718,7 +838,7 @@ def procedure_delden_all():
         delden.save(filename = i)
 
     parsers.combine_deldensity_results(path)
-    save_plots_compare(directory)
+    save_plot_delden(directory)
 
 def procedure_delden_all_log():
 
@@ -756,7 +876,7 @@ def procedure_delden_all_log():
         delden.save(filename = i)
 
     parsers.combine_deldensity_results(path)
-    save_plots_compare(directory)
+    save_plot_delden(directory)
 
 def procedure_delden_groups():
 
@@ -795,7 +915,7 @@ def procedure_delden_groups():
         delden.save(filename = '-'.join(i))
 
     parsers.combine_deldensity_results(path)
-    save_plots_compare(directory)
+    save_plot_delden(directory)
 
 def procedure_delden_groups_log():
 
@@ -834,7 +954,7 @@ def procedure_delden_groups_log():
         delden.save(filename = '-'.join(i))
 
     parsers.combine_deldensity_results(path)
-    save_plots_compare(directory)
+    save_plot_delden(directory)
 
 def procedure_delden_compare():
 
@@ -858,6 +978,52 @@ def procedure_delden_compare():
     save_name = directory + '/compare_01' + '.png'
     backend.select.run_matlab(
         script_relpath = './matlab/delden_log_compare_01.m',
+        variables = (
+            f"directory_1 = \'{directory_1}\'; directory_2 = \'{directory_2}\';"
+            f" save_name = \'{save_name}\';"
+        )
+    )
+
+def procedure_delvol_compare():
+
+    terminal.reset_screen()
+    directory_1 = 'All_2'
+    directory_2 = 'All_Log_2'
+    directory = f'compare_{directory_1}_{directory_2}'
+    path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    save_name = directory + '/compare' + '.png'
+    backend.select.run_matlab(
+        script_relpath = './matlab/delvol_compare.m',
+        variables = (
+            f"directory_1 = \'{directory_1}\'; directory_2 = \'{directory_2}\';"
+            f" save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name = directory + '/compare_01' + '.png'
+    backend.select.run_matlab(
+        script_relpath = './matlab/delvol_compare_01.m',
+        variables = (
+            f"directory_1 = \'{directory_1}\'; directory_2 = \'{directory_2}\';"
+            f" save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name = directory + '/log_compare' + '.png'
+    backend.select.run_matlab(
+        script_relpath = './matlab/delvol_log_compare.m',
+        variables = (
+            f"directory_1 = \'{directory_1}\'; directory_2 = \'{directory_2}\';"
+            f" save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name = directory + '/log_compare_01' + '.png'
+    backend.select.run_matlab(
+        script_relpath = './matlab/delvol_log_compare_01.m',
         variables = (
             f"directory_1 = \'{directory_1}\'; directory_2 = \'{directory_2}\';"
             f" save_name = \'{save_name}\';"
@@ -899,7 +1065,123 @@ def procedure_delvol_all():
         delvol.save(filename = i)
 
     parsers.combine_delvol_results(path)
-    save_plots_compare(directory)
+    save_plot_delden(directory)
+
+def procedure_delvol_all_log():
+
+    BucketManager.download('density_data')
+    terminal.reset_screen()
+
+    title = 'How many experiments to run?'
+    val_range = [0, 100]
+    N_experiments = select.select_int(title, val_range)
+    exps = backend.groups.delvol_exps['all']
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
+    }
+
+    terminal.reset_screen()
+
+    directory = backend.utils.select.create_unique_name(prefix = 'combined')
+    path = backend.config.delvol_relpath / directory
+    path.mkdir(exist_ok = True)
+    length = len(exps)
+    for n,i in enumerate(exps):
+        title = backend.utils.format.B(f'EXPERIMENT {i} ')
+        title += backend.utils.format.I(f'({n+1}/{length})')
+        delvol = delvolsity.delvolsity(save_dir = path, title = title)
+        delvol.set_experiments(i)
+        delvol.grid_search(
+            itermax = N_experiments, train_size = 0.75, log = True,
+            **gridsearch_params
+        )
+        delvol.save(filename = i)
+
+    parsers.combine_delvolsity_results(path)
+    save_plot_delvol(directory)
+
+def procedure_delvol_groups():
+
+    BucketManager.download('density_data')
+    terminal.reset_screen()
+
+    title = 'How many experiments to run?'
+    val_range = [0, 100]
+    N_experiments = select.select_int(title, val_range)
+    opts = backend.groups.delvol_exps
+    exps = [opts['WG'], opts['M8'], opts['MONZ']]
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
+    }
+
+    terminal.reset_screen()
+
+    directory = backend.utils.select.create_unique_name(prefix = 'combined')
+    path = backend.config.delvol_relpath / directory
+    path.mkdir(exist_ok = True)
+    length = len(exps)
+    for n,i in enumerate(exps):
+        title = backend.utils.format.B(f'EXPERIMENTS {", ".join(i)} ')
+        title += backend.utils.format.I(f'({n+1}/{length})')
+        delvol = delvolsity.delvolsity(save_dir = path, title = title)
+        delvol.set_experiments(*i)
+        delvol.grid_search(
+            itermax = N_experiments, train_size = 0.75,
+            **gridsearch_params
+        )
+        delvol.save(filename = '-'.join(i))
+
+    parsers.combine_delvolsity_results(path)
+    save_plot_delvol(directory)
+
+def procedure_delvol_groups_log():
+
+    BucketManager.download('density_data')
+    terminal.reset_screen()
+
+    title = 'How many experiments to run?'
+    val_range = [0, 100]
+    N_experiments = select.select_int(title, val_range)
+    opts = backend.groups.delvol_exps
+    exps = [opts['WG'], opts['M8'], opts['MONZ']]
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
+    }
+
+    terminal.reset_screen()
+
+    directory = backend.utils.select.create_unique_name(prefix = 'combined')
+    path = backend.config.delvol_relpath / directory
+    path.mkdir(exist_ok = True)
+    length = len(exps)
+    for n,i in enumerate(exps):
+        title = backend.utils.format.B(f'EXPERIMENTS {", ".join(i)} ')
+        title += backend.utils.format.I(f'({n+1}/{length})')
+        delvol = delvolsity.delvolsity(save_dir = path, title = title)
+        delvol.set_experiments(*i)
+        delvol.grid_search(
+            itermax = N_experiments, train_size = 0.75, log = True,
+            **gridsearch_params
+        )
+        delvol.save(filename = '-'.join(i))
+
+    parsers.combine_delvolsity_results(path)
+    save_plot_delvol(directory)
 
 def procedure_sync():
 
@@ -1027,12 +1309,7 @@ if args.score_DNN:
     procedure_score_DNN()
 
 if args.test:
-
-    directories = [
-        'All_2', 'Groups_2'
-    ]
-    for i in directories:
-        save_plots_compare(i, suppress = False)
+    save_plot_delvol('combined_2020-11-09 14:41:20.861630', suppress = False)
 
 if args.cluster:
     procedure_cluster()
@@ -1057,6 +1334,15 @@ if args.delden_compare:
 
 if args.delvol_all:
     procedure_delvol_all()
+
+if args.delvol_all_log:
+    procedure_delvol_all_log()
+
+if args.delvol_groups:
+    procedure_delvol_groups()
+
+if args.delvol_groups_log:
+    procedure_delvol_groups_log()
 
 if args.sync:
     procedure_sync()

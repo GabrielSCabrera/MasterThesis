@@ -1,4 +1,4 @@
-[y_train, y_test, y_train_pred, y_test_pred, r2_train, r2_test, scores, folders] = utils.load_best_from_combined(directory);
+[y_train, y_test, y_train_pred, y_test_pred, r2_train, r2_test, scores, folders] = delden_utils.load_best_from_combined(directory);
 
 N_plots = size(y_train);
 N_plots = N_plots(2);
@@ -19,6 +19,7 @@ for i = 1:N_plots
   end
 
   [maximum, idx] = max(r2_tests);
+  title_string = sprintf(format_spec, label, r2_train_str, maximum);
 
   a0 = table2array(y_train{i}(idx,:));
   b0 = table2array(y_train_pred{i}(idx,:));
@@ -99,15 +100,14 @@ newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
 
-utils.save_plot(fig, save_name_1);
-utils.save_plot(fig, save_name_2);
+delden_utils.save_plot(fig, save_name_1);
+delden_utils.save_plot(fig, save_name_2);
 
 for i = 1:N_plots
   r2_train_str = r2_train(i);
   r2_test_str = r2_test(i);
   label = folders{i};
   format_spec = '%s; R^2 Train = %.2f, Test = %.2f';
-  title_string = sprintf(format_spec, label, r2_train_str, r2_test_str);
   r2_tests = zeros(height(y_test{i}), 0);
 
   for j = 1:height(y_train{i})
@@ -116,6 +116,7 @@ for i = 1:N_plots
   end
 
   [maximum, idx] = max(r2_tests);
+  title_string = sprintf(format_spec, label, r2_train_str, maximum);
 
   a0 = table2array(y_train{i}(idx,:));
   b0 = table2array(y_train_pred{i}(idx,:));
@@ -202,7 +203,7 @@ newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
 
-utils.save_plot(fig, save_name_3);
-utils.save_plot(fig, save_name_4);
+delden_utils.save_plot(fig, save_name_3);
+delden_utils.save_plot(fig, save_name_4);
 
 exit

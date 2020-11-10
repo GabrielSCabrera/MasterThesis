@@ -1,5 +1,5 @@
 directory = "M8_1";
-[y_train, y_test, y_train_pred, y_test_pred, scores] = delden_utils.load_from_delden(directory);
+[y_train, y_test, y_train_pred, y_test_pred, scores] = delvol_utils.load_from_delvol(directory);
 N_plots = height(y_train);
 
 closest_square = ceil(sqrt(double(N_plots)));
@@ -46,8 +46,8 @@ newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
 
-delden_utils.save_plot(fig, "delden_results.png");
-delden_utils.save_plot(fig, "delden_results.pdf");
+delvol_utils.save_plot(fig, "delvol_results.png");
+delvol_utils.save_plot(fig, "delvol_results.pdf");
 
 for i = 1:N_plots
   r2_train = table2array(scores(i,1));
@@ -92,7 +92,7 @@ newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
 
-delden_utils.save_plot(fig, "delden_results_log.png");
-delden_utils.save_plot(fig, "delden_results_log.pdf");
+delvol_utils.save_plot(fig, "delvol_results_log.png");
+delvol_utils.save_plot(fig, "delvol_results_log.pdf");
 
 exit

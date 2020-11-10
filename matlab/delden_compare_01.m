@@ -1,4 +1,4 @@
-[scores] = utils.load_from_combined(directory);
+[scores] = delden_utils.load_from_combined(directory);
 N_experiments = height(scores);
 avg_idx = 2;
 std_idx = 6;
@@ -15,5 +15,5 @@ set(gca, 'xtick', xpoints, 'xticklabel', scores.Properties.RowNames);
 xlabel('Experiment (Rock Type Abbreviation)');
 ylabel('R^2 Average Score and Standard Deviation');
 grid();
-utils.save_plot(fig, save_name);
+delden_utils.save_plot(fig, save_name);
 exit();

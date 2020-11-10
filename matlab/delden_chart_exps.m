@@ -1,4 +1,4 @@
-[y_train, y_test, y_train_pred, y_test_pred, r2_train, r2_test, folders] = utils.load_all_from_combined(directory);
+[y_train, y_test, y_train_pred, y_test_pred, r2_train, r2_test, folders] = delden_utils.load_all_from_combined(directory);
 
 N_plots = size(y_train);
 N_plots = N_plots(2);
@@ -95,8 +95,8 @@ newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
 
-utils.save_plot(fig, save_name_1);
-utils.save_plot(fig, save_name_2);
+delden_utils.save_plot(fig, save_name_1);
+delden_utils.save_plot(fig, save_name_2);
 
 for i = 1:N_plots
   r2_train_str = r2_train(i);
@@ -193,7 +193,7 @@ newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
 
-utils.save_plot(fig, save_name_3);
-utils.save_plot(fig, save_name_4);
+delden_utils.save_plot(fig, save_name_3);
+delden_utils.save_plot(fig, save_name_4);
 
 exit

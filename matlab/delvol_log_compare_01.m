@@ -1,5 +1,5 @@
-[r2_train_scores_1, r2_test_scores_1, folders] = delden_utils.load_R2_from_combined(directory_1);
-[r2_train_scores_2, r2_test_scores_2, folders] = delden_utils.load_R2_from_combined(directory_2);
+[r2_train_scores_1, r2_test_scores_1, folders] = delvol_utils.load_R2_from_combined(directory_1);
+[r2_train_scores_2, r2_test_scores_2, folders] = delvol_utils.load_R2_from_combined(directory_2);
 [rows_1, cols_1] = size(r2_train_scores_1);
 [rows_2, cols_2] = size(r2_train_scores_2);
 R2_train_idx = 1;
@@ -29,6 +29,6 @@ ylim([0 1])
 legend([L1, L2],{'Linear', 'Logarithmic'});
 ylabel('R^2 Score')
 xlabel('Experiment')
-delden_utils.save_plot(fig, save_name);
+delvol_utils.save_plot(fig, save_name);
 hold off
 exit();
