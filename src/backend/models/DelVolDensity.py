@@ -264,7 +264,7 @@ class DelVolDensity:
             cv = delvol_cv_folds
 
         estimator = xgb.XGBRegressor(
-            objective = objective, tree_method = 'gpu_hist'
+            objective = objective#, tree_method = 'gpu_hist'
         )
 
         param_grid = self._gridsearch_params(
