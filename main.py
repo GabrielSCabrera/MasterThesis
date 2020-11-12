@@ -837,7 +837,7 @@ def procedure_delden_all():
         )
         delden.save(filename = i)
 
-    parsers.combine_deldensity_results(path)
+    parsers.combine_delden_results(path)
     save_plot_delden(directory)
 
 def procedure_delden_all_log():
@@ -875,7 +875,7 @@ def procedure_delden_all_log():
         )
         delden.save(filename = i)
 
-    parsers.combine_deldensity_results(path)
+    parsers.combine_delden_results(path)
     save_plot_delden(directory)
 
 def procedure_delden_groups():
@@ -914,7 +914,7 @@ def procedure_delden_groups():
         )
         delden.save(filename = '-'.join(i))
 
-    parsers.combine_deldensity_results(path)
+    parsers.combine_delden_results(path)
     save_plot_delden(directory)
 
 def procedure_delden_groups_log():
@@ -953,7 +953,7 @@ def procedure_delden_groups_log():
         )
         delden.save(filename = '-'.join(i))
 
-    parsers.combine_deldensity_results(path)
+    parsers.combine_delden_results(path)
     save_plot_delden(directory)
 
 def procedure_delden_compare():
@@ -1102,7 +1102,7 @@ def procedure_delvol_all_log():
         )
         delvol.save(filename = i)
 
-    parsers.combine_delden_results(path)
+    parsers.combine_delvol_results(path)
     save_plot_delvol(directory)
 
 def procedure_delvol_groups():
@@ -1141,7 +1141,7 @@ def procedure_delvol_groups():
         )
         delvol.save(filename = '-'.join(i))
 
-    parsers.combine_deldensity_results(path)
+    parsers.combine_delvol_results(path)
     save_plot_delvol(directory)
 
 def procedure_delvol_groups_log():
@@ -1180,7 +1180,7 @@ def procedure_delvol_groups_log():
         )
         delvol.save(filename = '-'.join(i))
 
-    parsers.combine_deldensity_results(path)
+    parsers.combine_delvol_results(path)
     save_plot_delvol(directory)
 
 def procedure_sync():
@@ -1231,7 +1231,7 @@ def procedure_delden_combine():
 
     terminal.reset_screen()
     print(format.B('Selected Experiment: ') + format.I(selection))
-    parsers.combine_deldensity_results(selection)
+    parsers.combine_delden_results(selection)
 
 def procedure_matlab():
     directories = [

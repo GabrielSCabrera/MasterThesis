@@ -263,7 +263,9 @@ class DelVolDensity:
         if cv is None:
             cv = delvol_cv_folds
 
-        estimator = xgb.XGBRegressor(objective = objective)
+        estimator = xgb.XGBRegressor(
+            objective = objective, tree_method = 'gpu_hist'
+        )
 
         param_grid = self._gridsearch_params(
             colsample_bytree, alpha, learning_rate, n_estimators, max_depth
@@ -482,7 +484,7 @@ class DelVolDensity:
             return out
 
     def _preprocess(
-    self, train_size:int, log:bool = False) -> pd.DataFrame:
+    self, train_size:int, log:bool = False, split:str = 'time') -> pd.DataFrame:
         '''
             Reads all experiment data and returns a set of scaled & split
             DataFrames.
@@ -491,21 +493,87 @@ class DelVolDensity:
         for exp in self.exps:
             path = self.data_dir / delvol_datafile.format(exp)
             df = self._read_data(path)
-            # if log:
-                # scaler = MinMaxScaler()
-            # else:
-                # scaler = RobustScaler()
             scaler = StandardScaler()
             data = data.append(df, ignore_index = True)
-        # data[:] = scaler.fit_transform(data[:].values)
-        X = np.array(data.drop(self.pred_str, axis = 1))
-        X = scaler.fit_transform(X)
 
-        y = np.array(data[self.pred_str])
+        X = []
+        for n,col in enumerate(data.columns):
+            if col in self.feats:
+                X.append(data.iloc[:,n])
+
+        X = scaler.fit_transform(np.array(X).T)
+
+        y = np.array(data.loc[:,self.pred_str])
+
         if log:
             X, y = self._logarithm(X, y)
 
-        return train_test_split(X, y, train_size = train_size)
+        if split.lower() == 'time':
+            col_label = 'sig_d'
+            col = data.loc[:,col_label]
+            indices = [np.where(col == val)[0] for val in np.unique(col)]
+            lens = np.array([i.shape[0] for i in indices], dtype = np.int64)
+            N_train = int(np.sum(lens)*train_size)
+            done = False
+            lim = min(5E3, lens.shape[0]**2)
+            tol = 0.05
+            while n < lim and done is False:
+                train_idx = []
+                total = 0
+                iter = np.random.choice(
+                    lens.shape[0], lens.shape[0], replace = False
+                )
+                for i in iter:
+                    new_total = lens[i] + total
+                    if N_train - tol <= new_total <= N_train + tol:
+                        total = new_total
+                        done = True
+                        train_idx.append(i)
+                        break
+                    elif new_total > N_train + tol:
+                        continue
+                    else:
+                        total = new_total
+                        train_idx.append(i)
+                n += 1
+            if done is False:
+                msg = (
+                    f'Unable to successfully divide the training and testing '
+                    f'sets by time.  Reason unknown.'
+                )
+                raise RuntimeError(msg)
+
+            test_idx_temp = np.arange(0, lens.shape[0], 1, dtype = np.int64)
+            test_idx = []
+            for idx in test_idx_temp:
+                if idx not in train_idx:
+                    test_idx.append(idx)
+            test_idx = np.array(test_idx)
+
+            X_train = X[train_idx]
+            X_test = X[test_idx]
+
+            y_train = y[train_idx]
+            y_test = y[test_idx]
+
+            rand_train = np.random.choice(
+                X_train.shape[0], X_train.shape[0], replace = False
+            )
+
+            rand_test = np.random.choice(
+                X_test.shape[0], X_test.shape[0], replace = False
+            )
+
+            X_train = X[rand_train]
+            X_test = X[rand_test]
+
+            y_train = y[rand_train]
+            y_test = y[rand_test]
+
+            return X_train, X_test, y_train, y_test
+
+        elif split.lower().startswith('rand'):
+            return train_test_split(X, y, train_size = train_size)
 
     def _logarithm(
     self, X:np.ndarray, y:np.ndarray) -> Tuple[np.ndarray]:

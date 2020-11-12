@@ -48,7 +48,7 @@ def format_bytes(b:int) -> str:
         b /= step
     return f'{b}B'
 
-def combine_deldensity_results(experiment:str, directory:Path = None) -> None:
+def combine_delden_results(experiment:str, directory:Path = None) -> None:
     '''
         Takes results from a set of deldensity experiments saved in a folder of
         format `/combined_YYYY-MM-DD HH:MM:SS.XXXXXX`, which are by default

@@ -6,8 +6,8 @@ seed = 1337
 
 np.random.seed(seed)
 
-n_jobs = 32
-term_width = 79
+n_jobs = -2
+term_width = 80
 
 # MAIN DIRECTORIES
 documents_path = Path.home() / "Documents"
