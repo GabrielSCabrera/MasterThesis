@@ -1065,7 +1065,7 @@ def procedure_delvol_all():
         delvol.save(filename = i)
 
     parsers.combine_delvol_results(path)
-    save_plot_delden(directory)
+    save_plot_delvol(directory)
 
 def procedure_delvol_all_log():
 
@@ -1107,7 +1107,7 @@ def procedure_delvol_all_log():
 
 def procedure_delvol_groups():
 
-    BucketManager.download('density_data')
+    BucketManager.download('delvol_data')
     terminal.reset_screen()
 
     title = 'How many experiments to run?'
@@ -1309,7 +1309,8 @@ if args.score_DNN:
     procedure_score_DNN()
 
 if args.test:
-    save_plot_delvol('combined_2020-11-09 14:41:20.861630', suppress = False)
+    save_plot_delvol('combined_2020-11-12 15:38:51.531613', suppress = False)
+    save_plot_delvol('combined_2020-11-12 22:54:54.260169', suppress = False)
 
 if args.cluster:
     procedure_cluster()
