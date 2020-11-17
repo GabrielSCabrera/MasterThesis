@@ -1359,8 +1359,21 @@ if args.score_DNN:
     procedure_score_DNN()
 
 if args.test:
-    save_plot_delvol('combined_2020-11-12 22:54:54.260169', suppress = False)
-    save_plot_delvol('combined_2020-11-12 19:50:09.233591', suppress = False)
+    directory = 'combined_2020-11-12 15:38:51.531613'
+    savename = 'test_001'
+    load, save = plots.delvol.argparser(
+        directory = directory, savename = savename
+    )
+
+    combined_data = plots.delvol.load_combined(load_path = load)
+
+    # plots.delvol.histogram(combined_data, text = ' (Random Train-Test Split)')
+    plots.delvol.errorbars(combined_data, text = ' (Random Train-Test Split)')
+
+    # print(data)
+
+    # save_plot_delvol('combined_2020-11-12 22:54:54.260169', suppress = False)
+    # save_plot_delvol('combined_2020-11-12 19:50:09.233591', suppress = False)
 
 if args.cluster:
     procedure_cluster()
