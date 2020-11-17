@@ -1,4 +1,3 @@
-directory = "M8_1";
 [y_train, y_test, y_train_pred, y_test_pred, scores] = delvol_utils.load_from_delvol(directory);
 N_plots = height(y_train);
 

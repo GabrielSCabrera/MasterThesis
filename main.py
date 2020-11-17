@@ -101,6 +101,10 @@ def parse_args():
         'Synchronizes the local data with the complete dataset collection.'
     )
 
+    help_delvol_combine = (
+        'Synchronizes the local data with the complete dataset collection.'
+    )
+
     help_matlab = (
         'Runs a custom MATLAB script.'
     )
@@ -174,6 +178,9 @@ def parse_args():
     )
     parser.add_argument(
         '--delden-combine', action='store_true', help = help_delden_combine
+    )
+    parser.add_argument(
+        '--delvol-combine', action='store_true', help = help_delvol_combine
     )
     parser.add_argument(
         '--matlab', action='store_true', help = help_matlab
@@ -1233,6 +1240,49 @@ def procedure_delden_combine():
     print(format.B('Selected Experiment: ') + format.I(selection))
     parsers.combine_delden_results(selection)
 
+def procedure_delvol_combine():
+
+    terminal.reset_screen()
+    directory = config.delvol_relpath
+
+    filename_pat = (
+        r'combined\_(\d{4})\-(\d{2})\-(\d{2}) (\d{2})\:(\d{2})\:(\d{2})\.(\d{6})'
+    )
+    filename_repl = (
+        r'\1/\2/\3 \4:\5:\6.\7'
+    )
+
+    files = []
+    for f in directory.glob('*'):
+        if len(re.findall(filename_pat, f.name)) != 0:
+            files.append(f.name)
+
+    N = len(files)
+    if N == 0:
+        msg = (
+            f'\n\nNo combined delvol experiments found.  Run `python main.py '
+            f'--delvol-all` to create a set of experiment output files in '
+            f'`~/Documents/MasterThesis/results/delvol/`.\n'
+        )
+        raise FileNotFoundError(msg)
+    elif N == 1:
+        selection = select.select_bool(f'Select Experiment `{files[0]}`?')
+        if not selection:
+            print('Terminating.')
+            exit()
+        else:
+            selection = files[0]
+    else:
+        selection = select.scroll_select(
+            f'Select an Experiment – {N} option(s)', files
+        )
+
+    path = directory / selection
+
+    terminal.reset_screen()
+    print(format.B('Selected Experiment: ') + format.I(selection))
+    parsers.combine_delvol_results(selection)
+
 def procedure_matlab():
     directories = [
         'combined_2020-10-06 07:39:50.711793',
@@ -1309,8 +1359,8 @@ if args.score_DNN:
     procedure_score_DNN()
 
 if args.test:
-    save_plot_delvol('combined_2020-11-12 15:38:51.531613', suppress = False)
     save_plot_delvol('combined_2020-11-12 22:54:54.260169', suppress = False)
+    save_plot_delvol('combined_2020-11-12 19:50:09.233591', suppress = False)
 
 if args.cluster:
     procedure_cluster()
@@ -1353,6 +1403,9 @@ if args.force_sync:
 
 if args.delden_combine:
     procedure_delden_combine()
+
+if args.delvol_combine:
+    procedure_delvol_combine()
 
 if args.matlab:
     procedure_matlab()
