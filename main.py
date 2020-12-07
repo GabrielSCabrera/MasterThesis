@@ -1074,7 +1074,7 @@ def procedure_delvol_all():
         delvol.save(filename = i)
 
     parsers.combine_delvol_results(path)
-    save_plot_delvol(directory)
+    # save_plot_delvol(directory)
 
 def procedure_delvol_all_log():
 
@@ -1155,7 +1155,7 @@ def procedure_delvol_groups():
         delvol.save(filename = '-'.join(i))
 
     parsers.combine_delvol_results(path)
-    save_plot_delvol(directory)
+    # save_plot_delvol(directory)
 
 def procedure_delvol_groups_log():
 
