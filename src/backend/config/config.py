@@ -57,7 +57,6 @@ delden_test_pred_data = "y_test_pred.csv"
 delden_scores_data = "scores.csv"
 
 delvol_pred_str = "delv50"
-delvol_pred_str = "delv50"
 delvol_savename = "delden_results"
 delvol_datafile = "{}_3D_delvol_a3000_subv300.txt"
 delvol_xgb_obj = "reg:squarederror"

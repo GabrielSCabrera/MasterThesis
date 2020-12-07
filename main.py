@@ -1061,11 +1061,13 @@ def procedure_delvol_all():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
+    training_label = 'delvtot'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
         delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
         delvol.set_experiments(i)
+        delvol.set_training_label(training_label)
         delvol.grid_search(
             itermax = N_experiments, train_size = 0.75, **gridsearch_params
         )
@@ -1098,11 +1100,13 @@ def procedure_delvol_all_log():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
+    training_label = 'delvtot'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
         delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
         delvol.set_experiments(i)
+        delvol.set_training_label(training_label)
         delvol.grid_search(
             itermax = N_experiments, train_size = 0.75, log = True,
             **gridsearch_params
@@ -1137,11 +1141,13 @@ def procedure_delvol_groups():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
+    training_label = 'delvtot'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENTS {", ".join(i)} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
         delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
         delvol.set_experiments(*i)
+        delvol.set_training_label(training_label)
         delvol.grid_search(
             itermax = N_experiments, train_size = 0.75,
             **gridsearch_params
@@ -1176,11 +1182,13 @@ def procedure_delvol_groups_log():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
+    training_label = 'delvtot'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENTS {", ".join(i)} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
         delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
         delvol.set_experiments(*i)
+        delvol.set_training_label(training_label)
         delvol.grid_search(
             itermax = N_experiments, train_size = 0.75, log = True,
             **gridsearch_params
