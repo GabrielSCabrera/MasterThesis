@@ -1,4 +1,4 @@
-[y_train, y_test, y_train_pred, y_test_pred, r2_train, r2_test, folders] = delvol_utils.load_all_from_combined(directory);
+[y_train, y_test, y_train_pred, y_test_pred, r2_train, r2_test, scores, folders] = delvol_utils.load_all_from_combined(directory);
 
 N_plots = size(y_train);
 N_plots = N_plots(2);
@@ -75,7 +75,9 @@ for i = 1:N_plots
   ax.FontSize = 5;
   hold on
   line2 = plot(c, d, 'r.', 'MarkerSize', 8);
-  line3 = plot([-1000 1000], [-1000, 1000], 'k:');
+  xl = xlim;
+  line3 = plot([-1E8 1E8], [-1E8, 1E8], 'k:');
+  xlim(xl);
   hold off
 end
 
@@ -94,6 +96,7 @@ hL = legend([line1, line2, line3],{'Training Data','Testing Data','f(x) = x'}, '
 newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
+grid();
 
 delvol_utils.save_plot(fig, save_name_1);
 delvol_utils.save_plot(fig, save_name_2);
@@ -159,7 +162,7 @@ for i = 1:N_plots
   % diag_y = [min([min(b(b > 0)), min(d(d > 0))]) max([max(b(b > 0)), max(d(d > 0))])];
   diag_x = [min([min(a), min(c)]) max([max(a), max(c)])];
   diag_y = [min([min(b), min(d)]) max([max(b), max(d)])];
-  diag_line = linspace(-100, 100, 5E3);
+  diag_line = linspace(-1E8, 1E8, 5E3);
 
   line1 = loglog(a, b, 'bx', 'MarkerSize', 4);
   if diag_x(1) < diag_x(2)
@@ -172,7 +175,9 @@ for i = 1:N_plots
   ax.FontSize = 5;
   hold on
   line2 = loglog(c, d, 'r.', 'MarkerSize', 8);
+  xl = xlim;
   line3 = loglog(diag_line, diag_line, 'k:');
+  xlim(xl);
   hold off
 
 end
@@ -192,6 +197,7 @@ hL = legend([line1, line2, line3],{'Training Data','Testing Data','f(x) = x'}, '
 newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
+grid();
 
 delvol_utils.save_plot(fig, save_name_3);
 delvol_utils.save_plot(fig, save_name_4);

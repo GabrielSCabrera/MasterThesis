@@ -25,7 +25,9 @@ for i = 1:N_plots
   ax.FontSize = 5;
   hold on
   line2 = plot(c, d, 'r.', 'MarkerSize', 8);
-  line3 = plot([-100 100], [-100, 100], 'k:');
+  xl = xlim;
+  line3 = plot([-1E8 1E8], [-1E8, 1E8], 'k:');
+  xlim(xl);
   hold off
 end
 
@@ -44,6 +46,7 @@ hL = legend([line1, line2, line3],{'Training Data','Testing Data','$f(x) = x$'},
 newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
+grid();
 
 delvol_utils.save_plot(fig, "delvol_results.png");
 delvol_utils.save_plot(fig, "delvol_results.pdf");
@@ -90,6 +93,7 @@ hL = legend([line1, line2, line3],{'Training Data','Testing Data','$f(x) = x$'},
 newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
+grid();
 
 delvol_utils.save_plot(fig, "delvol_results_log.png");
 delvol_utils.save_plot(fig, "delvol_results_log.pdf");

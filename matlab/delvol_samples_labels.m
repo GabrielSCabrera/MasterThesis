@@ -17,7 +17,7 @@ for i = 1:N_tabs
         number = number + 1;
       end
     end
-    l1 = plot(number, r2_train_scores(j,i), 'rs');
+    l1 = plot(i, number, 'rs');
   end
 end
 
@@ -33,18 +33,18 @@ for i = 1:N_tabs
         number = number + 1;
       end
     end
-    l2 = plot(number, r2_test_scores(j,i), 'b^');
+    l2 = plot(i, number, 'b^');
   end
 end
 
-legend([l1, l2],{'Training Set', 'Testing Set'});
+xpoints = linspace(1, N_tabs, N_tabs);
 scaler = 0.1;
-xl = xlim;
-dx = xl(2) - xl(1);
-xlim([xl(1)-dx*scaler xl(2)+dx*scaler]);
-title('$R^2$ Scores for Prediction of Fracture Densities by No. of Experiments', 'Interpreter', 'latex')
-xlabel('Number of Experiments', 'Interpreter', 'latex');
-ylabel('$R^2$ Score', 'Interpreter', 'latex');
+xlim([1-N_tabs*scaler N_tabs+N_tabs*scaler]);
+set(gca, 'xtick', xpoints, 'xticklabel', scores.Properties.RowNames);
+legend([l1, l2],{'Training Set', 'Testing Set'});
+title('No. of Experiments per-Run, per-Rock-Type', 'Interpreter', 'latex')
+xlabel('Experiment (Rock Type Abbreviation)', 'Interpreter', 'latex');
+ylabel('Number of Experiments', 'Interpreter', 'latex');
 grid();
 delvol_utils.save_plot(fig, save_name);
 hold off

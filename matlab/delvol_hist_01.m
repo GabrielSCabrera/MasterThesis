@@ -15,9 +15,13 @@ for i = 1:cols
   end
 end
 set(gca, 'xtick', 1:cols, 'xticklabel', folders);
+xlabel('Experiment (Rock Type Abbreviation)', 'Interpreter', 'latex');
+ylabel('$R^2$ Score', 'Interpreter', 'latex');
+title('Run- and Experiment-Wise $R^2$ Scores', 'Interpreter', 'latex');
 scaler = 0.1;
 xlim([1-cols*scaler cols+cols*scaler]);
 ylim([0 1]);
+grid();
 delvol_utils.save_plot(fig, save_name);
 hold off
 exit();

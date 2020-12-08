@@ -45,6 +45,7 @@ xlim([xl(1)-dx*scaler xl(2)+dx*scaler]);
 title('$R^2$ Scores for Prediction of Fracture Densities by No. of Experiments', 'Interpreter', 'latex')
 xlabel('Number of Experiments', 'Interpreter', 'latex');
 ylabel('$R^2$ Score', 'Interpreter', 'latex');
+ylim([0 1]);
 grid();
 delvol_utils.save_plot(fig, save_name);
 hold off

@@ -28,6 +28,8 @@ xlim([1-cols_1*scaler cols_1+cols_1*scaler]);
 legend([L1, L2],{'Linear', 'Logarithmic'});
 ylabel('R^2 Score')
 xlabel('Experiment')
+title('Comparing Mean and Std. of $R^2$ Scores for Each Experiment (log)', 'Interpreter', 'latex');
+grid();
 delvol_utils.save_plot(fig, save_name);
 hold off
 exit();

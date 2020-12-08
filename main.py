@@ -411,6 +411,48 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
         )
     )
 
+    save_name_1 = directory + '/compare_sample_observed' + '.png'
+    save_name_2 = directory + '/compare_sample_observed' + '.pdf'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_compare_sample_observed.m',
+        variables = (
+            f"directory = \'{directory}\'; "
+            f"save_name_1 = \'{save_name_1}\'; "
+            f"save_name_2 = \'{save_name_2}\'; "
+        )
+    )
+
+    save_name = directory + '/samples_exp' + '.png'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_samples_exp.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name = directory + '/samples_exp_01' + '.png'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_samples_exp_01.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    save_name_1 = directory + '/chart_exps_best_worst' + '.png'
+    save_name_2 = directory + '/chart_exps_best_worst' + '.pdf'
+    backend.select.run_matlab(
+        suppress = suppress,
+        script_relpath = './matlab/delvol_chart_exps_best_worst_compare.m',
+        variables = (
+            f"directory = \'{directory}\'; "
+            f"save_name_1 = \'{save_name_1}\'; "
+            f"save_name_2 = \'{save_name_2}\'; "
+        )
+    )
+
 """SCRIPT PROCEDURES"""
 
 def procedure_split():
@@ -1367,21 +1409,10 @@ if args.score_DNN:
     procedure_score_DNN()
 
 if args.test:
-    directory = 'combined_2020-11-12 15:38:51.531613'
-    savename = 'test_001'
-    load, save = plots.delvol.argparser(
-        directory = directory, savename = savename
-    )
 
-    combined_data = plots.delvol.load_combined(load_path = load)
-
-    # plots.delvol.histogram(combined_data, text = ' (Random Train-Test Split)')
-    plots.delvol.errorbars(combined_data, text = ' (Random Train-Test Split)')
-
-    # print(data)
-
-    # save_plot_delvol('combined_2020-11-12 22:54:54.260169', suppress = False)
-    # save_plot_delvol('combined_2020-11-12 19:50:09.233591', suppress = False)
+    save_plot_delvol('del50 All', suppress = False)
+    save_plot_delvol('del50 Groups', suppress = False)
+    save_plot_delvol('delglobden All', suppress = False)
 
 if args.cluster:
     procedure_cluster()

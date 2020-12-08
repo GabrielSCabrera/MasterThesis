@@ -11,8 +11,9 @@ fig = errorbar(xpoints, avg_arr, std_arr, ':s', 'MarkerSize', 10, 'MarkerEdgeCol
 chunk = 0.1*(max(xpoints) - min(xpoints));
 xlim([min(xpoints) - chunk max(xpoints) + chunk]);
 set(gca, 'xtick', xpoints, 'xticklabel', scores.Properties.RowNames);
-xlabel('Experiment (Rock Type Abbreviation)');
-ylabel('R^2 Average Score and Standard Deviation');
+xlabel('Experiment (Rock Type Abbreviation)', 'Interpreter', 'latex');
+ylabel('$R^2$ Average Score and Standard Deviation', 'Interpreter', 'latex');
+title('Comparing Mean and Std. of $R^2$ Scores for Each Experiment', 'Interpreter', 'latex');
 grid();
 delvol_utils.save_plot(fig, save_name);
 exit();

@@ -96,7 +96,7 @@ classdef delvol_utils
       end
     end
 
-    function [y_train_list, y_test_list, y_train_pred_list, y_test_pred_list, r2_train, r2_test, folders] = load_all_from_combined(directory)
+    function [y_train_list, y_test_list, y_train_pred_list, y_test_pred_list, r2_train, r2_test, scores, folders] = load_all_from_combined(directory)
       % Reads the data from a set of .csv files and returns its values as
       % matrices
       arguments
