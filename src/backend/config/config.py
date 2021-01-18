@@ -66,6 +66,7 @@ delvol_test_data = "y_test.csv"
 delvol_train_pred_data = "y_train_pred.csv"
 delvol_test_pred_data = "y_test_pred.csv"
 delvol_scores_data = "scores.csv"
+delvol_importance_data = "cumulative_importance.csv"
 
 DNN_model_extension = ".dnn"
 cluster_dir_labels = "CL{:05d}"

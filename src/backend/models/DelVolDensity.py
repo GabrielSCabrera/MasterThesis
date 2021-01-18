@@ -12,9 +12,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt
 import xgboost as xgb
 import pandas as pd
 import numpy as np
+import shap
 
 from ..config.defaults import delvol_xgb_gridsearch_defaults as xgb_def
 from ..config.groups import delvol_groups, delvol_exps
@@ -27,7 +29,7 @@ from ..config.config import (
     delvol_data_relpath, delvol_relpath, delvol_pred_str, delvol_savename,
     delvol_datafile, delvol_xgb_obj, delvol_cv_folds, term_width,
     delvol_train_data, delvol_test_data, delvol_train_pred_data,
-    delvol_test_pred_data, delvol_scores_data
+    delvol_test_pred_data, delvol_scores_data, delvol_importance_data
 )
 
 class DelVolDensity:
@@ -88,6 +90,7 @@ class DelVolDensity:
         self.r2_test = []
         self.rmse_test = []
         self.best_models = []
+        self._X_full = None
 
     def set_experiments(self, *labels:Tuple[str]):
         '''
@@ -370,6 +373,7 @@ class DelVolDensity:
         y_test_pred_path = save_path / delvol_test_pred_data
 
         scores_out_path = save_path / delvol_scores_data
+        importances_path = save_path / delvol_importance_data
 
         with open(y_train_path, 'w+') as outfile:
             outfile.write(self._str_array_out(self.y_train))
@@ -385,6 +389,24 @@ class DelVolDensity:
 
         with open(scores_out_path, 'w+') as outfile:
             outfile.write(self._str_scores_out())
+
+        # Calculating SHAP Values
+        importances = []
+        for model, r2 in zip(self.best_models, self.r2_test):
+            explainer = shap.TreeExplainer(model)
+            shap_values = explainer.shap_values(self._X_full)
+            shap_avg = np.mean(np.abs(shap_values), axis = 0)
+            shap_max = np.max(shap_avg)
+            shap_norm = shap_avg/shap_max
+            importances.append(shap_norm*r2)
+        importances = np.array(importances)
+        cumulative_importance = np.sum(importances, axis = 0)
+
+        header = ','.join(self.feats)
+        values = ','.join(f'{i:f}' for i in cumulative_importance)
+
+        with open(importances_path, 'w+') as outfile:
+            outfile.write(header + '\n' + values)
 
     # PRIVATE METHODS
     @staticmethod
@@ -502,6 +524,15 @@ class DelVolDensity:
                 X.append(data.iloc[:,n])
 
         X = scaler.fit_transform(np.array(X).T)
+        if self._X_full is None:
+            self._X_full = X
+        elif not np.array_equal(self._X_full, X):
+            msg = (
+                f'\n\nAn issue has occurred during preprocessing in class'
+                f'DelVolDensity, where the input array X is inconsistent over '
+                f'the course of multiple iterations.  Reason unknown.'
+            )
+            raise RuntimeError(msg)
 
         y = np.array(data.loc[:,self.pred_str])
 
@@ -549,6 +580,7 @@ class DelVolDensity:
                 if idx not in train_idx:
                     test_idx.append(idx)
             test_idx = np.array(test_idx)
+
 
             X_train = X[train_idx]
             X_test = X[test_idx]
