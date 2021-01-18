@@ -1097,15 +1097,6 @@ def procedure_delvol_all():
         "max_depth":        [1, 3, 5, 7, 9, 11]
     }
 
-    gridsearch_params = {
-        "colsample_bytree": [0.3, 0.5],
-        "alpha":            [0, 0.001],
-        "learning_rate":    [0.005, 0.01, 0.05],
-        "n_estimators":     [10],
-        "max_depth":        [1, 3]
-    }
-
-
     terminal.reset_screen()
 
     directory = backend.utils.select.create_unique_name(prefix = 'combined')
