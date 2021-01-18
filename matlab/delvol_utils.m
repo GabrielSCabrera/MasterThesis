@@ -8,7 +8,7 @@ classdef delvol_utils
       arguments
         filename string
       end
-      storage = "~/Documents/MasterThesis/data/matlab/";
+      storage = '~/Documents/MasterThesis/data/matlab/';
       file_path = strcat(storage, filename);
       matrix_out = readmatrix(file_path);
     end
@@ -19,13 +19,13 @@ classdef delvol_utils
       arguments
         directory string
       end
-      storage = "~/Documents/MasterThesis/results/delvol/";
+      storage = '~/Documents/MasterThesis/results/delvol/';
       main_path = strcat(storage, directory);
-      train_path = strcat(main_path, "/y_train.csv");
-      test_path = strcat(main_path, "/y_test.csv");
-      train_pred_path = strcat(main_path, "/y_train_pred.csv");
-      test_pred_path = strcat(main_path, "/y_test_pred.csv");
-      scores_path = strcat(main_path, "/scores.csv");
+      train_path = strcat(main_path, '/y_train.csv');
+      test_path = strcat(main_path, '/y_test.csv');
+      train_pred_path = strcat(main_path, '/y_train_pred.csv');
+      test_pred_path = strcat(main_path, '/y_test_pred.csv');
+      scores_path = strcat(main_path, '/scores.csv');
 
       opts = detectImportOptions(train_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
       y_train = readtable(train_path, opts);
@@ -45,11 +45,40 @@ classdef delvol_utils
       arguments
         directory string
       end
-      storage = "~/Documents/MasterThesis/results/delvol/";
+      storage = '~/Documents/MasterThesis/results/delvol/';
       main_path = strcat(storage, directory);
-      scores_path = strcat(main_path, "/scores.csv");
+      scores_path = strcat(main_path, '/scores.csv');
       scores = readtable(scores_path, 'ReadRowNames', true);
       scores = sortrows(scores, 'RowNames');
+    end
+
+    function [headers, importances, folders] = load_importance(directory)
+      % Reads the data from a set of .csv files and returns its values as
+      % matrices
+      arguments
+        directory string
+      end
+
+      storage = '~/Documents/MasterThesis/results/delvol/';
+      main_path = strcat(storage, directory);
+      directory = dir(main_path);
+      folders = {directory([directory.isdir]).name};
+      folders = folders(~ismember(folders, {'.','..'}));
+      % folders = sort(folders);
+      importances = [];
+      N_experiments = length(folders);
+
+      for i = 1:N_experiments
+        importance_path = strcat(main_path, '/');
+        importance_path = strcat(importance_path, folders(i));
+        importance_path = strcat(importance_path, '/cumulative_importance.csv');
+
+        % opts = detectImportOptions(importance_path, 'NumHeaderLines', 1);
+        importance = readtable(importance_path);
+        headers = importance.Properties.VariableNames;
+        importance = table2array(importance(1,:));
+        importances = [importances ; importance];
+      end
     end
 
     function [density_data] = load_from_density_data(filename)
@@ -58,7 +87,7 @@ classdef delvol_utils
       arguments
         filename string
       end
-      storage = "~/Documents/MasterThesis/data/density_data/";
+      storage = '~/Documents/MasterThesis/data/density_data/';
       path = strcat(storage, filename);
       density_data = readtable(path, 'ReadVariableNames', true);
     end
@@ -72,7 +101,7 @@ classdef delvol_utils
       R2_train_idx = 1;
       R2_test_idx = 2;
 
-      storage = "~/Documents/MasterThesis/results/delvol/";
+      storage = '~/Documents/MasterThesis/results/delvol/';
       main_path = strcat(storage, directory);
       directory = dir(main_path);
       folders = {directory([directory.isdir]).name};
@@ -83,9 +112,9 @@ classdef delvol_utils
       N_experiments = length(folders);
 
       for i = 1:N_experiments
-        scores_path = strcat(main_path, "/");
+        scores_path = strcat(main_path, '/');
         scores_path = strcat(scores_path, folders(i));
-        scores_path = strcat(scores_path, "/scores.csv");
+        scores_path = strcat(scores_path, '/scores.csv');
 
         opts = detectImportOptions(scores_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
         scores = readtable(scores_path, opts);
@@ -105,7 +134,7 @@ classdef delvol_utils
       R2_train_idx = 1;
       R2_test_idx = 2;
 
-      storage = "~/Documents/MasterThesis/results/delvol/";
+      storage = '~/Documents/MasterThesis/results/delvol/';
       main_path = strcat(storage, directory);
       directory = dir(main_path);
       folders = {directory([directory.isdir]).name};
@@ -119,12 +148,12 @@ classdef delvol_utils
       y_test_pred_list = cell(N_experiments,0);
 
       for i = 1:N_experiments
-        scores_path = strcat(main_path, "/");
+        scores_path = strcat(main_path, '/');
         scores_path = strcat(scores_path, folders(i));
-        train_path = strcat(scores_path, "/y_train.csv");
-        test_path = strcat(scores_path, "/y_test.csv");
-        train_pred_path = strcat(scores_path, "/y_train_pred.csv");
-        test_pred_path = strcat(scores_path, "/y_test_pred.csv");
+        train_path = strcat(scores_path, '/y_train.csv');
+        test_path = strcat(scores_path, '/y_test.csv');
+        train_pred_path = strcat(scores_path, '/y_train_pred.csv');
+        test_pred_path = strcat(scores_path, '/y_test_pred.csv');
 
         opts = detectImportOptions(train_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
         y_train = readtable(train_path, opts);
@@ -141,7 +170,7 @@ classdef delvol_utils
         y_test_pred_list{i} = y_test_pred;
       end
 
-      scores_path = strcat(main_path, "/scores.csv");
+      scores_path = strcat(main_path, '/scores.csv');
       scores = readtable(scores_path, 'ReadRowNames', true);
       r2_train = table2array(scores(:, R2_train_idx));
       r2_test = table2array(scores(:, R2_test_idx));
@@ -156,7 +185,7 @@ classdef delvol_utils
       R2_train_idx = 1;
       R2_test_idx = 2;
 
-      storage = "~/Documents/MasterThesis/results/delvol/";
+      storage = '~/Documents/MasterThesis/results/delvol/';
       main_path = strcat(storage, directory);
       directory = dir(main_path);
       folders = {directory([directory.isdir]).name};
@@ -171,13 +200,13 @@ classdef delvol_utils
       scores = cell(N_experiments,0);
 
       for i = 1:N_experiments
-        scores_path = strcat(main_path, "/");
+        scores_path = strcat(main_path, '/');
         scores_path = strcat(scores_path, folders(i));
-        train_path = strcat(scores_path, "/y_train.csv");
-        test_path = strcat(scores_path, "/y_test.csv");
-        train_pred_path = strcat(scores_path, "/y_train_pred.csv");
-        test_pred_path = strcat(scores_path, "/y_test_pred.csv");
-        scores_path = strcat(scores_path, "/scores.csv");
+        train_path = strcat(scores_path, '/y_train.csv');
+        test_path = strcat(scores_path, '/y_test.csv');
+        train_pred_path = strcat(scores_path, '/y_train_pred.csv');
+        test_pred_path = strcat(scores_path, '/y_test_pred.csv');
+        scores_path = strcat(scores_path, '/scores.csv');
 
         opts = detectImportOptions(train_path, 'NumHeaderLines', 0, 'ReadVariableNames', false);
         y_train = readtable(train_path, opts);
@@ -197,7 +226,7 @@ classdef delvol_utils
         scores{i} = score;
       end
 
-      scores_path = strcat(main_path, "/scores.csv");
+      scores_path = strcat(main_path, '/scores.csv');
       scores_comp = readtable(scores_path, 'ReadRowNames', true);
       r2_train = table2array(scores_comp(:, R2_train_idx));
       r2_test = table2array(scores_comp(:, R2_test_idx));
@@ -208,7 +237,7 @@ classdef delvol_utils
         H
         filename string
       end
-      storage = "~/Documents/MasterThesis/results/matlab/img/";
+      storage = '~/Documents/MasterThesis/results/matlab/img/';
       file_path = strcat(storage, filename);
       saveas(H, file_path);
       msg = 'Saved MATLAB Plot to Path:';

@@ -1103,7 +1103,7 @@ def procedure_delvol_all():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
-    training_label = 'delvtot'
+    training_label = 'delv50'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
@@ -1410,9 +1410,23 @@ if args.score_DNN:
 
 if args.test:
 
-    save_plot_delvol('del50 All', suppress = False)
-    save_plot_delvol('del50 Groups', suppress = False)
-    save_plot_delvol('delglobden All', suppress = False)
+    path = backend.config.matlab_img_relpath
+    directory = 'combined_2021-01-18 14:10:35.946145'
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    save_name = directory + '/importances_'
+    backend.select.run_matlab(
+        suppress = False,
+        script_relpath = './matlab/delvol_importances.m',
+        variables = (
+            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+        )
+    )
+
+    # save_plot_delvol('del50 All', suppress = False)
+    # save_plot_delvol('del50 Groups', suppress = False)
+    # save_plot_delvol('delglobden All', suppress = False)
 
 if args.cluster:
     procedure_cluster()
