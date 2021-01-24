@@ -29,7 +29,8 @@ from ..config.config import (
     delvol_data_relpath, delvol_relpath, delvol_pred_str, delvol_savename,
     delvol_datafile, delvol_xgb_obj, delvol_cv_folds, term_width,
     delvol_train_data, delvol_test_data, delvol_train_pred_data,
-    delvol_test_pred_data, delvol_scores_data, delvol_importance_data
+    delvol_test_pred_data, delvol_scores_data, delvol_importance_data,
+    delvol_shap_data, delvol_models_dir, delvol_model_names
 )
 
 class DelVolDensity:
@@ -374,6 +375,10 @@ class DelVolDensity:
 
         scores_out_path = save_path / delvol_scores_data
         importances_path = save_path / delvol_importance_data
+        shap_path = save_path / delvol_shap_data
+        model_path = save_path / delvol_models_dir
+
+        model_path.mkdir(exist_ok = True)
 
         with open(y_train_path, 'w+') as outfile:
             outfile.write(self._str_array_out(self.y_train))
@@ -392,21 +397,26 @@ class DelVolDensity:
 
         # Calculating SHAP Values
         importances = []
-        for model, r2 in zip(self.best_models, self.r2_test):
+        for n,(model, r2) in enumerate(zip(self.best_models, self.r2_test)):
             explainer = shap.TreeExplainer(model)
             shap_values = explainer.shap_values(self._X_full)
             shap_avg = np.mean(np.abs(shap_values), axis = 0)
             shap_max = np.max(shap_avg)
             shap_norm = shap_avg/shap_max
             importances.append(shap_norm*r2)
+            model.save_model(model_path / delvol_model_names.format(n+1))
         importances = np.array(importances)
         cumulative_importance = np.sum(importances, axis = 0)
 
         header = ','.join(self.feats)
-        values = ','.join(f'{i:f}' for i in cumulative_importance)
+        shap_values = ','.join(f'{i:f}' for i in shap_avg)
+        importance_values = ','.join(f'{i:f}' for i in cumulative_importance)
+
+        with open(shap_path, 'w+') as outfile:
+            outfile.write(header + '\n' + shap_values)
 
         with open(importances_path, 'w+') as outfile:
-            outfile.write(header + '\n' + values)
+            outfile.write(header + '\n' + importance_values)
 
     # PRIVATE METHODS
     @staticmethod
@@ -506,7 +516,7 @@ class DelVolDensity:
             return out
 
     def _preprocess(
-    self, train_size:int, log:bool = False, split:str = 'time') -> pd.DataFrame:
+    self, train_size:int, log:bool = False, split:str = 'random') -> pd.DataFrame:
         '''
             Reads all experiment data and returns a set of scaled & split
             DataFrames.

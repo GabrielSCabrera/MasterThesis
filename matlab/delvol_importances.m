@@ -14,9 +14,14 @@ for j = 1:rows
   new_headers = [];
 
   for i = 1:cols
-    plot(i, temp_importances(idx(i)), 'Marker', 'o', 'MarkerFaceColor', [1-color_dist(j) 0 color_dist(j)], 'MarkerEdgeColor', [1-color_dist(j) 0 color_dist(j)]);
-    new_headers = [new_headers headers(idx(i))];
+    plot(i, importances(j,i), 'Marker', 'o', 'MarkerFaceColor', [1-color_dist(j) 0 color_dist(j)], 'MarkerEdgeColor', [1-color_dist(j) 0 color_dist(j)]);
+    new_headers = [new_headers headers(i)];
   end
+
+  % for i = 1:cols
+  %   plot(i, temp_importances(idx(i)), 'Marker', 'o', 'MarkerFaceColor', [1-color_dist(j) 0 color_dist(j)], 'MarkerEdgeColor', [1-color_dist(j) 0 color_dist(j)]);
+  %   new_headers = [new_headers headers(idx(i))];
+  % end
 
   xtickangle(45);
 
