@@ -15,4 +15,3 @@ grid();
 xlim([min(sigd) max(sigd)]);
 delden_utils.save_plot(fig, save_name);
 hold off
-exit();

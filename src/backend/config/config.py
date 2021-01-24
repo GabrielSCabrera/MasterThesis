@@ -14,6 +14,7 @@ documents_path = Path.home() / "Documents"
 storage_path = documents_path / "MasterThesis"
 hidden_path = Path.home() / ".MasterThesis"
 credentials_path = hidden_path / "credentials"
+package_root_path = Path(__file__).parent.parent.parent
 
 data_url_root = Path(
     r"storage.googleapis.com/gsc_thesis"
@@ -45,6 +46,8 @@ matlab_results_relpath = results_path / "matlab"
 matlab_img_relpath = matlab_results_relpath / "img"
 
 # FILES
+matlab_files_abspath = package_root_path / "frontend" / "matlab"
+
 delden_pred_str = "del_den"
 delden_savename = "delden_results"
 delden_datafile = "damage_{}_s25_d9.txt"
@@ -70,6 +73,8 @@ delvol_importance_data = "cumulative_importance.csv"
 delvol_shap_data = "shap.csv"
 delvol_models_dir = "models"
 delvol_model_names = "model_{:03d}"
+delvol_R2_threshold = 0.7
+delvol_filter_data = "filter.dat"
 
 DNN_model_extension = ".dnn"
 cluster_dir_labels = "CL{:05d}"

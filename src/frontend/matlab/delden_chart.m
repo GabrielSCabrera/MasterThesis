@@ -1,4 +1,5 @@
-[y_train, y_test, y_train_pred, y_test_pred, scores] = delvol_utils.load_from_delvol(directory);
+directory = "M8_1";
+[y_train, y_test, y_train_pred, y_test_pred, scores] = delden_utils.load_from_delden(directory);
 N_plots = height(y_train);
 
 closest_square = ceil(sqrt(double(N_plots)));
@@ -25,9 +26,7 @@ for i = 1:N_plots
   ax.FontSize = 5;
   hold on
   line2 = plot(c, d, 'r.', 'MarkerSize', 8);
-  xl = xlim;
-  line3 = plot([-1E8 1E8], [-1E8, 1E8], 'k:');
-  xlim(xl);
+  line3 = plot([-100 100], [-100, 100], 'k:');
   hold off
 end
 
@@ -46,10 +45,9 @@ hL = legend([line1, line2, line3],{'Training Data','Testing Data','$f(x) = x$'},
 newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
-grid();
 
-delvol_utils.save_plot(fig, "delvol_results.png");
-delvol_utils.save_plot(fig, "delvol_results.pdf");
+delden_utils.save_plot(fig, "delden_results.png");
+delden_utils.save_plot(fig, "delden_results.pdf");
 
 for i = 1:N_plots
   r2_train = table2array(scores(i,1));
@@ -93,9 +91,6 @@ hL = legend([line1, line2, line3],{'Training Data','Testing Data','$f(x) = x$'},
 newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
-grid();
 
-delvol_utils.save_plot(fig, "delvol_results_log.png");
-delvol_utils.save_plot(fig, "delvol_results_log.pdf");
-
-exit
+delden_utils.save_plot(fig, "delden_results_log.png");
+delden_utils.save_plot(fig, "delden_results_log.pdf");

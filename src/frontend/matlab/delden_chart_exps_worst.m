@@ -1,4 +1,4 @@
-[y_train, y_test, y_train_pred, y_test_pred, r2_train, r2_test, scores, folders] = delvol_utils.load_all_from_combined(directory);
+[y_train, y_test, y_train_pred, y_test_pred, r2_train, r2_test, scores, folders] = delden_utils.load_best_from_combined(directory);
 
 N_plots = size(y_train);
 N_plots = N_plots(2);
@@ -9,25 +9,30 @@ for i = 1:N_plots
   r2_train_str = r2_train(i);
   r2_test_str = r2_test(i);
   label = folders{i};
-  format_spec = '%s';
-  title_string = sprintf(format_spec, label);
-  a0 = [];
-  b0 = [];
-  c0 = [];
-  d0 = [];
+  format_spec = '%s; R^2 Train = %.2f, Test = %.2f';
+  title_string = sprintf(format_spec, label, r2_train_str, r2_test_str);
+  r2_tests = zeros(height(y_test{i}), 0);
+
   for j = 1:height(y_train{i})
-    a0 = [a0 table2array(y_train{i}(j,:))];
-    b0 = [b0 table2array(y_train_pred{i}(j,:))];
-    c0 = [c0 table2array(y_test{i}(j,:))];
-    d0 = [d0 table2array(y_test_pred{i}(j,:))];
+    score = scores{i};
+    r2_tests(j) = table2array(score(j,2));
   end
+
+  [minimum, idx] = min(r2_tests);
+  title_string = sprintf(format_spec, label, r2_train_str, minimum);
+
+  a0 = table2array(y_train{i}(idx,:));
+  b0 = table2array(y_train_pred{i}(idx,:));
+  c0 = table2array(y_test{i}(idx,:));
+  d0 = table2array(y_test_pred{i}(idx,:));
+  iters = size(a0);
+  iters = iters(2);
 
   a = [];
   b = [];
   c = [];
   d = [];
-  iters = size(a0);
-  iters = iters(2);
+
   for j = 1:iters
     a_val = a0(j);
     b_val = b0(j);
@@ -75,9 +80,7 @@ for i = 1:N_plots
   ax.FontSize = 5;
   hold on
   line2 = plot(c, d, 'r.', 'MarkerSize', 8);
-  xl = xlim;
-  line3 = plot([-1E8 1E8], [-1E8, 1E8], 'k:');
-  xlim(xl);
+  line3 = plot([-1000 1000], [-1000, 1000], 'k:');
   hold off
 end
 
@@ -87,7 +90,7 @@ han.XLabel.Visible ='on';
 han.YLabel.Visible ='on';
 ylabel(han,'Predicted Values');
 xlabel(han,'Expected Values');
-title_obj = title(han,'Expected vs. Predicted Values of Fracture Densities');
+title_obj = title(han,'Worst Expected vs. Predicted Values of Fracture Densities');
 titlePos = get(title_obj , 'position');
 titlePos(1) = 0.45;
 titlePos(2) = 1.02;
@@ -96,27 +99,31 @@ hL = legend([line1, line2, line3],{'Training Data','Testing Data','f(x) = x'}, '
 newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
-grid();
 
-delvol_utils.save_plot(fig, save_name_1);
-delvol_utils.save_plot(fig, save_name_2);
+delden_utils.save_plot(fig, save_name_1);
+delden_utils.save_plot(fig, save_name_2);
 
 for i = 1:N_plots
   r2_train_str = r2_train(i);
   r2_test_str = r2_test(i);
   label = folders{i};
-  format_spec = '%s';
-  title_string = sprintf(format_spec, label);
-  a0 = [];
-  b0 = [];
-  c0 = [];
-  d0 = [];
+  format_spec = '%s; R^2 Train = %.2f, Test = %.2f';
+  r2_tests = zeros(height(y_test{i}), 0);
+
   for j = 1:height(y_train{i})
-    a0 = [a0 table2array(y_train{i}(j,:))];
-    b0 = [b0 table2array(y_train_pred{i}(j,:))];
-    c0 = [c0 table2array(y_test{i}(j,:))];
-    d0 = [d0 table2array(y_test_pred{i}(j,:))];
+    score = scores{i};
+    r2_tests(j) = table2array(score(j,2));
   end
+
+  [minimum, idx] = min(r2_tests);
+  title_string = sprintf(format_spec, label, r2_train_str, minimum);
+
+  a0 = table2array(y_train{i}(idx,:));
+  b0 = table2array(y_train_pred{i}(idx,:));
+  c0 = table2array(y_test{i}(idx,:));
+  d0 = table2array(y_test_pred{i}(idx,:));
+  iters = size(a0);
+  iters = iters(2);
 
   a = [];
   b = [];
@@ -162,7 +169,7 @@ for i = 1:N_plots
   % diag_y = [min([min(b(b > 0)), min(d(d > 0))]) max([max(b(b > 0)), max(d(d > 0))])];
   diag_x = [min([min(a), min(c)]) max([max(a), max(c)])];
   diag_y = [min([min(b), min(d)]) max([max(b), max(d)])];
-  diag_line = linspace(-1E8, 1E8, 5E3);
+  diag_line = linspace(-100, 100, 5E3);
 
   line1 = loglog(a, b, 'bx', 'MarkerSize', 4);
   if diag_x(1) < diag_x(2)
@@ -175,9 +182,7 @@ for i = 1:N_plots
   ax.FontSize = 5;
   hold on
   line2 = loglog(c, d, 'r.', 'MarkerSize', 8);
-  xl = xlim;
   line3 = loglog(diag_line, diag_line, 'k:');
-  xlim(xl);
   hold off
 
 end
@@ -188,7 +193,7 @@ han.XLabel.Visible ='on';
 han.YLabel.Visible ='on';
 ylabel(han,'log( Predicted Values )');
 xlabel(han,'log( Expected Values )');
-title_obj = title(han,'Expected vs. Predicted Values of Fracture Densities (Log)');
+title_obj = title(han,'Worst Expected vs. Predicted Values of Fracture Densities (Log)');
 titlePos = get(title_obj , 'position');
 titlePos(1) = 0.4;
 titlePos(2) = 1.02;
@@ -197,9 +202,6 @@ hL = legend([line1, line2, line3],{'Training Data','Testing Data','f(x) = x'}, '
 newPosition = [0.82 0.94 0.05 0.05];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits);
-grid();
 
-delvol_utils.save_plot(fig, save_name_3);
-delvol_utils.save_plot(fig, save_name_4);
-
-exit
+delden_utils.save_plot(fig, save_name_3);
+delden_utils.save_plot(fig, save_name_4);

@@ -30,7 +30,8 @@ from ..config.config import (
     delvol_datafile, delvol_xgb_obj, delvol_cv_folds, term_width,
     delvol_train_data, delvol_test_data, delvol_train_pred_data,
     delvol_test_pred_data, delvol_scores_data, delvol_importance_data,
-    delvol_shap_data, delvol_models_dir, delvol_model_names
+    delvol_shap_data, delvol_models_dir, delvol_model_names, delvol_filter_data,
+    delvol_R2_threshold
 )
 
 class DelVolDensity:
@@ -376,6 +377,7 @@ class DelVolDensity:
         scores_out_path = save_path / delvol_scores_data
         importances_path = save_path / delvol_importance_data
         shap_path = save_path / delvol_shap_data
+        filter_path = save_path / delvol_filter_data
         model_path = save_path / delvol_models_dir
 
         model_path.mkdir(exist_ok = True)
@@ -405,6 +407,7 @@ class DelVolDensity:
             shap_norm = shap_avg/shap_max
             importances.append(shap_norm*r2)
             model.save_model(model_path / delvol_model_names.format(n+1))
+
         importances = np.array(importances)
         cumulative_importance = np.sum(importances, axis = 0)
 
@@ -417,6 +420,12 @@ class DelVolDensity:
 
         with open(importances_path, 'w+') as outfile:
             outfile.write(header + '\n' + importance_values)
+
+        # Row 1 is the MEAN filter, while Row 2 is the ANY filter.
+        mean_filter = int(np.mean(self.r2_test) > delvol_R2_threshold)
+        any_filter = int(all(i > delvol_R2_threshold for i in self.r2_test))
+        with open(filter_path, 'w+') as outfile:
+            outfile.write(f'{mean_filter}\n{any_filter}')
 
     # PRIVATE METHODS
     @staticmethod

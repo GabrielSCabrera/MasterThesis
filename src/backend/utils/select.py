@@ -1,6 +1,7 @@
 from termios import tcflush, TCIFLUSH
 from datetime import datetime
 from pathlib import Path
+import subprocess
 import time
 import sys
 import re
@@ -9,9 +10,9 @@ import os
 import numpy as np
 
 from .terminal import clear_line, reset_screen, cursor_up, get_key_press
+from ..config.config import delden_relpath, matlab_files_abspath
 from ..preprocessing import file_io
 from .format import B, I
-from ..config.config import delden_relpath
 from . import terminal
 
 def select(title:str, options):
@@ -225,18 +226,26 @@ def create_unique_name(prefix:str = None, suffix:str = None) -> str:
     filename = f'{prefix}{datetime_str}{suffix}'
     return filename
 
-def run_matlab(script_relpath:str, variables:str = None, suppress:bool = True):
+def run_matlab(script_name:str, variables:str = None, suppress:bool = True):
     '''
         Runs a MATLAB script with the given initial conditions.
     '''
     print(f'\033[1mAttempting to run MATLAB script:\033[m', end = ' ')
-    print(f'\033[3m{script_relpath}\033[m')
-    try:
-        script = f"{variables} run(\'{script_relpath}\');"
-        cmd = f'matlab -nodisplay -nosplash -nodesktop -r "{script}"'
-        if suppress:
-            cmd += ' > /dev/null'
-        os.system(cmd)
-        print('\033[1mSuccessfully ran MATLAB script\033[m')
-    except:
-        print('\033[1mFailed to run MATLAB script\033[m')
+    print(f'\033[3m{script_name}\033[m')
+
+    script_path = matlab_files_abspath / script_name
+    script = (
+        f"try, {variables} run(\'{script_path}\'), catch e, exit(1), end,"
+        f"exit(0)"
+    )
+    cmd = f'matlab -nodisplay -nosplash -nodesktop -r "{script}"'
+
+    if suppress:
+        cmd += ' > /dev/null'
+
+    completed_process = os.system(cmd)
+
+    if completed_process == 0:
+        print('\033[1;32mSuccessfully\033[m\033[1m ran MATLAB script\033[m')
+    else:
+        print('\033[1;31mFailed\033[m\033[1m to run MATLAB script\033[m')

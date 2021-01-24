@@ -211,5 +211,3 @@ grid();
 
 delvol_utils.save_plot(fig, save_name_3);
 delvol_utils.save_plot(fig, save_name_4);
-
-exit

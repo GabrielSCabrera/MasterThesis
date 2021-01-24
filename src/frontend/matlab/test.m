@@ -18,4 +18,3 @@ xlabel("Sample X-Axis Label");
 ylabel("Sample Y-Axis Label");
 legend({'Curve 1', 'Curve 2'});
 utils.save_plot(fig, "test_plot.pdf");
-exit;

@@ -48,4 +48,3 @@ ylabel('Number of Experiments', 'Interpreter', 'latex');
 grid();
 delvol_utils.save_plot(fig, save_name);
 hold off
-exit();

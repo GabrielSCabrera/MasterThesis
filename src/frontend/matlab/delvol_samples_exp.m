@@ -48,4 +48,3 @@ ylabel('$R^2$ Score', 'Interpreter', 'latex');
 grid();
 delvol_utils.save_plot(fig, save_name);
 hold off
-exit();

@@ -16,4 +16,3 @@ xlim([min(sigd) max(sigd)]);
 grid();
 delvol_utils.save_plot(fig, save_name);
 hold off
-exit();
