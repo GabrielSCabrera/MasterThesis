@@ -81,6 +81,35 @@ classdef delvol_utils
       end
     end
 
+    function [mean_filters, any_filters] = load_filter(directory)
+      % Reads the data from a set of .dat files and returns its values
+
+      arguments
+        directory string
+      end
+
+      storage = '~/Documents/MasterThesis/results/delvol/';
+      main_path = strcat(storage, directory);
+      directory = dir(main_path);
+      folders = {directory([directory.isdir]).name};
+      folders = folders(~ismember(folders, {'.','..'}));
+      mean_filters = [];
+      any_filters = [];
+      N_experiments = length(folders);
+
+      for i = 1:N_experiments
+        filter_path = strcat(main_path, '/');
+        filter_path = strcat(filter_path, folders(i));
+        filter_path = strcat(filter_path, '/filter.dat');
+
+        data = readtable(filter_path);
+        mean_filters = [mean_filters; data(1,1)];
+        any_filters = [any_filters; data(2,1)];
+      end
+      mean_filters = table2array(mean_filters);
+      any_filters = table2array(any_filters);
+    end
+
     function [density_data] = load_from_density_data(filename)
       % Reads the data from a given .csv file and returns its values as
       % matrices

@@ -330,154 +330,170 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
         Saves a variety of plots for the `compare` results of delvol.
     '''
 
+    scripts = [
+        'delvol_compare.m',
+        'delvol_compare_01.m',
+        'delvol_hist.m',
+        'delvol_hist_01.m',
+        'delvol_chart_exps.m',
+        'delvol_chart_exps_best.m',
+        'delvol_chart_exps_worst.m',
+        'delvol_compare_sample_observed.m',
+        'delvol_samples_exp.m',
+        'delvol_samples_exp_01.m',
+        'delvol_chart_exps_best_worst_compare.m',
+        'delvol_importances.m',
+        'delvol_importances_compare.m',
+        'delvol_importances_mean.m',
+        'delvol_importances_any.m',
+    ]
+
+    variables = []
+
+    #################################################################
+
+    save_name = directory + '/compare' + '.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    )
+
+    #################################################################
+    save_name = directory + '/compare_01' + '.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    )
+
+    #################################################################
+    save_name = directory + '/hist' + '.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    )
+
+    #################################################################
+    save_name = directory + '/hist_01' + '.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    )
+
+    #################################################################
+    save_name_1 = directory + '/chart_exps' + '.png'
+    save_name_2 = directory + '/chart_exps' + '.pdf'
+    save_name_3 = directory + '/chart_exps_log' + '.png'
+    save_name_4 = directory + '/chart_exps_log' + '.pdf'
+
+    variables.append(
+        f"directory = \'{directory}\'; "
+        f"save_name_1 = \'{save_name_1}\'; "
+        f"save_name_2 = \'{save_name_2}\'; "
+        f"save_name_3 = \'{save_name_3}\'; "
+        f"save_name_4 = \'{save_name_4}\'; "
+    )
+
+    #################################################################
+    save_name_1 = directory + '/chart_exps_best' + '.png'
+    save_name_2 = directory + '/chart_exps_best' + '.pdf'
+    save_name_3 = directory + '/chart_exps_best_log' + '.png'
+    save_name_4 = directory + '/chart_exps_best_log' + '.pdf'
+
+    variables.append(
+        f"directory = \'{directory}\'; "
+        f"save_name_1 = \'{save_name_1}\'; "
+        f"save_name_2 = \'{save_name_2}\'; "
+        f"save_name_3 = \'{save_name_3}\'; "
+        f"save_name_4 = \'{save_name_4}\'; "
+    )
+
+    #################################################################
+    save_name_1 = directory + '/chart_exps_worst' + '.png'
+    save_name_2 = directory + '/chart_exps_worst' + '.pdf'
+    save_name_3 = directory + '/chart_exps_worst_log' + '.png'
+    save_name_4 = directory + '/chart_exps_worst_log' + '.pdf'
+
+    variables.append(
+        f"directory = \'{directory}\'; "
+        f"save_name_1 = \'{save_name_1}\'; "
+        f"save_name_2 = \'{save_name_2}\'; "
+        f"save_name_3 = \'{save_name_3}\'; "
+        f"save_name_4 = \'{save_name_4}\'; "
+    )
+
+    #################################################################
+    save_name_1 = directory + '/compare_sample_observed' + '.png'
+    save_name_2 = directory + '/compare_sample_observed' + '.pdf'
+    variables.append(
+        f"directory = \'{directory}\'; "
+        f"save_name_1 = \'{save_name_1}\'; "
+        f"save_name_2 = \'{save_name_2}\'; "
+    )
+
+    #################################################################
+    save_name = directory + '/samples_exp' + '.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    )
+
+    #################################################################
+    save_name = directory + '/samples_exp_01' + '.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    )
+
+    #################################################################
+    save_name_1 = directory + '/chart_exps_best_worst' + '.png'
+    save_name_2 = directory + '/chart_exps_best_worst' + '.pdf'
+    variables.append(
+        f"directory = \'{directory}\'; "
+        f"save_name_1 = \'{save_name_1}\'; "
+        f"save_name_2 = \'{save_name_2}\'; "
+    )
+
+    #################################################################
+    save_name = directory + '/importances_'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    )
+
+    #################################################################
+    save_name = directory + '/importances_compare.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    )
+
+    #################################################################
+    save_name = directory + '/importances_mean.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+        f"threshold = {config.delvol_R2_threshold};"
+    )
+
+    #################################################################
+    save_name = directory + '/importances_any.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+        f"threshold = {config.delvol_R2_threshold};"
+    )
+
+    #################################################################
+
     if path is None:
         path = backend.config.matlab_img_relpath
     path = path / directory
     path.mkdir(exist_ok = True)
 
-    save_name = directory + '/compare' + '.png'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_compare.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
-        )
-    )
+    result = backend.select.run_matlab_set(scripts, variables, suppress)
 
-    save_name = directory + '/compare_01' + '.png'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_compare_01.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
+    if result != 0:
+        msg = (
+            '\n\033[1mReverting to Running Scripts Individually (Slow)\033[m\n'
         )
-    )
-
-    save_name = directory + '/hist' + '.png'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_hist.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
-        )
-    )
-
-    save_name = directory + '/hist_01' + '.png'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_hist_01.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
-        )
-    )
-
-    save_name_1 = directory + '/chart_exps' + '.png'
-    save_name_2 = directory + '/chart_exps' + '.pdf'
-    save_name_3 = directory + '/chart_exps_log' + '.png'
-    save_name_4 = directory + '/chart_exps_log' + '.pdf'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_chart_exps.m',
-        variables = (
-            f"directory = \'{directory}\'; "
-            f"save_name_1 = \'{save_name_1}\'; "
-            f"save_name_2 = \'{save_name_2}\'; "
-            f"save_name_3 = \'{save_name_3}\'; "
-            f"save_name_4 = \'{save_name_4}\'; "
-        )
-    )
-
-    save_name_1 = directory + '/chart_exps_best' + '.png'
-    save_name_2 = directory + '/chart_exps_best' + '.pdf'
-    save_name_3 = directory + '/chart_exps_best_log' + '.png'
-    save_name_4 = directory + '/chart_exps_best_log' + '.pdf'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_chart_exps_best.m',
-        variables = (
-            f"directory = \'{directory}\'; "
-            f"save_name_1 = \'{save_name_1}\'; "
-            f"save_name_2 = \'{save_name_2}\'; "
-            f"save_name_3 = \'{save_name_3}\'; "
-            f"save_name_4 = \'{save_name_4}\'; "
-        )
-    )
-
-    save_name_1 = directory + '/chart_exps_worst' + '.png'
-    save_name_2 = directory + '/chart_exps_worst' + '.pdf'
-    save_name_3 = directory + '/chart_exps_worst_log' + '.png'
-    save_name_4 = directory + '/chart_exps_worst_log' + '.pdf'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_chart_exps_worst.m',
-        variables = (
-            f"directory = \'{directory}\'; "
-            f"save_name_1 = \'{save_name_1}\'; "
-            f"save_name_2 = \'{save_name_2}\'; "
-            f"save_name_3 = \'{save_name_3}\'; "
-            f"save_name_4 = \'{save_name_4}\'; "
-        )
-    )
-
-    save_name_1 = directory + '/compare_sample_observed' + '.png'
-    save_name_2 = directory + '/compare_sample_observed' + '.pdf'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_compare_sample_observed.m',
-        variables = (
-            f"directory = \'{directory}\'; "
-            f"save_name_1 = \'{save_name_1}\'; "
-            f"save_name_2 = \'{save_name_2}\'; "
-        )
-    )
-
-    save_name = directory + '/samples_exp' + '.png'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_samples_exp.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
-        )
-    )
-
-    save_name = directory + '/samples_exp_01' + '.png'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_samples_exp_01.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
-        )
-    )
-
-    save_name_1 = directory + '/chart_exps_best_worst' + '.png'
-    save_name_2 = directory + '/chart_exps_best_worst' + '.pdf'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_chart_exps_best_worst_compare.m',
-        variables = (
-            f"directory = \'{directory}\'; "
-            f"save_name_1 = \'{save_name_1}\'; "
-            f"save_name_2 = \'{save_name_2}\'; "
-        )
-    )
-
-    save_name = directory + '/importances_'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_importances.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
-        )
-    )
-
-    save_name = directory + '/importances_compare.png'
-    backend.select.run_matlab(
-        suppress = suppress,
-        script_name = 'delvol_importances_compare.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
-        )
-    )
+        print(msg, flush = True)
+        exit() # TODO: Remove this
+        for script, var in zip(scripts, variables):
+            backend.select.run_matlab(
+                suppress = suppress,
+                script_name = script,
+                variables = var
+            )
 
 """SCRIPT PROCEDURES"""
 
@@ -1129,7 +1145,7 @@ def procedure_delvol_all():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
-    training_label = 'delvtot'
+    training_label = 'delv50'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
@@ -1149,13 +1165,13 @@ def procedure_delvol_lite():
     BucketManager.download('delvol_data')
     terminal.reset_screen()
 
-    N_experiments = 5
+    N_experiments = 15
     exps = backend.groups.delvol_exps['all']
 
     gridsearch_params = {
         "colsample_bytree": [0.3, 0.9],
-        "alpha":            [0.001, 0.1],
-        "learning_rate":    [0.005, 0.1],
+        "alpha":            [0.001],
+        "learning_rate":    [0.005],
         "n_estimators":     [10,],
         "max_depth":        [3, 5]
     }
@@ -1166,7 +1182,7 @@ def procedure_delvol_lite():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
-    training_label = 'delvtot'
+    training_label = 'delv50'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
@@ -1205,7 +1221,7 @@ def procedure_delvol_all_log():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
-    training_label = 'delvtot'
+    training_label = 'delv50'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
@@ -1246,7 +1262,7 @@ def procedure_delvol_groups():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
-    training_label = 'delvtot'
+    training_label = 'delv50'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENTS {", ".join(i)} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
@@ -1472,23 +1488,7 @@ if args.score_DNN:
     procedure_score_DNN()
 
 if args.test:
-
-    directory = 'delvtot all'
-    path = backend.config.matlab_img_relpath
-    path = path / directory
-    path.mkdir(exist_ok = True)
-    save_name = directory + '/importances_compare.png'
-    backend.select.run_matlab(
-        suppress = True,
-        script_name = 'delvol_importances_compare.m',
-        variables = (
-            f"directory = \'{directory}\'; save_name = \'{save_name}\';"
-        )
-    )
-
-    # save_plot_delvol('del50 All', suppress = False)
-    # save_plot_delvol('del50 Groups', suppress = False)
-    # save_plot_delvol('delglobden All', suppress = False)
+    save_plot_delvol('lite_test', suppress = True)
 
 if args.cluster:
     procedure_cluster()

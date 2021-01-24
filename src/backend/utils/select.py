@@ -235,8 +235,8 @@ def run_matlab(script_name:str, variables:str = None, suppress:bool = True):
 
     script_path = matlab_files_abspath / script_name
     script = (
-        f"try, {variables} run(\'{script_path}\'), catch e, exit(1), end,"
-        f"exit(0)"
+        f"try, {variables} run(\'{script_path}\'), catch e, disp(e), exit(1),"
+        f"end, exit(0)"
     )
     cmd = f'matlab -nodisplay -nosplash -nodesktop -r "{script}"'
 
@@ -249,3 +249,44 @@ def run_matlab(script_name:str, variables:str = None, suppress:bool = True):
         print('\033[1;32mSuccessfully\033[m\033[1m ran MATLAB script\033[m')
     else:
         print('\033[1;31mFailed\033[m\033[1m to run MATLAB script\033[m')
+
+    return completed_process
+
+def run_matlab_set(scripts:str, variables:str = None, suppress:bool = True):
+    '''
+        Runs several MATLAB scripts with the given sets of initial conditions.
+    '''
+    print(
+        f'\033[1mAttempting to run multiple MATLAB scripts\033[m', flush = True
+    )
+
+    script_str = ''
+    for script, var in zip(scripts, variables):
+        script_path = matlab_files_abspath / script
+        script_str += f"{var} run(\'{script_path}\');"
+
+    catch_str = f"try, {script_str}, catch e, disp(e), exit(1), end, exit(0)"
+    script_str = script_str[:-2]
+    cmd = f'matlab -nodisplay -nosplash -nodesktop -r "{catch_str}"'
+
+    if suppress:
+        cmd += ' > /dev/null'
+
+    completed_process = os.system(cmd)
+
+    if completed_process == 0:
+        msg = (
+            f'\033[1;32mSuccessfully\033[m\033[1m ran MATLAB scripts in bulk:'
+            f'\033[m\n'
+        )
+        for script in scripts:
+            script_path = matlab_files_abspath / script
+            msg += f'\n\t{script_path.name}'
+        print(msg, flush = True)
+    else:
+        msg = (
+            '\033[1;31mFailed\033[m\033[1m to run MATLAB scripts in bulk\033[m'
+        )
+        print(msg, flush = True)
+
+    return completed_process

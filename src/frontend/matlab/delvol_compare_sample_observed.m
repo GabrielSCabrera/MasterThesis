@@ -2,7 +2,6 @@
 
 N = size(y_train);
 N = N(2);
-
 fig = figure();
 for i = 1:N
   label = folders{i};
@@ -45,7 +44,6 @@ for i = 1:N
   hold on
 end
 hL = legend([l1, l2],{'Training Set', 'Testing Set'});
-
 han = axes(fig,'visible','off');
 han.Title.Visible ='on';
 han.XLabel.Visible ='on';
