@@ -424,8 +424,9 @@ class DelVolDensity:
         # Row 1 is the MEAN filter, while Row 2 is the ANY filter.
         mean_filter = int(np.mean(self.r2_test) > delvol_R2_threshold)
         any_filter = int(all(i > delvol_R2_threshold for i in self.r2_test))
+        weak_filter = int(any(i > delvol_R2_threshold for i in self.r2_test))
         with open(filter_path, 'w+') as outfile:
-            outfile.write(f'{mean_filter}\n{any_filter}')
+            outfile.write(f'{mean_filter}\n{any_filter}\n{weak_filter}')
 
     # PRIVATE METHODS
     @staticmethod

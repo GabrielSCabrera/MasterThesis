@@ -8,7 +8,7 @@ hold on
 
 new_folders = [];
 for j = 1:rows
-  if mean_filters(j,1) == 1
+  if weak_filters(j,1) == 1
     plot(1:cols, importances(j,:));
     new_folders = [new_folders folders(j)];
   end

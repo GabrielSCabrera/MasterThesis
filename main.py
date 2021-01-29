@@ -91,6 +91,10 @@ def parse_args():
         'Begins by taking the logarithm of all values.'
     )
 
+    help_delvol_plots = (
+        'Select a previously run experiment and create the related figures.'
+    )
+
     help_sync = (
         'Synchronizes the local data with the complete dataset collection, but '
         'only if the local files are of a different size than those hosted '
@@ -177,6 +181,9 @@ def parse_args():
     parser.add_argument(
         '--delvol-groups-log', action='store_true',
         help = help_delvol_groups_log
+    )
+    parser.add_argument(
+        '--delvol-plots', action='store_true', help = help_delvol_plots
     )
     parser.add_argument(
         '--sync', action='store_true', help = help_sync
@@ -346,6 +353,7 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
         'delvol_importances_compare.m',
         'delvol_importances_mean.m',
         'delvol_importances_any.m',
+        'delvol_importances_weak.m',
     ]
 
     variables = []
@@ -474,6 +482,13 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
     )
 
     #################################################################
+    save_name = directory + '/importances_weak.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+        f"threshold = {config.delvol_R2_threshold};"
+    )
+
+    #################################################################
 
     if path is None:
         path = backend.config.matlab_img_relpath
@@ -487,7 +502,6 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
             '\n\033[1mReverting to Running Scripts Individually (Slow)\033[m\n'
         )
         print(msg, flush = True)
-        exit() # TODO: Remove this
         for script, var in zip(scripts, variables):
             backend.select.run_matlab(
                 suppress = suppress,
@@ -1319,6 +1333,16 @@ def procedure_delvol_groups_log():
     parsers.combine_delvol_results(path)
     save_plot_delvol(directory)
 
+def procedure_delvol_plots():
+    title = (
+        f'Select a Set of Results.'
+    )
+    path = backend.config.delvol_relpath
+    options = [str(i.name) for i in path.glob('*')]
+    selection = select.scroll_select(title, options)
+    terminal.reset_screen()
+    save_plot_delvol(selection, suppress = True)
+
 def procedure_sync():
 
     BucketManager.sync()
@@ -1488,7 +1512,25 @@ if args.score_DNN:
     procedure_score_DNN()
 
 if args.test:
-    save_plot_delvol('lite_test', suppress = True)
+
+    script = 'delvol_importances_mean.m'
+    directory = 'lite_test'
+
+    path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    save_name = directory + '/importances_any.png'
+    variables = (
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+        f"threshold = {config.delvol_R2_threshold};"
+    )
+
+    backend.select.run_matlab(
+        suppress = False,
+        script_name = script,
+        variables = variables
+    )
 
 if args.cluster:
     procedure_cluster()
@@ -1525,6 +1567,9 @@ if args.delvol_groups:
 
 if args.delvol_groups_log:
     procedure_delvol_groups_log()
+
+if args.delvol_plots:
+    procedure_delvol_plots()
 
 if args.sync:
     procedure_sync()

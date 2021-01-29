@@ -81,7 +81,7 @@ classdef delvol_utils
       end
     end
 
-    function [mean_filters, any_filters] = load_filter(directory)
+    function [mean_filters, any_filters, weak_filters] = load_filter(directory)
       % Reads the data from a set of .dat files and returns its values
 
       arguments
@@ -95,6 +95,7 @@ classdef delvol_utils
       folders = folders(~ismember(folders, {'.','..'}));
       mean_filters = [];
       any_filters = [];
+      weak_filters = [];
       N_experiments = length(folders);
 
       for i = 1:N_experiments
@@ -105,9 +106,11 @@ classdef delvol_utils
         data = readtable(filter_path);
         mean_filters = [mean_filters; data(1,1)];
         any_filters = [any_filters; data(2,1)];
+        weak_filters = [weak_filters; data(3,1)];
       end
       mean_filters = table2array(mean_filters);
       any_filters = table2array(any_filters);
+      weak_filters = table2array(weak_filters);
     end
 
     function [density_data] = load_from_density_data(filename)

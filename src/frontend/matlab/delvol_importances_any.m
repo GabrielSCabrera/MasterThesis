@@ -1,5 +1,5 @@
 [headers, importances, folders] = delvol_utils.load_importance(directory);
-[mean_filters, any_filters] = delvol_utils.load_filter(directory);
+[mean_filters, any_filters, weak_filters] = delvol_utils.load_filter(directory);
 [rows, cols] = size(importances);
 
 fig = figure();
