@@ -532,14 +532,6 @@ def procedure_delvol_all_custom(N_experiments:int, training_labels:List[str]):
         "max_depth":        [1, 3, 5, 7, 9, 11]
     }
 
-    gridsearch_params = {
-        "colsample_bytree": [0.3],
-        "alpha":            [0],
-        "learning_rate":    [0.005],
-        "n_estimators":     [10],
-        "max_depth":        [1],
-    }
-
     for label in training_labels:
         terminal.reset_screen()
         directory = backend.utils.select.create_unique_name(prefix = 'combined')
