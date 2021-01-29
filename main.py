@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 import numpy as np
 import argparse
 import time
@@ -126,6 +127,10 @@ def parse_args():
         'Removes downloaded data files, experiments, and all processed files.'
     )
 
+    help_custom = (
+        'Custom script, set this up on-demand.'
+    )
+
     parser = argparse.ArgumentParser(description = argparse_desc)
 
     parser.add_argument(
@@ -205,6 +210,9 @@ def parse_args():
     )
     parser.add_argument(
         '--uninstall', action='store_true', help = help_uninstall
+    )
+    parser.add_argument(
+        '--custom', action='store_true', help = help_custom
     )
 
     return parser.parse_args()
@@ -508,6 +516,49 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
                 script_name = script,
                 variables = var
             )
+
+def procedure_delvol_all_custom(N_experiments:int, training_labels:List[str]):
+
+    BucketManager.download('delvol_data')
+    terminal.reset_screen()
+
+    exps = backend.groups.delvol_exps['all']
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
+    }
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3],
+        "alpha":            [0],
+        "learning_rate":    [0.005],
+        "n_estimators":     [10],
+        "max_depth":        [1],
+    }
+
+    for label in training_labels:
+        terminal.reset_screen()
+        directory = backend.utils.select.create_unique_name(prefix = 'combined')
+        path = backend.config.delvol_relpath / directory
+        path.mkdir(exist_ok = True)
+        length = len(exps)
+        for n,i in enumerate(exps):
+            title = backend.utils.format.B(f'EXPERIMENT {i} ')
+            title += backend.utils.format.I(f'({n+1}/{length})')
+            delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
+            delvol.set_experiments(i)
+            delvol.set_training_label(label)
+            delvol.grid_search(
+                itermax = N_experiments, train_size = 0.75, **gridsearch_params
+            )
+            delvol.save(filename = i)
+
+        parsers.combine_delvol_results(path)
+        save_plot_delvol(directory)
 
 """SCRIPT PROCEDURES"""
 
@@ -1510,6 +1561,11 @@ if args.train_DNN:
 
 if args.score_DNN:
     procedure_score_DNN()
+
+if args.custom:
+    training_labels = ['delvtot', 'delv50', 'time', 'sig_d']
+    N_experiments = 5
+    procedure_delvol_all_custom(N_experiments, training_labels)
 
 if args.test:
 
