@@ -1556,7 +1556,7 @@ if args.score_DNN:
 
 if args.custom:
     training_labels = ['delvtot', 'delv50', 'time', 'sig_d']
-    N_experiments = 5
+    N_experiments = 15
     procedure_delvol_all_custom(N_experiments, training_labels)
 
 if args.test:
