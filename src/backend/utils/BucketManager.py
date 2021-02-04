@@ -144,7 +144,7 @@ class BucketManager:
         if directories is None:
             directories = [
                 config.density_data_relpath, config.bins_relpath,
-                config.input_txts_relpath
+                config.input_txts_relpath, config.delvol_data_relpath,
             ]
         sizes = {}
         for i in directories:

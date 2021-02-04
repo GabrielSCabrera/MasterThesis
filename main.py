@@ -96,6 +96,12 @@ def parse_args():
         'Select a previously run experiment and create the related figures.'
     )
 
+    help_delvol_data_plots = (
+        'Creates plots that are universal to the delvol dataset, meaning plots '
+        'that can be created with the data provided without the need to create '
+        'or evaluate a model.'
+    )
+
     help_sync = (
         'Synchronizes the local data with the complete dataset collection, but '
         'only if the local files are of a different size than those hosted '
@@ -113,6 +119,11 @@ def parse_args():
 
     help_delvol_combine = (
         'Synchronizes the local data with the complete dataset collection.'
+    )
+
+    help_delvol_logspace = (
+        'Runs delvol for a single sample, but for many N (number of models) '
+        'in order to understand the trend for the std of R².'
     )
 
     help_matlab = (
@@ -191,6 +202,10 @@ def parse_args():
         '--delvol-plots', action='store_true', help = help_delvol_plots
     )
     parser.add_argument(
+        '--delvol-data-plots', action='store_true',
+        help = help_delvol_data_plots
+    )
+    parser.add_argument(
         '--sync', action='store_true', help = help_sync
     )
     parser.add_argument(
@@ -201,6 +216,9 @@ def parse_args():
     )
     parser.add_argument(
         '--delvol-combine', action='store_true', help = help_delvol_combine
+    )
+    parser.add_argument(
+        '--delvol-logspace', action='store_true', help = help_delvol_logspace
     )
     parser.add_argument(
         '--matlab', action='store_true', help = help_matlab
@@ -538,7 +556,7 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
                 variables = var
             )
 
-def procedure_delvol_all_custom(N_experiments:int, training_labels:List[str]):
+def delvol_all_custom(N_experiments:int, training_labels:List[str]):
 
     BucketManager.download('delvol_data')
     terminal.reset_screen()
@@ -1407,6 +1425,94 @@ def procedure_delvol_plots():
     terminal.reset_screen()
     save_plot_delvol(selection, suppress = True)
 
+def procedure_delvol_data_plots():
+    delvol_path = config.delvol_data_relpath
+    delden_path = config.density_data_relpath
+
+    delvol_files = list(delvol_path.glob('*.txt'))
+    delden_files = list(delden_path.glob('*d9.txt'))
+
+    delvol_data = []
+    delden_data = []
+
+    delden_columns = [
+        'del_den', 'glob_den', 'sigd', 'ep', 'del_f', 'del_sig', 'del_ep',
+        'v_p10', 'v_p20', 'v_p30', 'v_p40', 'v_p50', 'v_mean', 'v_p60', 'v_p70',
+        'v_p80', 'v_p90', 'v_max', 'v_sum', 'v_std', 'den_p10', 'den_p20',
+        'den_p30', 'den_p40', 'den_p50', 'den_mean', 'den_p60', 'den_p70',
+        'den_p80', 'den_p90', 'den_max', 'den_sum', 'den_std', 'den_numloc',
+        'den_volloc', 'dist_p10', 'dist_p20', 'dist_p30', 'dist_p40',
+        'dist_p50', 'dist_mean', 'dist_p60', 'dist_p70', 'dist_p80', 'dist_p90',
+        'dist_max', 'dist_sum', 'dist_std', 'c_10', 'c_20', 'c_30', 'c_40',
+        'c_50', 'c_60', 'c_70', 'c_80', 'c_90', 'c_len'
+    ]
+
+    delvol_columns = [
+        'delvtot', 'delv50', 'time', 'sig_d', 'x', 'y', 'z', 'dmin_min',
+        'dmin_25', 'dmin_50', 'dmin_75', 'dmin_max', 'th1_min', 'th1_25',
+        'th1_50', 'th1_75', 'th1_max', 'th3_min', 'th3_25', 'th3_50', 'th3_75',
+        'th3_max', 'l1_min', 'l1_25', 'l1_50', 'l1_75', 'l1_max', 'l3_min',
+        'l3_25', 'l3_50', 'l3_75', 'l3_max', 'ani_min', 'ani_25', 'ani_50',
+        'ani_75', 'ani_max', 'vol_min', 'vol_25', 'vol_50', 'vol_75', 'vol_max',
+        'dc_25', 'dc_50', 'dc_75', 'dc_max', 'tot_vol', 'rand'
+    ]
+
+    for i in delden_files:
+        with open(i, 'r') as infile:
+            lines = infile.readlines()[1:]
+        for n, line in enumerate(lines):
+            lines[n] = [float(i) for i in line.split(' ')[:-1]]
+        delden_data.append(np.array(lines))
+    delden_columns = {i:j for j,i in enumerate(delden_columns)}
+
+    for i in delvol_files:
+        with open(i, 'r') as infile:
+            lines = infile.readlines()[1:]
+        for n, line in enumerate(lines):
+            lines[n] = [float(i) for i in line.split(' ')[:-1]]
+        delvol_data.append(np.array(lines))
+    delvol_columns = {i:j for j,i in enumerate(delvol_columns)}
+
+    # Sorting the delden data by sig_d
+    delden_all = {}
+    for doc, name in zip(delden_data, delden_files):
+        row = {}
+        for i in doc:
+            sig_d = i[delden_columns['sigd']]
+            axial_strain = i[delden_columns['ep']]
+            row[sig_d] = axial_strain
+        pat = r'damage_([A-Z0-9_]+)_s25_d9.txt'
+        key = re.sub(pat, r'\1', name.name)
+        delden_all[key] = row
+
+    # Dividing the delvol into subvolumes by sig_d
+    delvol_all = {}
+    for doc, name in zip(delvol_data, delvol_files):
+        subv = {}
+        for row in doc:
+            sig_d = row[delvol_columns['sig_d']]
+            if sig_d not in subv.keys():
+                subv[sig_d] = [row]
+            else:
+                subv[sig_d].append(row)
+        pat = r'([A-Z0-9_]+)_3D_delvol_a3000_subv300.txt'
+        key = re.sub(pat, r'\1', name.name)
+        delvol_all[key] = subv
+
+    # Arrays for the MATLAB plots
+    # First Plot: Delv50 vs. Axial Strain
+
+    delv50 = []
+    axial_strain = []
+    for dv, dd in zip(delvol_all, delden_all):
+        dv = delvol_all[key]
+        dd = delden_all[key]
+        print(dd.keys())
+        for k,v in dv.items():
+            print(dd[k])
+
+
+
 def procedure_sync():
 
     BucketManager.sync()
@@ -1463,7 +1569,7 @@ def procedure_delvol_combine():
     directory = config.delvol_relpath
 
     filename_pat = (
-        r'combined\_(\d{4})\-(\d{2})\-(\d{2}) (\d{2})\:(\d{2})\:(\d{2})\.(\d{6})'
+        r'logspace\_(\d{4})\-(\d{2})\-(\d{2}) (\d{2})\:(\d{2})\:(\d{2})\.(\d{6})'
     )
     filename_repl = (
         r'\1/\2/\3 \4:\5:\6.\7'
@@ -1477,8 +1583,8 @@ def procedure_delvol_combine():
     N = len(files)
     if N == 0:
         msg = (
-            f'\n\nNo combined delvol experiments found.  Run `python main.py '
-            f'--delvol-all` to create a set of experiment output files in '
+            f'\n\nNo logspace delvol experiments found.  Run `python main.py '
+            f'--delvol-logspace` to create a set of experiment output files in '
             f'`~/Documents/MasterThesis/results/delvol/`.\n'
         )
         raise FileNotFoundError(msg)
@@ -1498,7 +1604,52 @@ def procedure_delvol_combine():
 
     terminal.reset_screen()
     print(format.B('Selected Experiment: ') + format.I(selection))
-    parsers.combine_delvol_results(selection)
+    parsers.combine_logspace_results(selection)
+
+def procedure_delvol_logspace():
+
+    BucketManager.download('delvol_data')
+    terminal.reset_screen()
+
+    experiment = 'MONZ4'
+    N_experiments = np.ceil(np.logspace(0.3, 2, 15)).astype(np.int64)
+    exps = backend.groups.delvol_exps['all']
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
+    }
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3],
+        "alpha":            [0],
+        "learning_rate":    [0.005],
+        "n_estimators":     [10],
+        "max_depth":        [1],
+    }
+
+    terminal.reset_screen()
+
+    directory = backend.utils.select.create_unique_name(prefix = 'logspace')
+    path = backend.config.delvol_relpath / directory
+    path.mkdir(exist_ok = True)
+    length = len(N_experiments)
+    training_label = 'delv50'
+    for n,i in enumerate(N_experiments):
+        title = backend.utils.format.B(f'EXPERIMENT FOR N={i:d} ')
+        title += backend.utils.format.I(f'({n+1}/{length})')
+        delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
+        delvol.set_experiments(experiment)
+        delvol.set_training_label(training_label)
+        delvol.grid_search(
+            itermax = i, train_size = 0.75, **gridsearch_params
+        )
+        delvol.save(filename = f'{experiment}_N{i:d}')
+
+    parsers.combine_logspace_results(directory)
 
 def procedure_matlab():
     directories = [
@@ -1578,7 +1729,10 @@ if args.score_DNN:
 if args.custom:
     training_labels = ['delvtot', 'delv50', 'sig_d']
     N_experiments = 25
-    procedure_delvol_all_custom(N_experiments, training_labels)
+    delvol_all_custom(N_experiments, training_labels)
+
+if args.delvol_logspace:
+    procedure_delvol_logspace()
 
 if args.test:
     script = 'delvol_importances_good.m'
@@ -1638,6 +1792,9 @@ if args.delvol_groups_log:
 
 if args.delvol_plots:
     procedure_delvol_plots()
+
+if args.delvol_data_plots:
+    procedure_delvol_data_plots()
 
 if args.sync:
     procedure_sync()
