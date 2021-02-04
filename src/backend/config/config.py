@@ -70,11 +70,13 @@ delvol_train_pred_data = "y_train_pred.csv"
 delvol_test_pred_data = "y_test_pred.csv"
 delvol_scores_data = "scores.csv"
 delvol_importance_data = "cumulative_importance.csv"
+delvol_importances_good_data = "good_importances.csv"
 delvol_shap_data = "shap.csv"
 delvol_models_dir = "models"
 delvol_model_names = "model_{:03d}"
 delvol_R2_threshold = 0.7
 delvol_filter_data = "filter.dat"
+delvol_N_good_data = "N_good.dat"
 
 DNN_model_extension = ".dnn"
 cluster_dir_labels = "CL{:05d}"

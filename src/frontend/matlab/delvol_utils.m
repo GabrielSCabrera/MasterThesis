@@ -81,6 +81,35 @@ classdef delvol_utils
       end
     end
 
+    function [headers, importances, folders] = load_good_importance(directory)
+      % Reads the data from a set of .csv files and returns its values as
+      % matrices
+      arguments
+        directory string
+      end
+
+      storage = '~/Documents/MasterThesis/results/delvol/';
+      main_path = strcat(storage, directory);
+      directory = dir(main_path);
+      folders = {directory([directory.isdir]).name};
+      folders = folders(~ismember(folders, {'.','..'}));
+      % folders = sort(folders);
+      importances = [];
+      N_experiments = length(folders);
+
+      for i = 1:N_experiments
+        importance_path = strcat(main_path, '/');
+        importance_path = strcat(importance_path, folders(i));
+        importance_path = strcat(importance_path, '/good_importances.csv');
+
+        % opts = detectImportOptions(importance_path, 'NumHeaderLines', 1);
+        importance = readtable(importance_path);
+        headers = importance.Properties.VariableNames;
+        importance = table2array(importance(1,:));
+        importances = [importances ; importance];
+      end
+    end
+
     function [mean_filters, any_filters, weak_filters] = load_filter(directory)
       % Reads the data from a set of .dat files and returns its values
 

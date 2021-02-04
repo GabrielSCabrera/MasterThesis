@@ -246,6 +246,11 @@ def display_status():
 
 """FUNCTIONS"""
 
+def cross_ref_delvol(directory:str, path:Path = None, suppress:bool = True):
+    '''
+        Cross references the delvol and delden data in order to
+    '''
+
 def save_plot_delden(directory:str, path:Path = None, suppress:bool = True):
     '''
         Saves a variety of plots for the `compare` results of delden.
@@ -362,6 +367,7 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
         'delvol_importances_mean.m',
         'delvol_importances_any.m',
         'delvol_importances_weak.m',
+        'delvol_importances_good.m',
     ]
 
     variables = []
@@ -491,6 +497,13 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
 
     #################################################################
     save_name = directory + '/importances_weak.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+        f"threshold = {config.delvol_R2_threshold};"
+    )
+
+    #################################################################
+    save_name = directory + '/importances_good.png'
     variables.append(
         f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
         f"threshold = {config.delvol_R2_threshold};"
@@ -1560,7 +1573,6 @@ if args.custom:
     procedure_delvol_all_custom(N_experiments, training_labels)
 
 if args.test:
-
     script = 'delvol_importances_mean.m'
     directory = 'lite_test'
 

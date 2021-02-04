@@ -31,7 +31,7 @@ from ..config.config import (
     delvol_train_data, delvol_test_data, delvol_train_pred_data,
     delvol_test_pred_data, delvol_scores_data, delvol_importance_data,
     delvol_shap_data, delvol_models_dir, delvol_model_names, delvol_filter_data,
-    delvol_R2_threshold
+    delvol_R2_threshold, delvol_N_good_data, delvol_importances_good_data
 )
 
 class DelVolDensity:
@@ -376,8 +376,10 @@ class DelVolDensity:
 
         scores_out_path = save_path / delvol_scores_data
         importances_path = save_path / delvol_importance_data
+        importances_good_path = save_path / delvol_importances_good_data
         shap_path = save_path / delvol_shap_data
         filter_path = save_path / delvol_filter_data
+        N_good_path = save_path / delvol_N_good_data
         model_path = save_path / delvol_models_dir
 
         model_path.mkdir(exist_ok = True)
@@ -399,6 +401,8 @@ class DelVolDensity:
 
         # Calculating SHAP Values
         importances = []
+        importances_good = []
+        N_good = 0
         for n,(model, r2) in enumerate(zip(self.best_models, self.r2_test)):
             explainer = shap.TreeExplainer(model)
             shap_values = explainer.shap_values(self._X_full)
@@ -406,20 +410,38 @@ class DelVolDensity:
             shap_max = np.max(shap_avg)
             shap_norm = shap_avg/shap_max
             importances.append(shap_norm*r2)
+            if r2 >= delvol_R2_threshold:
+                importances_good.append(shap_norm*r2)
+                N_good += 1
             model.save_model(model_path / delvol_model_names.format(n+1))
 
         importances = np.array(importances)
+        importances_good = np.array(importances_good)
         cumulative_importance = np.sum(importances, axis = 0)
+        cumulative_good_importance = np.sum(importances_good, axis = 0)
 
         header = ','.join(self.feats)
         shap_values = ','.join(f'{i:f}' for i in shap_avg)
         importance_values = ','.join(f'{i:f}' for i in cumulative_importance)
+
+        if isinstance(cumulative_good_importance, np.float64):
+            cumulative_good_importance = np.zeros_like(cumulative_importance)
+
+        importance_good_values = ','.join(
+            f'{i:f}' for i in cumulative_good_importance
+        )
 
         with open(shap_path, 'w+') as outfile:
             outfile.write(header + '\n' + shap_values)
 
         with open(importances_path, 'w+') as outfile:
             outfile.write(header + '\n' + importance_values)
+
+        with open(importances_good_path, 'w+') as outfile:
+            outfile.write(header + '\n' + importance_good_values)
+
+        with open(N_good_path, 'w+') as outfile:
+            outfile.write(f'{N_good:d}')
 
         # Row 1 is the MEAN filter, while Row 2 is the ANY filter.
         mean_filter = int(np.mean(self.r2_test) > delvol_R2_threshold)
