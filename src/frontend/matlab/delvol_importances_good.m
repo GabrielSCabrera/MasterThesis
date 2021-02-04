@@ -1,4 +1,5 @@
 [headers, importances, folders] = delvol_utils.load_good_importance(directory);
+[N_good] = delvol_utils.load_N_good(directory);
 [mean_filters, any_filters, weak_filters] = delvol_utils.load_filter(directory);
 [rows, cols] = size(importances);
 
@@ -8,7 +9,7 @@ hold on
 
 new_folders = [];
 for j = 1:rows
-  if any_filters(j,1) == 1
+  if N_good(j,1) >= 1
     plot(1:cols, importances(j,:));
     new_folders = [new_folders folders(j)];
   end

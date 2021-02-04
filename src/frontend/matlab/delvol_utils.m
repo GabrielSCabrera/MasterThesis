@@ -142,6 +142,33 @@ classdef delvol_utils
       weak_filters = table2array(weak_filters);
     end
 
+    function [N_good] = load_N_good(directory)
+      % Reads the data from a set of .dat files and returns its values
+
+      arguments
+        directory string
+      end
+
+      storage = '~/Documents/MasterThesis/results/delvol/';
+      main_path = strcat(storage, directory);
+      directory = dir(main_path);
+      folders = {directory([directory.isdir]).name};
+      folders = folders(~ismember(folders, {'.','..'}));
+      N_good = [];
+      N_experiments = length(folders);
+
+      for i = 1:N_experiments
+        filter_path = strcat(main_path, '/');
+        filter_path = strcat(filter_path, folders(i));
+        filter_path = strcat(filter_path, '/N_good.dat');
+
+        data = readtable(filter_path);
+        N_good = [N_good; data(1,1)];
+      end
+      N_good = table2array(N_good);
+    end
+
+
     function [density_data] = load_from_density_data(filename)
       % Reads the data from a given .csv file and returns its values as
       % matrices
