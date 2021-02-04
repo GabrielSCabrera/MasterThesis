@@ -547,7 +547,7 @@ def procedure_delvol_all_custom(N_experiments:int, training_labels:List[str]):
 
     for label in training_labels:
         terminal.reset_screen()
-        directory = backend.utils.select.create_unique_name(prefix = 'combined')
+        directory = label
         path = backend.config.delvol_relpath / directory
         path.mkdir(exist_ok = True)
         length = len(exps)
@@ -1568,8 +1568,8 @@ if args.score_DNN:
     procedure_score_DNN()
 
 if args.custom:
-    training_labels = ['delvtot', 'delv50', 'time', 'sig_d']
-    N_experiments = 15
+    training_labels = ['delvtot', 'delv50', 'sig_d']
+    N_experiments = 25
     procedure_delvol_all_custom(N_experiments, training_labels)
 
 if args.test:
