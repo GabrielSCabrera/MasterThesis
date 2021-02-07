@@ -387,6 +387,7 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
         'delvol_importances_weak.m',
         'delvol_importances_good.m',
         'delvol_importances_good_norm.m',
+        'delvol_importances_good_sum.m',
     ]
 
     variables = []
@@ -504,35 +505,36 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
     save_name = directory + '/importances_mean.png'
     variables.append(
         f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
-        f"threshold = {config.delvol_R2_threshold};"
     )
 
     #################################################################
     save_name = directory + '/importances_any.png'
     variables.append(
         f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
-        f"threshold = {config.delvol_R2_threshold};"
     )
 
     #################################################################
     save_name = directory + '/importances_weak.png'
     variables.append(
         f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
-        f"threshold = {config.delvol_R2_threshold};"
     )
 
     #################################################################
     save_name = directory + '/importances_good.png'
     variables.append(
         f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
-        f"threshold = {config.delvol_R2_threshold};"
     )
 
     #################################################################
     save_name = directory + '/importances_good_norm.png'
     variables.append(
         f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
-        f"threshold = {config.delvol_R2_threshold};"
+    )
+
+    #################################################################
+    save_name = directory + '/importances_good_sum.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
     )
 
     #################################################################
@@ -1511,8 +1513,6 @@ def procedure_delvol_data_plots():
         for k,v in dv.items():
             print(dd[k])
 
-
-
 def procedure_sync():
 
     BucketManager.sync()
@@ -1612,7 +1612,7 @@ def procedure_delvol_logspace():
     terminal.reset_screen()
 
     experiment = 'MONZ4'
-    N_experiments = np.ceil(np.logspace(0.3, 2, 15)).astype(np.int64)
+    N_experiments = np.ceil(np.logspace(1, 2.2, 30)).astype(np.int64)
     exps = backend.groups.delvol_exps['all']
 
     gridsearch_params = {
@@ -1735,24 +1735,27 @@ if args.delvol_logspace:
     procedure_delvol_logspace()
 
 if args.test:
-    script = 'delvol_importances_good.m'
-    directory = 'lite_test'
+    directory = 'logspace_2021-02-06 11:03:22.109769'
+    parsers.combine_logspace_results(directory)
 
-    path = backend.config.matlab_img_relpath
-    path = path / directory
-    path.mkdir(exist_ok = True)
-
-    save_name = directory + '/importances_good.png'
-    variables = (
-        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
-        f"threshold = {config.delvol_R2_threshold};"
-    )
-
-    backend.select.run_matlab(
-        suppress = False,
-        script_name = script,
-        variables = variables
-    )
+    # script = 'delvol_importances_good_sum.m'
+    # directory = 'delvtot'
+    #
+    # path = backend.config.matlab_img_relpath
+    # path = path / directory
+    # path.mkdir(exist_ok = True)
+    #
+    # save_name = directory + '/importances_good_sum.png'
+    # variables = (
+    #     f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+    #     f"threshold = {config.delvol_R2_threshold};"
+    # )
+    #
+    # backend.select.run_matlab(
+    #     suppress = False,
+    #     script_name = script,
+    #     variables = variables
+    # )
 
 if args.cluster:
     procedure_cluster()

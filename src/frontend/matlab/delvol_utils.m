@@ -168,7 +168,6 @@ classdef delvol_utils
       N_good = table2array(N_good);
     end
 
-
     function [density_data] = load_from_density_data(filename)
       % Reads the data from a given .csv file and returns its values as
       % matrices

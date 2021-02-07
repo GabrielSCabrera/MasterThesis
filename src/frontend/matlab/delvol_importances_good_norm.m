@@ -21,7 +21,7 @@ legend(new_folders, 'Interpreter', 'none');
 set(gca, 'xtick', 1:cols, 'xticklabel', headers);
 set(gca,'TickLabelInterpreter','none');
 xlabel('Features', 'Interpreter', 'none');
-ylabel('Cumulative Importance', 'Interpreter', 'latex');
+ylabel('(Cumulative Importance) / (No. of Models with $R^2 > 0.7$)', 'Interpreter', 'latex');
 title('The Cumulative Importances of Individual Features Over All Rock Types');
 grid();
 set(gca, 'FontSize', 8);
