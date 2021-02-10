@@ -77,6 +77,7 @@ delvol_model_names = "model_{:03d}"
 delvol_R2_threshold = 0.7
 delvol_filter_data = "filter.dat"
 delvol_N_good_data = "N_good.dat"
+delvol_x_data = "logspace_x_points.dat"
 
 DNN_model_extension = ".dnn"
 cluster_dir_labels = "CL{:05d}"

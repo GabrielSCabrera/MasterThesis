@@ -236,7 +236,7 @@ class DelVolDensity:
             out_str += '\n\n' + self._str_scores()
             out_str += '\n\n' + self._str_importances()
 
-        return f'{self.title}\n\n{out_str}'
+        return f'\n{out_str}\n\n{self.title}'
 
     # TRAINING
     def grid_search(
@@ -328,9 +328,9 @@ class DelVolDensity:
 
             if self.verb:
                 reset_screen()
-                print(self.title, end = '\n\n')
                 print(self._str_importances(ignored) + '\n')
                 print(self._str_scores())
+                print(self.title, end = '\n\n')
 
         self.is_trained = True
 

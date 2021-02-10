@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List
 import numpy as np
 import argparse
+import datetime
 import time
 import sys
 import os
@@ -96,6 +97,16 @@ def parse_args():
         'Select a previously run experiment and create the related figures.'
     )
 
+    help_delvol_logspace_plots = (
+        'Select a previously run logspace experiment and create the related '
+        'figures.'
+    )
+
+    help_delvol_linspace_plots = (
+        'Select a previously run logspace experiment and create the related '
+        'figures.'
+    )
+
     help_delvol_data_plots = (
         'Creates plots that are universal to the delvol dataset, meaning plots '
         'that can be created with the data provided without the need to create '
@@ -122,6 +133,11 @@ def parse_args():
     )
 
     help_delvol_logspace = (
+        'Runs delvol for a single sample, but for many N (number of models) '
+        'in order to understand the trend for the std of R².'
+    )
+
+    help_delvol_linspace = (
         'Runs delvol for a single sample, but for many N (number of models) '
         'in order to understand the trend for the std of R².'
     )
@@ -202,6 +218,14 @@ def parse_args():
         '--delvol-plots', action='store_true', help = help_delvol_plots
     )
     parser.add_argument(
+        '--delvol-logspace-plots', action='store_true',
+        help = help_delvol_logspace_plots
+    )
+    parser.add_argument(
+        '--delvol-linspace-plots', action='store_true',
+        help = help_delvol_linspace_plots
+    )
+    parser.add_argument(
         '--delvol-data-plots', action='store_true',
         help = help_delvol_data_plots
     )
@@ -219,6 +243,9 @@ def parse_args():
     )
     parser.add_argument(
         '--delvol-logspace', action='store_true', help = help_delvol_logspace
+    )
+    parser.add_argument(
+        '--delvol-linspace', action='store_true', help = help_delvol_linspace
     )
     parser.add_argument(
         '--matlab', action='store_true', help = help_matlab
@@ -388,6 +415,7 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
         'delvol_importances_good.m',
         'delvol_importances_good_norm.m',
         'delvol_importances_good_sum.m',
+        'delvol_importances_good_sum_norm.m',
     ]
 
     variables = []
@@ -538,6 +566,12 @@ def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
     )
 
     #################################################################
+    save_name = directory + '/importances_good_sum_norm.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+    )
+
+    #################################################################
 
     if path is None:
         path = backend.config.matlab_img_relpath
@@ -592,6 +626,51 @@ def delvol_all_custom(N_experiments:int, training_labels:List[str]):
 
         parsers.combine_delvol_results(path)
         save_plot_delvol(directory)
+
+def delvol_logspace_plot(directory:str, path:Path = None, suppress:bool = True):
+    '''
+        Creates plots showing the trend of the mean and std of R² for differing
+        numbers of models.
+    '''
+    scripts = [
+        'delvol_logspace_bars.m',
+        'delvol_logspace_line.m',
+    ]
+
+    variables = []
+
+    #################################################################
+    save_name = directory + '/logspace_bars.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+    save_name_1 = directory + '/logspace_mean_lines.png'
+    save_name_2 = directory + '/logspace_std_lines.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name_1 = \'{save_name_1}\'; "
+        f"save_name_2 = \'{save_name_2}\'; "
+    )
+    #################################################################
+
+    if path is None:
+        path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    result = backend.select.run_matlab_set(scripts, variables, suppress)
+
+    if result != 0:
+        msg = (
+            '\n\033[1mReverting to Running Scripts Individually (Slow)\033[m\n'
+        )
+        print(msg, flush = True)
+        for script, var in zip(scripts, variables):
+            backend.select.run_matlab(
+                suppress = suppress,
+                script_name = script,
+                variables = var
+            )
 
 """SCRIPT PROCEDURES"""
 
@@ -1427,6 +1506,26 @@ def procedure_delvol_plots():
     terminal.reset_screen()
     save_plot_delvol(selection, suppress = True)
 
+def procedure_delvol_logspace_plots():
+    title = (
+        f'Select a Set of Results.'
+    )
+    path = backend.config.delvol_relpath
+    options = [str(i.name) for i in path.glob('*')]
+    selection = select.scroll_select(title, options)
+    terminal.reset_screen()
+    delvol_logspace_plot(selection, suppress = True)
+
+def procedure_delvol_linspace_plots():
+    title = (
+        f'Select a Set of Results.'
+    )
+    path = backend.config.delvol_relpath
+    options = [str(i.name) for i in path.glob('*')]
+    selection = select.scroll_select(title, options)
+    terminal.reset_screen()
+    delvol_linspace_plot(selection, suppress = True)
+
 def procedure_delvol_data_plots():
     delvol_path = config.delvol_data_relpath
     delden_path = config.density_data_relpath
@@ -1623,14 +1722,6 @@ def procedure_delvol_logspace():
         "max_depth":        [1, 3, 5, 7, 9, 11]
     }
 
-    gridsearch_params = {
-        "colsample_bytree": [0.3],
-        "alpha":            [0],
-        "learning_rate":    [0.005],
-        "n_estimators":     [10],
-        "max_depth":        [1],
-    }
-
     terminal.reset_screen()
 
     directory = backend.utils.select.create_unique_name(prefix = 'logspace')
@@ -1649,7 +1740,52 @@ def procedure_delvol_logspace():
         )
         delvol.save(filename = f'{experiment}_N{i:d}')
 
+    with open(path / config.delvol_x_data, 'w+') as outfile:
+        outfile.write(','.join(str(i) for i in N_experiments))
+
     parsers.combine_logspace_results(directory)
+    delvol_logspace_plot(directory)
+
+def procedure_delvol_linspace():
+
+    BucketManager.download('delvol_data')
+    terminal.reset_screen()
+
+    experiment = 'MONZ4'
+    N_experiments = np.ceil(np.linspace(5, 150, 30)).astype(np.int64)
+    exps = backend.groups.delvol_exps['all']
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
+    }
+
+    terminal.reset_screen()
+
+    directory = backend.utils.select.create_unique_name(prefix = 'linspace')
+    path = backend.config.delvol_relpath / directory
+    path.mkdir(exist_ok = True)
+    length = len(N_experiments)
+    training_label = 'delv50'
+    for n,i in enumerate(N_experiments):
+        title = backend.utils.format.B(f'EXPERIMENT FOR N={i:d} ')
+        title += backend.utils.format.I(f'({n+1}/{length})')
+        delvol = DelVolDensity.DelVolDensity(save_dir = path, title = title)
+        delvol.set_experiments(experiment)
+        delvol.set_training_label(training_label)
+        delvol.grid_search(
+            itermax = i, train_size = 0.75, **gridsearch_params
+        )
+        delvol.save(filename = f'{experiment}_N{i:d}')
+
+    with open(path / config.delvol_x_data, 'w+') as outfile:
+        outfile.write(','.join(str(i) for i in N_experiments))
+
+    parsers.combine_linspace_results(directory)
+    delvol_linspace_plot(directory)
 
 def procedure_matlab():
     directories = [
@@ -1727,35 +1863,100 @@ if args.score_DNN:
     procedure_score_DNN()
 
 if args.custom:
-    training_labels = ['delvtot', 'delv50', 'sig_d']
-    N_experiments = 25
-    delvol_all_custom(N_experiments, training_labels)
+
+    BucketManager.download('delvol_data')
+    terminal.reset_screen()
+
+    experiments = ['MONZ4', 'WG01']
+    training_labels = ['delv50', 'delvtot', 'sig_d']
+    N_repeats = 3
+    N_experiments = np.ceil(np.linspace(5, 100, 24)).astype(np.int64)
+    exps = backend.groups.delvol_exps['all']
+
+    gridsearch_params = {
+        "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+        "alpha":            [0, 0.001, 0.01, 0.1],
+        "learning_rate":    [0.005, 0.01, 0.05, 0.1, 0.5],
+        "n_estimators":     [10, 25, 50, 100, 150],
+        "max_depth":        [1, 3, 5, 7, 9, 11]
+    }
+
+    length = len(N_experiments)*N_repeats
+    length *= len(training_labels)*len(experiments)
+
+    factors = [
+        len(N_experiments), len(N_experiments)*N_repeats,
+        len(N_experiments)*N_repeats*len(training_labels)
+    ]
+
+    for N1, experiment in enumerate(experiments):
+        for N2, training_label in enumerate(training_labels):
+            for N3 in range(N_repeats):
+                try:
+                    terminal.reset_screen()
+
+                    directory = backend.utils.select.create_unique_name(
+                        prefix = 'linspace'
+                    )
+
+                    path = backend.config.delvol_relpath / directory
+                    path.mkdir(exist_ok = True)
+                    for n,i in enumerate(N_experiments):
+                        curr = n + N1*factors[0] + N2*factors[1] + N3*factors[2]
+                        title = backend.utils.format.B(f'EXPERIMENT FOR N={i:d} ')
+                        title += backend.utils.format.I(f'({curr}/{length})')
+                        title += f'\tEXP:{experiment}\t TARGET:{training_label}'
+                        delvol = DelVolDensity.DelVolDensity(
+                            save_dir = path, title = title
+                        )
+                        delvol.set_experiments(experiment)
+                        delvol.set_training_label(training_label)
+                        delvol.grid_search(
+                            itermax = i, train_size = 0.75, **gridsearch_params
+                        )
+                        delvol.save(filename = f'{experiment}_N{i:d}')
+
+                    with open(path / config.delvol_x_data, 'w+') as outfile:
+                        outfile.write(','.join(str(i) for i in N_experiments))
+
+                    parsers.combine_linspace_results(directory)
+                    delvol_linspace_plot(directory)
+
+                except Exception as e:
+
+                    with open(Path.home() / 'Documents/error_log.txt', 'a+') as outfile:
+                        T = datetime.datetime.now()
+                        msg = (
+                            f'Error in iteration {n} of exp {experiment} at {T}:\n'
+                            f'\t{e}\nDescription:\t{title}\n\n'
+                        )
+                        outfile.write(msg)
+
+if args.delvol_linspace:
+    procedure_delvol_linspace()
 
 if args.delvol_logspace:
     procedure_delvol_logspace()
 
 if args.test:
-    directory = 'logspace_2021-02-06 11:03:22.109769'
-    parsers.combine_logspace_results(directory)
+    script = 'delvol_importances_good_sum_norm.m'
+    directory = 'delv50'
 
-    # script = 'delvol_importances_good_sum.m'
-    # directory = 'delvtot'
-    #
-    # path = backend.config.matlab_img_relpath
-    # path = path / directory
-    # path.mkdir(exist_ok = True)
-    #
-    # save_name = directory + '/importances_good_sum.png'
-    # variables = (
-    #     f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
-    #     f"threshold = {config.delvol_R2_threshold};"
-    # )
-    #
-    # backend.select.run_matlab(
-    #     suppress = False,
-    #     script_name = script,
-    #     variables = variables
-    # )
+    path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    save_name = directory + '/test.png'
+    variables = (
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+        f"threshold = {config.delvol_R2_threshold};"
+    )
+
+    backend.select.run_matlab(
+        suppress = False,
+        script_name = script,
+        variables = variables
+    )
 
 if args.cluster:
     procedure_cluster()
@@ -1795,6 +1996,9 @@ if args.delvol_groups_log:
 
 if args.delvol_plots:
     procedure_delvol_plots()
+
+if args.delvol_logspace_plots:
+    procedure_delvol_logspace_plots()
 
 if args.delvol_data_plots:
     procedure_delvol_data_plots()
