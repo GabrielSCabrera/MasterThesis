@@ -17,6 +17,22 @@ delvol_xgb_gridsearch_defaults = {
 }
 
 data_bucket_files = [
+    Path('stress_strain_exps_npy') / 'times_M8_1.npy',
+    Path('stress_strain_exps_npy') / 'times_M8_2.npy',
+    Path('stress_strain_exps_npy') / 'times_MONZ3.npy',
+    Path('stress_strain_exps_npy') / 'times_MONZ4.npy',
+    Path('stress_strain_exps_npy') / 'times_MONZ5.npy',
+    Path('stress_strain_exps_npy') / 'times_WG01.npy',
+    Path('stress_strain_exps_npy') / 'times_WG02.npy',
+    Path('stress_strain_exps_npy') / 'times_WG04.npy',
+    Path('stress_strain_exps') / 'times_M8_1.mat',
+    Path('stress_strain_exps') / 'times_M8_2.mat',
+    Path('stress_strain_exps') / 'times_MONZ3.mat',
+    Path('stress_strain_exps') / 'times_MONZ4.mat',
+    Path('stress_strain_exps') / 'times_MONZ5.mat',
+    Path('stress_strain_exps') / 'times_WG01.mat',
+    Path('stress_strain_exps') / 'times_WG02.mat',
+    Path('stress_strain_exps') / 'times_WG04.mat',
     Path('delvol_data') / 'M8_1_3D_delvol_a3000_subv300.txt',
     Path('delvol_data') / 'M8_2_3D_delvol_a3000_subv300.txt',
     Path('delvol_data') / 'MONZ3_3D_delvol_a3000_subv300.txt',

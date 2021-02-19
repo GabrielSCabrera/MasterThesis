@@ -142,6 +142,10 @@ def parse_args():
         'in order to understand the trend for the std of R².'
     )
 
+    help_stress_strain = (
+        'Plots the stress vs. the strain over time per-experiment.'
+    )
+
     help_matlab = (
         'Runs a custom MATLAB script.'
     )
@@ -246,6 +250,9 @@ def parse_args():
     )
     parser.add_argument(
         '--delvol-linspace', action='store_true', help = help_delvol_linspace
+    )
+    parser.add_argument(
+        '--stress-strain', action='store_true', help = help_stress_strain
     )
     parser.add_argument(
         '--matlab', action='store_true', help = help_matlab
@@ -647,6 +654,51 @@ def delvol_logspace_plot(directory:str, path:Path = None, suppress:bool = True):
     #################################################################
     save_name_1 = directory + '/logspace_mean_lines.png'
     save_name_2 = directory + '/logspace_std_lines.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name_1 = \'{save_name_1}\'; "
+        f"save_name_2 = \'{save_name_2}\'; "
+    )
+    #################################################################
+
+    if path is None:
+        path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    result = backend.select.run_matlab_set(scripts, variables, suppress)
+
+    if result != 0:
+        msg = (
+            '\n\033[1mReverting to Running Scripts Individually (Slow)\033[m\n'
+        )
+        print(msg, flush = True)
+        for script, var in zip(scripts, variables):
+            backend.select.run_matlab(
+                suppress = suppress,
+                script_name = script,
+                variables = var
+            )
+
+def delvol_linspace_plot(directory:str, path:Path = None, suppress:bool = True):
+    '''
+        Creates plots showing the trend of the mean and std of R² for differing
+        numbers of models.
+    '''
+    scripts = [
+        'delvol_linspace_bars.m',
+        'delvol_linspace_line.m',
+    ]
+
+    variables = []
+
+    #################################################################
+    save_name = directory + '/linspace_bars.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+    save_name_1 = directory + '/linspace_mean_lines.png'
+    save_name_2 = directory + '/linspace_std_lines.png'
     variables.append(
         f"directory = \'{directory}\'; save_name_1 = \'{save_name_1}\'; "
         f"save_name_2 = \'{save_name_2}\'; "
@@ -1527,26 +1579,15 @@ def procedure_delvol_linspace_plots():
     delvol_linspace_plot(selection, suppress = True)
 
 def procedure_delvol_data_plots():
+
     delvol_path = config.delvol_data_relpath
-    delden_path = config.density_data_relpath
+    stress_strain_path = config.stress_strain_npy_relpath
 
     delvol_files = list(delvol_path.glob('*.txt'))
-    delden_files = list(delden_path.glob('*d9.txt'))
+    stress_strain_files = list(stress_strain_path.glob('*.npy'))
 
     delvol_data = []
-    delden_data = []
-
-    delden_columns = [
-        'del_den', 'glob_den', 'sigd', 'ep', 'del_f', 'del_sig', 'del_ep',
-        'v_p10', 'v_p20', 'v_p30', 'v_p40', 'v_p50', 'v_mean', 'v_p60', 'v_p70',
-        'v_p80', 'v_p90', 'v_max', 'v_sum', 'v_std', 'den_p10', 'den_p20',
-        'den_p30', 'den_p40', 'den_p50', 'den_mean', 'den_p60', 'den_p70',
-        'den_p80', 'den_p90', 'den_max', 'den_sum', 'den_std', 'den_numloc',
-        'den_volloc', 'dist_p10', 'dist_p20', 'dist_p30', 'dist_p40',
-        'dist_p50', 'dist_mean', 'dist_p60', 'dist_p70', 'dist_p80', 'dist_p90',
-        'dist_max', 'dist_sum', 'dist_std', 'c_10', 'c_20', 'c_30', 'c_40',
-        'c_50', 'c_60', 'c_70', 'c_80', 'c_90', 'c_len'
-    ]
+    stress_strain_data = []
 
     delvol_columns = [
         'delvtot', 'delv50', 'time', 'sig_d', 'x', 'y', 'z', 'dmin_min',
@@ -1558,33 +1599,41 @@ def procedure_delvol_data_plots():
         'dc_25', 'dc_50', 'dc_75', 'dc_max', 'tot_vol', 'rand'
     ]
 
-    for i in delden_files:
-        with open(i, 'r') as infile:
-            lines = infile.readlines()[1:]
-        for n, line in enumerate(lines):
-            lines[n] = [float(i) for i in line.split(' ')[:-1]]
-        delden_data.append(np.array(lines))
-    delden_columns = {i:j for j,i in enumerate(delden_columns)}
+    stress_strain_columns = ['time', 'eps', 'distf', 'sig_d']
+
+    delvol_columns = {i:j for j,i in enumerate(delvol_columns)}
+    stress_strain_columns = {i:j for j,i in enumerate(stress_strain_columns)}
 
     for i in delvol_files:
         with open(i, 'r') as infile:
             lines = infile.readlines()[1:]
         for n, line in enumerate(lines):
             lines[n] = [float(i) for i in line.split(' ')[:-1]]
-        delvol_data.append(np.array(lines))
-    delvol_columns = {i:j for j,i in enumerate(delvol_columns)}
+        delvol_data.append(np.array(lines, dtype = np.float64))
 
-    # Sorting the delden data by sig_d
-    delden_all = {}
-    for doc, name in zip(delden_data, delden_files):
+    for i in stress_strain_files:
+        lines = np.load(i)
+        stress_strain_data.append(np.array(lines, dtype = np.float64))
+
+    # Creating a map from sig_d (differential stress) to eps (axial strain)
+    stress_strain_map = {}
+    idx1 = stress_strain_columns['sig_d']
+    idx2 = stress_strain_columns['eps']
+    for doc, name in zip(stress_strain_data, stress_strain_files):
         row = {}
-        for i in doc:
-            sig_d = i[delden_columns['sigd']]
-            axial_strain = i[delden_columns['ep']]
-            row[sig_d] = axial_strain
-        pat = r'damage_([A-Z0-9_]+)_s25_d9.txt'
+        for j in range(doc.shape[0]):
+            sig_d_val = doc[j,idx1]
+            eps_val = doc[j,idx2]
+            if sig_d_val not in row.keys():
+                row[sig_d_val] = eps_val
+            elif row[sig_d_val] != eps_val:
+                msg = (
+                    f'Inconsistency found: {row[sig_d_val]} != {eps_val}'
+                )
+                print(msg)
+        pat = r'times_([A-Z0-9_]+).npy'
         key = re.sub(pat, r'\1', name.name)
-        delden_all[key] = row
+        stress_strain_map[key] = row
 
     # Dividing the delvol into subvolumes by sig_d
     delvol_all = {}
@@ -1600,17 +1649,37 @@ def procedure_delvol_data_plots():
         key = re.sub(pat, r'\1', name.name)
         delvol_all[key] = subv
 
-    # Arrays for the MATLAB plots
-    # First Plot: Delv50 vs. Axial Strain
+    delvol_final = {}
+    stress_strain_final = {}
+    for key in delvol_all.keys():
+        dv_keys = np.array(list(delvol_all[key].keys()), dtype = float)
+        ss_keys = np.array(list(stress_strain_map[key].keys()), dtype = float)
+        ss_keys = {i:j for i,j in zip(np.round(ss_keys, 3), ss_keys)}
+        delvol_final[key] = {}
+        stress_strain_final[key] = {}
 
-    delv50 = []
-    axial_strain = []
-    for dv, dd in zip(delvol_all, delden_all):
-        dv = delvol_all[key]
-        dd = delden_all[key]
-        print(dd.keys())
-        for k,v in dv.items():
-            print(dd[k])
+        for i in dv_keys:
+            if i in ss_keys:
+                delvol_final[key][i] = delvol_all[key][i]
+                stress_strain_final[key][i] = stress_strain_map[key][ss_keys[i]]
+
+    # Making arrays of sig_d to eps
+    sig_d = {}
+    eps = {}
+    for key in delvol_final:
+        sig_d_vals = sorted(list(delvol_final[key].keys()))
+        sig_d[key] = []
+        eps[key] = []
+        for i in sig_d_vals:
+            sig_d[key].append(i)
+            eps[key].append(stress_strain_final[key][i])
+
+    import matplotlib.pyplot as plt
+
+    plt.plot(eps['WG04'], sig_d['WG04'])
+    plt.show()
+
+
 
 def procedure_sync():
 
@@ -1676,8 +1745,8 @@ def procedure_delvol_combine():
 
     files = []
     for f in directory.glob('*'):
-        if len(re.findall(filename_pat, f.name)) != 0:
-            files.append(f.name)
+        # if len(re.findall(filename_pat, f.name)) != 0:
+        files.append(f.name)
 
     N = len(files)
     if N == 0:
@@ -1740,7 +1809,7 @@ def procedure_delvol_logspace():
         )
         delvol.save(filename = f'{experiment}_N{i:d}')
 
-    with open(path / config.delvol_x_data, 'w+') as outfile:
+    with open(path / config.delvol_x_data_logspace, 'w+') as outfile:
         outfile.write(','.join(str(i) for i in N_experiments))
 
     parsers.combine_logspace_results(directory)
@@ -1781,11 +1850,25 @@ def procedure_delvol_linspace():
         )
         delvol.save(filename = f'{experiment}_N{i:d}')
 
-    with open(path / config.delvol_x_data, 'w+') as outfile:
+    with open(path / config.delvol_x_data_linspace, 'w+') as outfile:
         outfile.write(','.join(str(i) for i in N_experiments))
 
     parsers.combine_linspace_results(directory)
     delvol_linspace_plot(directory)
+
+def procedure_stress_strain():
+
+    import matplotlib.pyplot as plt
+    paths = config.stress_strain_npy_relpath.glob('*.npy')
+
+    for path in paths:
+        data = np.load(path)
+        eps = data[:,1]         # Axial Strain
+        sigds = data[:,2]       # Differential Stress
+        distf = data[:,3]       # Normalized Stress & Distance to Failure
+
+        plt.plot(sigds, eps)
+        plt.show()
 
 def procedure_matlab():
     directories = [
@@ -1916,7 +1999,7 @@ if args.custom:
                         )
                         delvol.save(filename = f'{experiment}_N{i:d}')
 
-                    with open(path / config.delvol_x_data, 'w+') as outfile:
+                    with open(path / config.delvol_x_data_linspace, 'w+') as outfile:
                         outfile.write(','.join(str(i) for i in N_experiments))
 
                     parsers.combine_linspace_results(directory)
@@ -1939,24 +2022,54 @@ if args.delvol_logspace:
     procedure_delvol_logspace()
 
 if args.test:
-    script = 'delvol_importances_good_sum_norm.m'
-    directory = 'delv50'
+    # script = 'delvol_linspace_bars.m'
+    # directory = 'linspace 001'
+    #
+    # path = backend.config.matlab_img_relpath
+    # path = path / directory
+    # path.mkdir(exist_ok = True)
+    #
+    # save_name = directory + '/test.png'
+    # variables = (
+    #     f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+    #     f"threshold = {config.delvol_R2_threshold};"
+    # )
+    #
+    # backend.select.run_matlab(
+    #     suppress = False,
+    #     script_name = script,
+    #     variables = variables
+    # )
 
-    path = backend.config.matlab_img_relpath
-    path = path / directory
-    path.mkdir(exist_ok = True)
+    from scipy import io
+    files = [
+        'times_M8_1.mat',
+        'times_M8_2.mat',
+        'times_MONZ3.mat',
+        'times_MONZ4.mat',
+        'times_MONZ5.mat',
+        'times_WG01.mat',
+        'times_WG02.mat',
+        'times_WG04.mat',
+    ]
 
-    save_name = directory + '/test.png'
-    variables = (
-        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
-        f"threshold = {config.delvol_R2_threshold};"
-    )
+    new_files = [
+        'times_M8_1.npy',
+        'times_M8_2.npy',
+        'times_MONZ3.npy',
+        'times_MONZ4.npy',
+        'times_MONZ5.npy',
+        'times_WG01.npy',
+        'times_WG02.npy',
+        'times_WG04.npy',
+    ]
 
-    backend.select.run_matlab(
-        suppress = False,
-        script_name = script,
-        variables = variables
-    )
+    for file1, file2 in zip(files, new_files):
+        path1 = config.stress_strain_relpath / file1
+        path2 = config.stress_strain_npy_relpath / file2
+        loaded = io.loadmat(path1)
+
+        np.save(path2, loaded['times_real'])
 
 if args.cluster:
     procedure_cluster()
@@ -2000,6 +2113,9 @@ if args.delvol_plots:
 if args.delvol_logspace_plots:
     procedure_delvol_logspace_plots()
 
+if args.delvol_linspace_plots:
+    procedure_delvol_linspace_plots()
+
 if args.delvol_data_plots:
     procedure_delvol_data_plots()
 
@@ -2014,6 +2130,9 @@ if args.delden_combine:
 
 if args.delvol_combine:
     procedure_delvol_combine()
+
+if args.stress_strain:
+    procedure_stress_strain()
 
 if args.matlab:
     procedure_matlab()

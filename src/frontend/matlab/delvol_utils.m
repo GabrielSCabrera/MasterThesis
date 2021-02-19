@@ -158,6 +158,22 @@ classdef delvol_utils
       x_points = str2double(x_points);
     end
 
+    function [x_points] = load_linspace(directory)
+      % Reads the data from a set of .dat files and returns its values
+
+      arguments
+        directory string
+      end
+
+      storage = '~/Documents/MasterThesis/results/delvol/';
+      main_path = strcat(storage, directory);
+      directory = dir(main_path);
+      points_path = strcat(main_path, '/linspace_x_points.dat');
+      x_points = readtable(points_path,'ReadVariableNames',false);
+      x_points = table2array(x_points);
+      x_points = str2double(x_points);
+    end
+
     function [N_good] = load_N_good(directory)
       % Reads the data from a set of .dat files and returns its values
 

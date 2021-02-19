@@ -35,6 +35,8 @@ DNN_models_relpath = data_path / "DNN_models"
 clusters_relpath = data_path / "clusters"
 density_data_relpath = data_path / "density_data"
 delvol_data_relpath = data_path / "delvol_data"
+stress_strain_relpath = data_path / "stress_strain_exps"
+stress_strain_npy_relpath = data_path / "stress_strain_exps_npy"
 
 plot_2D_relpath = results_path / "img_2D"
 plot_3D_relpath = results_path / "img_3D"
@@ -77,7 +79,8 @@ delvol_model_names = "model_{:03d}"
 delvol_R2_threshold = 0.7
 delvol_filter_data = "filter.dat"
 delvol_N_good_data = "N_good.dat"
-delvol_x_data = "logspace_x_points.dat"
+delvol_x_data_logspace = "logspace_x_points.dat"
+delvol_x_data_linspace = "linspace_x_points.dat"
 
 DNN_model_extension = ".dnn"
 cluster_dir_labels = "CL{:05d}"
@@ -103,6 +106,8 @@ DNN_models_relpath.mkdir(exist_ok = True)
 clusters_relpath.mkdir(exist_ok = True)
 density_data_relpath.mkdir(exist_ok = True)
 delvol_data_relpath.mkdir(exist_ok = True)
+stress_strain_relpath.mkdir(exist_ok = True)
+stress_strain_npy_relpath.mkdir(exist_ok = True)
 plot_2D_relpath.mkdir(exist_ok = True)
 plot_3D_relpath.mkdir(exist_ok = True)
 delden_relpath.mkdir(exist_ok = True)

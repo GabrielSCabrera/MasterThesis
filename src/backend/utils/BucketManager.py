@@ -143,8 +143,9 @@ class BucketManager:
         '''
         if directories is None:
             directories = [
+                config.stress_strain_relpath, config.stress_strain_npy_relpath,
                 config.density_data_relpath, config.bins_relpath,
-                config.input_txts_relpath, config.delvol_data_relpath,
+                config.input_txts_relpath,config.delvol_data_relpath,
             ]
         sizes = {}
         for i in directories:
@@ -186,6 +187,26 @@ class BucketManager:
             unless 'force' is True.
         '''
         datasets_remote = {
+            'stress_strain_npy_exps': [
+                Path('stress_strain_npy_exps') / 'times_M8_1.npy',
+                Path('stress_strain_npy_exps') / 'times_M8_2.npy',
+                Path('stress_strain_npy_exps') / 'times_MONZ3.npy',
+                Path('stress_strain_npy_exps') / 'times_MONZ4.npy',
+                Path('stress_strain_npy_exps') / 'times_MONZ5.npy',
+                Path('stress_strain_npy_exps') / 'times_WG01.npy',
+                Path('stress_strain_npy_exps') / 'times_WG02.npy',
+                Path('stress_strain_npy_exps') / 'times_WG04.npy',
+            ],
+            'stress_strain_exps' : [
+                Path('stress_strain_exps') / 'times_M8_1.mat',
+                Path('stress_strain_exps') / 'times_M8_2.mat',
+                Path('stress_strain_exps') / 'times_MONZ3.mat',
+                Path('stress_strain_exps') / 'times_MONZ4.mat',
+                Path('stress_strain_exps') / 'times_MONZ5.mat',
+                Path('stress_strain_exps') / 'times_WG01.mat',
+                Path('stress_strain_exps') / 'times_WG02.mat',
+                Path('stress_strain_exps') / 'times_WG04.mat',
+            ],
             'density_data' : [
                 Path('density_data') / 'damage_WG02_s25.txt',
                 Path('density_data') / 'damage_WG04_s25.txt',
@@ -241,6 +262,8 @@ class BucketManager:
         }
 
         datasets_local = {
+            'stress_strain_npy_exps' : [config.stress_strain_npy_relpath,],
+            'stress_strain_exps' : [config.stress_strain_relpath,],
             'density_data' : [config.density_data_relpath,],
             'bins' : [config.bins_relpath,],
             'input_txts' : [config.input_txts_relpath,],
