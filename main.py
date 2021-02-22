@@ -1679,8 +1679,6 @@ def procedure_delvol_data_plots():
     plt.plot(eps['WG04'], sig_d['WG04'])
     plt.show()
 
-
-
 def procedure_sync():
 
     BucketManager.sync()
@@ -1950,9 +1948,9 @@ if args.custom:
     BucketManager.download('delvol_data')
     terminal.reset_screen()
 
-    experiments = ['MONZ4', 'WG01']
-    training_labels = ['delv50', 'delvtot', 'sig_d']
-    N_repeats = 3
+    experiments = ['WG01', 'MONZ4']
+    training_labels = ['delvtot', 'sig_d']
+    N_repeats = 1
     N_experiments = np.ceil(np.linspace(5, 100, 24)).astype(np.int64)
     exps = backend.groups.delvol_exps['all']
 
