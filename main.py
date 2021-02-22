@@ -1932,7 +1932,7 @@ def procedure_plot_ondemand():
         save_name = directory + f'/{filename}_no_outliers.png'
     else:
         save_name = directory + f'/{filename}.png'
-        
+
     variables = (
         f"filename = \'{filename}.csv\'; save_name = \'{str(save_name)}\'; "
         f"label = \'{label}\';"
@@ -2024,9 +2024,9 @@ if args.custom:
     BucketManager.download('delvol_data')
     terminal.reset_screen()
 
-    experiments = ['MONZ4', 'WG01']
-    training_labels = ['delv50', 'delvtot', 'sig_d']
-    N_repeats = 3
+    experiments = ['WG01', 'MONZ4']
+    training_labels = ['delvtot', 'sig_d']
+    N_repeats = 1
     N_experiments = np.ceil(np.linspace(5, 100, 24)).astype(np.int64)
     exps = backend.groups.delvol_exps['all']
 
