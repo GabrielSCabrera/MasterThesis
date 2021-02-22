@@ -37,6 +37,7 @@ density_data_relpath = data_path / "density_data"
 delvol_data_relpath = data_path / "delvol_data"
 stress_strain_relpath = data_path / "stress_strain_exps"
 stress_strain_npy_relpath = data_path / "stress_strain_exps_npy"
+fmt_data_relpath = data_path / "formatted_data"
 
 plot_2D_relpath = results_path / "img_2D"
 plot_3D_relpath = results_path / "img_3D"
@@ -108,6 +109,7 @@ density_data_relpath.mkdir(exist_ok = True)
 delvol_data_relpath.mkdir(exist_ok = True)
 stress_strain_relpath.mkdir(exist_ok = True)
 stress_strain_npy_relpath.mkdir(exist_ok = True)
+fmt_data_relpath.mkdir(exist_ok = True)
 plot_2D_relpath.mkdir(exist_ok = True)
 plot_3D_relpath.mkdir(exist_ok = True)
 delden_relpath.mkdir(exist_ok = True)

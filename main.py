@@ -107,7 +107,7 @@ def parse_args():
         'figures.'
     )
 
-    help_delvol_data_plots = (
+    help_delvol_data_prep = (
         'Creates plots that are universal to the delvol dataset, meaning plots '
         'that can be created with the data provided without the need to create '
         'or evaluate a model.'
@@ -144,6 +144,11 @@ def parse_args():
 
     help_stress_strain = (
         'Plots the stress vs. the strain over time per-experiment.'
+    )
+
+    help_plot_ondemand = (
+        'Plots the differential stress of a selected experiment relative to '
+        'a selected column label.'
     )
 
     help_matlab = (
@@ -230,8 +235,8 @@ def parse_args():
         help = help_delvol_linspace_plots
     )
     parser.add_argument(
-        '--delvol-data-plots', action='store_true',
-        help = help_delvol_data_plots
+        '--delvol-data-prep', action='store_true',
+        help = help_delvol_data_prep
     )
     parser.add_argument(
         '--sync', action='store_true', help = help_sync
@@ -253,6 +258,9 @@ def parse_args():
     )
     parser.add_argument(
         '--stress-strain', action='store_true', help = help_stress_strain
+    )
+    parser.add_argument(
+        '--plot-ondemand', action='store_true', help = help_plot_ondemand
     )
     parser.add_argument(
         '--matlab', action='store_true', help = help_matlab
@@ -1578,7 +1586,7 @@ def procedure_delvol_linspace_plots():
     terminal.reset_screen()
     delvol_linspace_plot(selection, suppress = True)
 
-def procedure_delvol_data_plots():
+def procedure_delvol_data_prep():
 
     delvol_path = config.delvol_data_relpath
     stress_strain_path = config.stress_strain_npy_relpath
@@ -1674,12 +1682,18 @@ def procedure_delvol_data_plots():
             sig_d[key].append(i)
             eps[key].append(stress_strain_final[key][i])
 
-    import matplotlib.pyplot as plt
-
-    plt.plot(eps['WG04'], sig_d['WG04'])
-    plt.show()
-
-
+    for label, idx in delvol_columns.items():
+        for key1 in delvol_final:
+            pairs = []
+            for key2 in delvol_final[key1]:
+                rows = delvol_final[key1][key2]
+                for row in rows:
+                    pairs.append((key2, row[idx]))
+            filename = f'{key1}_{label}.csv'
+            csv_out = '\n'.join(f'{i[0]},{i[1]}' for i in pairs)
+            path = config.fmt_data_relpath / filename
+            with open(path, 'w+') as outfile:
+                outfile.write(csv_out)
 
 def procedure_sync():
 
@@ -1862,13 +1876,73 @@ def procedure_stress_strain():
     paths = config.stress_strain_npy_relpath.glob('*.npy')
 
     for path in paths:
-        data = np.load(path)
-        eps = data[:,1]         # Axial Strain
-        sigds = data[:,2]       # Differential Stress
-        distf = data[:,3]       # Normalized Stress & Distance to Failure
+        if 'WG04' in path.name:
+            data = np.load(path)
+            eps = data[:,1]         # Axial Strain
+            sigds = data[:,2]       # Differential Stress
+            distf = data[:,3]       # Normalized Stress & Distance to Failure
 
-        plt.plot(sigds, eps)
-        plt.show()
+            plt.grid()
+            plt.plot(sigds, eps)
+            plt.xlabel('Differential Stress [MPa]')
+            plt.ylabel('Axial Strain [MPa]')
+            plt.xlim(np.min(sigds), np.max(sigds))
+            plt.show()
+
+def procedure_plot_ondemand():
+    directory = 'Plots On-Demand'
+
+    exps = ['M8_1', 'M8_2', 'MONZ3', 'MONZ4', 'MONZ5', 'WG01', 'WG02', 'WG04']
+    labels = [
+        'delvtot', 'delv50', 'time', 'sig_d', 'x', 'y', 'z', 'dmin_min',
+        'dmin_25', 'dmin_50', 'dmin_75', 'dmin_max', 'th1_min', 'th1_25',
+        'th1_50', 'th1_75', 'th1_max', 'th3_min', 'th3_25', 'th3_50', 'th3_75',
+        'th3_max', 'l1_min', 'l1_25', 'l1_50', 'l1_75', 'l1_max', 'l3_min',
+        'l3_25', 'l3_50', 'l3_75', 'l3_max', 'ani_min', 'ani_25', 'ani_50',
+        'ani_75', 'ani_max', 'vol_min', 'vol_25', 'vol_50', 'vol_75', 'vol_max',
+        'dc_25', 'dc_50', 'dc_75', 'dc_max', 'tot_vol', 'rand'
+    ]
+
+    no_outliers = backend.utils.select.select_bool('Remove Outliers?')
+    if no_outliers:
+        script = 'delvol_plot_prepped_no_outliers.m'
+    else:
+        script = 'delvol_plot_prepped.m'
+
+    experiment = None
+    while experiment not in exps:
+        experiment = input('Please enter a valid experiment label.\n\t> ')
+        if experiment not in exps:
+            print('Invalid! Try Again.')
+
+    label = None
+    while label not in labels:
+        label = input('Please enter a valid column label.\n\t> ')
+        if label not in labels:
+            print('Invalid! Try Again.')
+
+    print()
+
+    filename = f'{experiment}_{label}'
+    path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    if no_outliers:
+        save_name = directory + f'/{filename}_no_outliers.png'
+    else:
+        save_name = directory + f'/{filename}.png'
+        
+    variables = (
+        f"filename = \'{filename}.csv\'; save_name = \'{str(save_name)}\'; "
+        f"label = \'{label}\';"
+    )
+
+    backend.select.run_matlab(
+        suppress = False,
+        script_name = script,
+        variables = variables
+    )
 
 def procedure_matlab():
     directories = [
@@ -2022,24 +2096,6 @@ if args.delvol_logspace:
     procedure_delvol_logspace()
 
 if args.test:
-    # script = 'delvol_linspace_bars.m'
-    # directory = 'linspace 001'
-    #
-    # path = backend.config.matlab_img_relpath
-    # path = path / directory
-    # path.mkdir(exist_ok = True)
-    #
-    # save_name = directory + '/test.png'
-    # variables = (
-    #     f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
-    #     f"threshold = {config.delvol_R2_threshold};"
-    # )
-    #
-    # backend.select.run_matlab(
-    #     suppress = False,
-    #     script_name = script,
-    #     variables = variables
-    # )
 
     from scipy import io
     files = [
@@ -2116,8 +2172,11 @@ if args.delvol_logspace_plots:
 if args.delvol_linspace_plots:
     procedure_delvol_linspace_plots()
 
-if args.delvol_data_plots:
-    procedure_delvol_data_plots()
+if args.delvol_data_prep:
+    procedure_delvol_data_prep()
+
+if args.plot_ondemand:
+    procedure_plot_ondemand()
 
 if args.sync:
     procedure_sync()

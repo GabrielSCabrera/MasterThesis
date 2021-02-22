@@ -174,6 +174,37 @@ classdef delvol_utils
       x_points = str2double(x_points);
     end
 
+    function [sigd, val] = load_plot_from_prep_no_outliers(filename)
+      % Reads the data from a set of .csv files and returns its values
+
+      arguments
+        filename string
+      end
+
+      storage = '~/Documents/MasterThesis/data/formatted_data/';
+      path = strcat(storage, filename);
+      data = readtable(path);
+      data = table2array(data);
+      data = rmoutliers(data);
+      sigd = data(:,1);
+      val = data(:,2);
+    end
+
+    function [sigd, val] = load_plot_from_prep(filename)
+      % Reads the data from a set of .csv files and returns its values
+
+      arguments
+        filename string
+      end
+
+      storage = '~/Documents/MasterThesis/data/formatted_data/';
+      path = strcat(storage, filename);
+      data = readtable(path);
+      data = table2array(data);
+      sigd = data(:,1);
+      val = data(:,2);
+    end
+
     function [N_good] = load_N_good(directory)
       % Reads the data from a set of .dat files and returns its values
 
