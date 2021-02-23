@@ -404,51 +404,71 @@ class DelVolDensity:
         importances_good = []
         N_good = 0
         for n,(model, r2) in enumerate(zip(self.best_models, self.r2_test)):
-            explainer = shap.TreeExplainer(model)
-            shap_values = explainer.shap_values(self._X_full)
-            shap_avg = np.mean(np.abs(shap_values), axis = 0)
-            shap_max = np.max(shap_avg)
-            shap_norm = shap_avg/shap_max
-            importances.append(shap_norm*r2)
-            if r2 >= delvol_R2_threshold:
-                importances_good.append(shap_norm*r2)
-                N_good += 1
+            try:
+                explainer = shap.TreeExplainer(model)
+                shap_values = explainer.shap_values(self._X_full)
+                shap_avg = np.mean(np.abs(shap_values), axis = 0)
+                shap_max = np.max(shap_avg)
+                shap_norm = shap_avg/shap_max
+                importances.append(shap_norm*r2)
+                if r2 >= delvol_R2_threshold:
+                    importances_good.append(shap_norm*r2)
+                    N_good += 1
+            except Exception as e:
+                err_path = Path.home() / 'Documents/error_log.txt'
+                with open(err_path, 'a+') as outfile:
+                    T = datetime.now()
+                    msg = (
+                        f'Error in SHAP I:\n\t{e}'
+                    )
+                    outfile.write(msg)
+
             model.save_model(model_path / delvol_model_names.format(n+1))
 
-        importances = np.array(importances)
-        importances_good = np.array(importances_good)
-        cumulative_importance = np.sum(importances, axis = 0)
-        cumulative_good_importance = np.sum(importances_good, axis = 0)
+        try:
+            importances = np.array(importances)
+            importances_good = np.array(importances_good)
+            cumulative_importance = np.sum(importances, axis = 0)
+            cumulative_good_importance = np.sum(importances_good, axis = 0)
 
-        header = ','.join(self.feats)
-        shap_values = ','.join(f'{i:f}' for i in shap_avg)
-        importance_values = ','.join(f'{i:f}' for i in cumulative_importance)
+            header = ','.join(self.feats)
+            shap_values = ','.join(f'{i:f}' for i in shap_avg)
+            importance_values = ','.join(f'{i:f}' for i in cumulative_importance)
 
-        if isinstance(cumulative_good_importance, np.float64):
-            cumulative_good_importance = np.zeros_like(cumulative_importance)
+            if isinstance(cumulative_good_importance, np.float64):
+                cumulative_good_importance = np.zeros_like(cumulative_importance)
 
-        importance_good_values = ','.join(
-            f'{i:f}' for i in cumulative_good_importance
-        )
+            importance_good_values = ','.join(
+                f'{i:f}' for i in cumulative_good_importance
+            )
 
-        with open(shap_path, 'w+') as outfile:
-            outfile.write(header + '\n' + shap_values)
+            with open(shap_path, 'w+') as outfile:
+                outfile.write(header + '\n' + shap_values)
 
-        with open(importances_path, 'w+') as outfile:
-            outfile.write(header + '\n' + importance_values)
+            with open(importances_path, 'w+') as outfile:
+                outfile.write(header + '\n' + importance_values)
 
-        with open(importances_good_path, 'w+') as outfile:
-            outfile.write(header + '\n' + importance_good_values)
+            with open(importances_good_path, 'w+') as outfile:
+                outfile.write(header + '\n' + importance_good_values)
 
-        with open(N_good_path, 'w+') as outfile:
-            outfile.write(f'{N_good:d}')
+            with open(N_good_path, 'w+') as outfile:
+                outfile.write(f'{N_good:d}')
 
-        # Row 1 is the MEAN filter, while Row 2 is the ANY filter.
-        mean_filter = int(np.mean(self.r2_test) > delvol_R2_threshold)
-        any_filter = int(all(i > delvol_R2_threshold for i in self.r2_test))
-        weak_filter = int(any(i > delvol_R2_threshold for i in self.r2_test))
-        with open(filter_path, 'w+') as outfile:
-            outfile.write(f'{mean_filter}\n{any_filter}\n{weak_filter}')
+            # Row 1 is the MEAN filter, while Row 2 is the ANY filter.
+            mean_filter = int(np.mean(self.r2_test) > delvol_R2_threshold)
+            any_filter = int(all(i > delvol_R2_threshold for i in self.r2_test))
+            weak_filter = int(any(i > delvol_R2_threshold for i in self.r2_test))
+            with open(filter_path, 'w+') as outfile:
+                outfile.write(f'{mean_filter}\n{any_filter}\n{weak_filter}')
+
+        except Exception as e:
+            err_path = Path.home() / 'Documents/error_log.txt'
+            with open(err_path, 'a+') as outfile:
+                T = datetime.now()
+                msg = (
+                    f'Error in SHAP II:\n\t{e}'
+                )
+                outfile.write(msg)
 
     # PRIVATE METHODS
     @staticmethod

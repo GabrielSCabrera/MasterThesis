@@ -1,6 +1,7 @@
 [sigd, val] = delvol_utils.load_plot_from_prep_no_outliers(filename);
 
-fig = plot(sigd, val, 'bo');
+fig = figure();
+plot(sigd, val, 'bo');
 xlabel('Differential Stress [MPa]', 'Interpreter', 'none');
 ylabel(label, 'Interpreter', 'none');
 grid();

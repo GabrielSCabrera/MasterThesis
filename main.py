@@ -19,150 +19,123 @@ def parse_args():
         'Runs various aspects of the rock fracture analysis depending on the '
         'sequence of included command-line arguments.'
     )
-
     help_split = (
         'Splits and saves the dataset into four arrays: X_train, X_test, '
         'y_train, y_test.'
     )
-
     help_train_DNN = (
         'Create and train a model based on a previously split and saved '
         'dataset.'
     )
-
     help_score_DNN = (
         'Load a previously saved model and split dataset and print the training'
         ' and testing accuracy.'
     )
-
     help_cluster = (
         'Load a previously saved model and split dataset and print the training'
         ' and testing accuracy.'
     )
-
     help_delden = (
         'Perform analyses on the given experiments using density data.'
     )
-
     help_delden_all = (
         'Perform analyses on the all experiments using density data.'
     )
-
     help_delden_all_log = (
         'Perform analyses on the all experiments using density data.  '
         'Begins by taking the logarithm of all values.'
     )
-
     help_delden_groups = (
         'Perform analyses on the all experiments using density data, combining '
         'experiments containing identical rock types.'
     )
-
     help_delden_groups_log = (
         'Perform analyses on the all experiments using density data, combining '
         'experiments containing identical rock types.  '
         'Begins by taking the logarithm of all values.'
     )
-
     help_delden_compare = (
         'Compares two different sets of calculations and plots their results.'
     )
-
     help_delvol_all = (
         'Perform analyses on the all experiments using delvol data.'
     )
-
     help_delvol_lite = (
         'Perform analyses on the all experiments using delvol data.  For test '
         'purposes only, does not yield useful data.'
     )
-
     help_delvol_all_log = (
         'Perform analyses on the all experiments using delvol data.  '
         'Begins by taking the logarithm of all values.'
     )
-
     help_delvol_groups = (
         'Perform analyses on the all experiments using delvol data, combining '
         'experiments containing identical rock types.'
     )
-
     help_delvol_groups_log = (
         'Perform analyses on the all experiments using delvol data, combining '
         'experiments containing identical rock types.  '
         'Begins by taking the logarithm of all values.'
     )
-
     help_delvol_plots = (
         'Select a previously run experiment and create the related figures.'
     )
-
     help_delvol_logspace_plots = (
         'Select a previously run logspace experiment and create the related '
         'figures.'
     )
-
     help_delvol_linspace_plots = (
         'Select a previously run logspace experiment and create the related '
         'figures.'
     )
-
     help_delvol_data_prep = (
         'Creates plots that are universal to the delvol dataset, meaning plots '
         'that can be created with the data provided without the need to create '
         'or evaluate a model.'
     )
-
     help_sync = (
         'Synchronizes the local data with the complete dataset collection, but '
         'only if the local files are of a different size than those hosted '
         'online.'
     )
-
     help_force_sync = (
         'Synchronizes the local data with the complete dataset collection, even'
         ' if the local files are identical to those hosted online.'
     )
-
     help_delden_combine = (
         'Synchronizes the local data with the complete dataset collection.'
     )
-
     help_delvol_combine = (
         'Synchronizes the local data with the complete dataset collection.'
     )
-
     help_delvol_logspace = (
         'Runs delvol for a single sample, but for many N (number of models) '
         'in order to understand the trend for the std of R².'
     )
-
     help_delvol_linspace = (
         'Runs delvol for a single sample, but for many N (number of models) '
         'in order to understand the trend for the std of R².'
     )
-
     help_stress_strain = (
         'Plots the stress vs. the strain over time per-experiment.'
     )
-
     help_plot_ondemand = (
         'Plots the differential stress of a selected experiment relative to '
         'a selected column label.'
     )
-
+    help_plots_all = (
+        'Plots the differential stress of all experiment relative to all column'
+        ' labels.'
+    )
     help_matlab = (
         'Runs a custom MATLAB script.'
     )
-
     help_install = (
         'Downloads data files and installs the pipenv.'
     )
-
     help_uninstall = (
         'Removes downloaded data files, experiments, and all processed files.'
     )
-
     help_custom = (
         'Custom script, set this up on-demand.'
     )
@@ -261,6 +234,9 @@ def parse_args():
     )
     parser.add_argument(
         '--plot-ondemand', action='store_true', help = help_plot_ondemand
+    )
+    parser.add_argument(
+        '--plots-all', action='store_true', help = help_plots_all
     )
     parser.add_argument(
         '--matlab', action='store_true', help = help_matlab
@@ -1588,6 +1564,37 @@ def procedure_delvol_linspace_plots():
 
 def procedure_delvol_data_prep():
 
+    from scipy import io
+
+    files = [
+        'times_M8_1.mat',
+        'times_M8_2.mat',
+        'times_MONZ3.mat',
+        'times_MONZ4.mat',
+        'times_MONZ5.mat',
+        'times_WG01.mat',
+        'times_WG02.mat',
+        'times_WG04.mat',
+    ]
+
+    new_files = [
+        'times_M8_1.npy',
+        'times_M8_2.npy',
+        'times_MONZ3.npy',
+        'times_MONZ4.npy',
+        'times_MONZ5.npy',
+        'times_WG01.npy',
+        'times_WG02.npy',
+        'times_WG04.npy',
+    ]
+
+    for file1, file2 in zip(files, new_files):
+        path1 = config.stress_strain_relpath / file1
+        path2 = config.stress_strain_npy_relpath / file2
+        loaded = io.loadmat(path1)
+
+        np.save(path2, loaded['times_real'])
+
     delvol_path = config.delvol_data_relpath
     stress_strain_path = config.stress_strain_npy_relpath
 
@@ -1694,6 +1701,16 @@ def procedure_delvol_data_prep():
             path = config.fmt_data_relpath / filename
             with open(path, 'w+') as outfile:
                 outfile.write(csv_out)
+
+    for key in delvol_final:
+        pairs = []
+        for i,j in zip(sig_d[key], eps[key]):
+            pairs.append((i, j))
+        filename = f'{key}_eps.csv'
+        csv_out = '\n'.join(f'{i[0]},{i[1]}' for i in pairs)
+        path = config.fmt_data_relpath / filename
+        with open(path, 'w+') as outfile:
+            outfile.write(csv_out)
 
 def procedure_sync():
 
@@ -1890,18 +1907,63 @@ def procedure_stress_strain():
             plt.show()
 
 def procedure_plot_ondemand():
+
     directory = 'Plots On-Demand'
 
     exps = ['M8_1', 'M8_2', 'MONZ3', 'MONZ4', 'MONZ5', 'WG01', 'WG02', 'WG04']
-    labels = [
-        'delvtot', 'delv50', 'time', 'sig_d', 'x', 'y', 'z', 'dmin_min',
-        'dmin_25', 'dmin_50', 'dmin_75', 'dmin_max', 'th1_min', 'th1_25',
-        'th1_50', 'th1_75', 'th1_max', 'th3_min', 'th3_25', 'th3_50', 'th3_75',
-        'th3_max', 'l1_min', 'l1_25', 'l1_50', 'l1_75', 'l1_max', 'l3_min',
-        'l3_25', 'l3_50', 'l3_75', 'l3_max', 'ani_min', 'ani_25', 'ani_50',
-        'ani_75', 'ani_max', 'vol_min', 'vol_25', 'vol_50', 'vol_75', 'vol_max',
-        'dc_25', 'dc_50', 'dc_75', 'dc_max', 'tot_vol', 'rand'
-    ]
+
+    labels = {
+        'delvtot'   : 'Change in Total Volume',
+        'delv50'    : 'Change in 50ᵗʰ Percentile Volume',
+        'time'      : 'Time',
+        'sig_d'     : 'Differential Stress [MPa]',
+        'x'         : 'Position (x)',
+        'y'         : 'Position (y)',
+        'z'         : 'Position (z)',
+        'dmin_min'  : 'Minimum of Minimum Distance Between Fracture Centroids',
+        'dmin_25'   : '25ᵗʰ Percentile Minimum Distance Between Fracture Centroids',
+        'dmin_50'   : '50ᵗʰ Percentile Minimum Distance Between Fracture Centroids',
+        'dmin_75'   : '75ᵗʰ Percentile Minimum Distance Between Fracture Centroids',
+        'dmin_max'  : 'Maximum of Minimum Distance Between Fracture Centroids',
+        'th1_min'   : 'Minimum Orientiation of Min. Eigenvector',
+        'th1_25'    : '25ᵗʰ Percentile Orientiation of Min. Eigenvector',
+        'th1_50'    : '50ᵗʰ Percentile Orientiation of Min. Eigenvector',
+        'th1_75'    : '75ᵗʰ Percentile Orientiation of Min. Eigenvector',
+        'th1_max'   : 'Maximum Orientiation of Min. Eigenvector',
+        'th3_min'   : 'Minimum Orientation of Max. Eigenvector',
+        'th3_25'    : '25ᵗʰ Percentile Orientation of Max. Eigenvector',
+        'th3_50'    : '50ᵗʰ Percentile Orientation of Max. Eigenvector',
+        'th3_75'    : '75ᵗʰ Percentile Orientation of Max. Eigenvector',
+        'th3_max'   : 'Maximum Orientation of Max. Eigenvector',
+        'l1_min'    : 'Minimum of Min. Eigenvalue, Fracture Aperture',
+        'l1_25'     : '25ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture',
+        'l1_50'     : '50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture',
+        'l1_75'     : '75ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture',
+        'l1_max'    : 'Maximum of Min. Eigenvalue, Fracture Aperture',
+        'l3_min'    : 'Minimum of Max. Eigenvalue, Fracture Aperture',
+        'l3_25'     : '25ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture',
+        'l3_50'     : '50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture',
+        'l3_75'     : '75ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture',
+        'l3_max'    : 'Maximum of Max. Eigenvalue, Fracture Aperture',
+        'ani_min'   : 'Minimum of Shape Anisotropy',
+        'ani_25'    : '25ᵗʰ Percentile Shape Anisotropy',
+        'ani_50'    : '50ᵗʰ Percentile Shape Anisotropy',
+        'ani_75'    : '75ᵗʰ Percentile Shape Anisotropy',
+        'ani_max'   : 'Maximum of Shape Anisotropy',
+        'vol_min'   : 'Minimum of Individual Fracture Volume',
+        'vol_25'    : '25ᵗʰ Percentile Individual Fracture Volume',
+        'vol_50'    : '50ᵗʰ Percentile Individual Fracture Volume',
+        'vol_75'    : '75ᵗʰ Percentile Individual Fracture Volume',
+        'vol_max'   : 'Maximum of Individual Fracture Volume',
+        'dc_25'     : 'Minimum of Distance Between Centroids',
+        'dc_50'     : '25ᵗʰ Percentile Distance Between Centroids',
+        'dc_75'     : '50ᵗʰ Percentile Distance Between Centroids',
+        'dc_max'    : '75ᵗʰ Percentile Distance Between Centroids',
+        'tot_vol'   : 'Fracture Volume',
+        'rand'      : 'Randomly Generated Values',
+        'eps'       : 'Axial Strain [MPa]',
+    }
+
 
     no_outliers = backend.utils.select.select_bool('Remove Outliers?')
     if no_outliers:
@@ -1911,15 +1973,16 @@ def procedure_plot_ondemand():
 
     experiment = None
     while experiment not in exps:
-        experiment = input('Please enter a valid experiment label.\n\t> ')
+        experiment = input('Please enter a valid experiment label.\n> ')
         if experiment not in exps:
             print('Invalid! Try Again.')
 
     label = None
-    while label not in labels:
-        label = input('Please enter a valid column label.\n\t> ')
-        if label not in labels:
+    while label not in labels.keys():
+        label = input('Please enter a valid column label.\n> ')
+        if label not in labels.keys():
             print('Invalid! Try Again.')
+    ylabel = labels[label]
 
     print()
 
@@ -1935,13 +1998,107 @@ def procedure_plot_ondemand():
 
     variables = (
         f"filename = \'{filename}.csv\'; save_name = \'{str(save_name)}\'; "
-        f"label = \'{label}\';"
+        f"label = \'{ylabel}\';"
     )
 
     backend.select.run_matlab(
-        suppress = False,
+        suppress = True,
         script_name = script,
         variables = variables
+    )
+
+def procedure_plots_all():
+
+    directory = 'Plots All'
+
+    exps = ['M8_1', 'M8_2', 'MONZ3', 'MONZ4', 'MONZ5', 'WG01', 'WG02', 'WG04']
+
+    labels = {
+        'delvtot'   : 'Change in Total Volume',
+        'delv50'    : 'Change in 50ᵗʰ Percentile Volume',
+        'time'      : 'Time',
+        'sig_d'     : 'Differential Stress [MPa]',
+        'x'         : 'Position (x)',
+        'y'         : 'Position (y)',
+        'z'         : 'Position (z)',
+        'dmin_min'  : 'Minimum of Minimum Distance Between Fracture Centroids',
+        'dmin_25'   : '25ᵗʰ Percentile Minimum Distance Between Fracture Centroids',
+        'dmin_50'   : '50ᵗʰ Percentile Minimum Distance Between Fracture Centroids',
+        'dmin_75'   : '75ᵗʰ Percentile Minimum Distance Between Fracture Centroids',
+        'dmin_max'  : 'Maximum of Minimum Distance Between Fracture Centroids',
+        'th1_min'   : 'Minimum Orientiation of Min. Eigenvector',
+        'th1_25'    : '25ᵗʰ Percentile Orientiation of Min. Eigenvector',
+        'th1_50'    : '50ᵗʰ Percentile Orientiation of Min. Eigenvector',
+        'th1_75'    : '75ᵗʰ Percentile Orientiation of Min. Eigenvector',
+        'th1_max'   : 'Maximum Orientiation of Min. Eigenvector',
+        'th3_min'   : 'Minimum Orientation of Max. Eigenvector',
+        'th3_25'    : '25ᵗʰ Percentile Orientation of Max. Eigenvector',
+        'th3_50'    : '50ᵗʰ Percentile Orientation of Max. Eigenvector',
+        'th3_75'    : '75ᵗʰ Percentile Orientation of Max. Eigenvector',
+        'th3_max'   : 'Maximum Orientation of Max. Eigenvector',
+        'l1_min'    : 'Minimum of Min. Eigenvalue, Fracture Aperture',
+        'l1_25'     : '25ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture',
+        'l1_50'     : '50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture',
+        'l1_75'     : '75ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture',
+        'l1_max'    : 'Maximum of Min. Eigenvalue, Fracture Aperture',
+        'l3_min'    : 'Minimum of Max. Eigenvalue, Fracture Aperture',
+        'l3_25'     : '25ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture',
+        'l3_50'     : '50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture',
+        'l3_75'     : '75ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture',
+        'l3_max'    : 'Maximum of Max. Eigenvalue, Fracture Aperture',
+        'ani_min'   : 'Minimum of Shape Anisotropy',
+        'ani_25'    : '25ᵗʰ Percentile Shape Anisotropy',
+        'ani_50'    : '50ᵗʰ Percentile Shape Anisotropy',
+        'ani_75'    : '75ᵗʰ Percentile Shape Anisotropy',
+        'ani_max'   : 'Maximum of Shape Anisotropy',
+        'vol_min'   : 'Minimum of Individual Fracture Volume',
+        'vol_25'    : '25ᵗʰ Percentile Individual Fracture Volume',
+        'vol_50'    : '50ᵗʰ Percentile Individual Fracture Volume',
+        'vol_75'    : '75ᵗʰ Percentile Individual Fracture Volume',
+        'vol_max'   : 'Maximum of Individual Fracture Volume',
+        'dc_25'     : 'Minimum of Distance Between Centroids',
+        'dc_50'     : '25ᵗʰ Percentile Distance Between Centroids',
+        'dc_75'     : '50ᵗʰ Percentile Distance Between Centroids',
+        'dc_max'    : '75ᵗʰ Percentile Distance Between Centroids',
+        'tot_vol'   : 'Fracture Volume',
+        'rand'      : 'Randomly Generated Values',
+        'eps'       : 'Axial Strain [MPa]',
+    }
+
+    no_outliers = backend.utils.select.select_bool('Remove Outliers?')
+    print()
+
+    if no_outliers:
+        script = 'delvol_plot_prepped_no_outliers.m'
+    else:
+        script = 'delvol_plot_prepped.m'
+
+    scripts = []
+    variables = []
+
+    for experiment in exps:
+        for label in labels:
+
+            filename = f'{experiment}_{label}'
+            path = backend.config.matlab_img_relpath
+            path = path / directory
+            path.mkdir(exist_ok = True)
+
+            if no_outliers:
+                save_name = directory + f'/{filename}_no_outliers.png'
+            else:
+                save_name = directory + f'/{filename}.png'
+
+            row = (
+                f"filename = \'{filename}.csv\'; save_name = \'{str(save_name)}\'; "
+                f"label = \'{labels[label]}\';"
+            )
+
+            scripts.append(script)
+            variables.append(row)
+
+    backend.select.run_matlab_set(
+        suppress = True, scripts = scripts, variables = variables
     )
 
 def procedure_matlab():
@@ -2177,6 +2334,9 @@ if args.delvol_data_prep:
 
 if args.plot_ondemand:
     procedure_plot_ondemand()
+
+if args.plots_all:
+    procedure_plots_all()
 
 if args.sync:
     procedure_sync()
