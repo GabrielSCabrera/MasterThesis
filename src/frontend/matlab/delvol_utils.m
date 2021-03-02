@@ -205,6 +205,39 @@ classdef delvol_utils
       val = data(:,2);
     end
 
+    function [sigd, mean, std] = load_plot_from_prep_no_outliers_avg(filename)
+      % Reads the data from a set of .csv files and returns its values
+
+      arguments
+        filename string
+      end
+
+      storage = '~/Documents/MasterThesis/data/formatted_data/';
+      path = strcat(storage, filename);
+      data = readtable(path);
+      data = table2array(data);
+      data = rmoutliers(data);
+      sigd = data(:,1);
+      mean = data(:,2);
+      std = data(:,3);
+    end
+
+    function [sigd, mean, std] = load_plot_from_prep_avg(filename)
+      % Reads the data from a set of .csv files and returns its values
+
+      arguments
+        filename string
+      end
+
+      storage = '~/Documents/MasterThesis/data/formatted_data/';
+      path = strcat(storage, filename);
+      data = readtable(path);
+      data = table2array(data);
+      sigd = data(:,1);
+      mean = data(:,2);
+      std = data(:,3);
+    end
+
     function [N_good] = load_N_good(directory)
       % Reads the data from a set of .dat files and returns its values
 

@@ -3,6 +3,7 @@ from typing import List
 import numpy as np
 import argparse
 import datetime
+import readline
 import time
 import sys
 import os
@@ -1547,7 +1548,7 @@ def procedure_delvol_logspace_plots():
         f'Select a Set of Results.'
     )
     path = backend.config.delvol_relpath
-    options = [str(i.name) for i in path.glob('*')]
+    options = sorted([str(i.name) for i in path.glob('*')])
     selection = select.scroll_select(title, options)
     terminal.reset_screen()
     delvol_logspace_plot(selection, suppress = True)
@@ -1557,7 +1558,7 @@ def procedure_delvol_linspace_plots():
         f'Select a Set of Results.'
     )
     path = backend.config.delvol_relpath
-    options = [str(i.name) for i in path.glob('*')]
+    options = sorted([str(i.name) for i in path.glob('*')])
     selection = select.scroll_select(title, options)
     terminal.reset_screen()
     delvol_linspace_plot(selection, suppress = True)
@@ -1698,6 +1699,22 @@ def procedure_delvol_data_prep():
                     pairs.append((key2, row[idx]))
             filename = f'{key1}_{label}.csv'
             csv_out = '\n'.join(f'{i[0]},{i[1]}' for i in pairs)
+            path = config.fmt_data_relpath / filename
+            with open(path, 'w+') as outfile:
+                outfile.write(csv_out)
+
+    for label, idx in delvol_columns.items():
+        for key1 in delvol_final:
+            triplets = []
+            for key2 in delvol_final[key1]:
+                rows = delvol_final[key1][key2]
+                vals = []
+                for row in rows:
+                    vals.append(row[idx])
+                triplets.append((key2, np.mean(vals), np.std(vals)))
+
+            filename = f'{key1}_{label}_avg.csv'
+            csv_out = '\n'.join(f'{i[0]},{i[1]},{i[2]}' for i in triplets)
             path = config.fmt_data_relpath / filename
             with open(path, 'w+') as outfile:
                 outfile.write(csv_out)
@@ -2062,16 +2079,21 @@ def procedure_plots_all():
         'dc_max'    : '75ᵗʰ Percentile Distance Between Centroids',
         'tot_vol'   : 'Fracture Volume',
         'rand'      : 'Randomly Generated Values',
-        'eps'       : 'Axial Strain [MPa]',
+        # 'eps'       : 'Axial Strain [MPa]',
     }
 
     no_outliers = backend.utils.select.select_bool('Remove Outliers?')
+    averaged = backend.utils.select.select_bool('Take Averages?')
     print()
 
     if no_outliers:
-        script = 'delvol_plot_prepped_no_outliers.m'
+        script = 'delvol_plot_prepped_no_outliers'
     else:
-        script = 'delvol_plot_prepped.m'
+        script = 'delvol_plot_prepped'
+
+    if averaged:
+        script += '_avg'
+    script += '.m'
 
     scripts = []
     variables = []
@@ -2084,10 +2106,18 @@ def procedure_plots_all():
             path = path / directory
             path.mkdir(exist_ok = True)
 
+            if averaged:
+                filename += '_avg'
+
             if no_outliers:
-                save_name = directory + f'/{filename}_no_outliers.png'
+                save_name = directory + f'/{filename}_no_outliers'
             else:
-                save_name = directory + f'/{filename}.png'
+                save_name = directory + f'/{filename}'
+
+            if averaged:
+                save_name += '_avg'
+
+            save_name += '.png'
 
             row = (
                 f"filename = \'{filename}.csv\'; save_name = \'{str(save_name)}\'; "
@@ -2181,7 +2211,7 @@ if args.custom:
     BucketManager.download('delvol_data')
     terminal.reset_screen()
 
-    experiments = ['WG01', 'MONZ4']
+    experiments = ['MONZ3']
     training_labels = ['delvtot', 'sig_d']
     N_repeats = 1
     N_experiments = np.ceil(np.linspace(5, 100, 24)).astype(np.int64)
