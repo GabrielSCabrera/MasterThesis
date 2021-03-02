@@ -419,7 +419,7 @@ class DelVolDensity:
                 with open(err_path, 'a+') as outfile:
                     T = datetime.now()
                     msg = (
-                        f'Error in SHAP I:\n\t{e}'
+                        f'Error in SHAP I at {T}:\n\t{e}'
                     )
                     outfile.write(msg)
 
@@ -466,7 +466,7 @@ class DelVolDensity:
             with open(err_path, 'a+') as outfile:
                 T = datetime.now()
                 msg = (
-                    f'Error in SHAP II:\n\t{e}'
+                    f'Error in SHAP II at {T}:\n\t{e}'
                 )
                 outfile.write(msg)
 
