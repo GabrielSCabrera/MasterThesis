@@ -1359,7 +1359,7 @@ def procedure_delvol_all():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
-    training_label = 'delv50'
+    training_label = 'delvtot'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
