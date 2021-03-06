@@ -280,6 +280,17 @@ def combine_linspace_results(experiment:str, directory:Path = None) -> None:
     if directory is None:
         directory = config.delvol_relpath
 
+    exps = [
+        'M8_1',
+        'M8_2',
+        'MONZ3',
+        'MONZ4',
+        'MONZ5',
+        'WG01',
+        'WG02',
+        'WG04',
+    ]
+    
     path = directory / experiment
     temp = list(path.glob('*'))
     experiments_unsorted = []

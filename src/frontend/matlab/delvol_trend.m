@@ -10,7 +10,7 @@ hold on
 plot(sigd, delvol, 'rx');
 xlabel('$\sigma_d$', 'Interpreter', 'latex');
 ylabel('$\nabla \rho$', 'Interpreter', 'latex');
-title('Del-Density as a Function of Stress over Time', 'Interpreter', 'latex');
+% title('Del-Density as a Function of Stress over Time', 'Interpreter', 'latex');
 grid();
 xlim([min(sigd) max(sigd)]);
 grid();

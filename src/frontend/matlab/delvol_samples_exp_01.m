@@ -42,7 +42,7 @@ scaler = 0.1;
 xl = xlim;
 dx = xl(2) - xl(1);
 xlim([xl(1)-dx*scaler xl(2)+dx*scaler]);
-title('$R^2$ Scores for Prediction of Fracture Densities by No. of Experiments', 'Interpreter', 'latex')
+% title('$R^2$ Scores for Prediction of Fracture Densities by No. of Experiments', 'Interpreter', 'latex')
 xlabel('Number of Experiments', 'Interpreter', 'latex');
 ylabel('$R^2$ Score', 'Interpreter', 'latex');
 ylim([0 1]);

@@ -26,8 +26,8 @@ for j = 1:rows
   ylabel('Cumulative Importance', 'Interpreter', 'latex');
   title_text = 'The Cumulative Importance of Individual Features for Rock Type';
   title_text = strcat(title_text, {' '}, string(folders(j)));
-  title(title_text, 'Interpreter', 'none');
-  grid();
+  % title(title_text, 'Interpreter', 'none');
+  % grid();
   set(gca, 'FontSize', 8)
   save_text = strcat(save_name, string(folders(j)));
   save_text = strcat(save_text, '.png');

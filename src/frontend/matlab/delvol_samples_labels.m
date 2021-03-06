@@ -42,7 +42,7 @@ scaler = 0.1;
 xlim([1-N_tabs*scaler N_tabs+N_tabs*scaler]);
 set(gca, 'xtick', xpoints, 'xticklabel', scores.Properties.RowNames);
 legend([l1, l2],{'Training Set', 'Testing Set'});
-title('No. of Experiments per-Run, per-Rock-Type', 'Interpreter', 'latex')
+% title('No. of Experiments per-Run, per-Rock-Type', 'Interpreter', 'latex')
 xlabel('Experiment (Rock Type Abbreviation)', 'Interpreter', 'latex');
 ylabel('Number of Experiments', 'Interpreter', 'latex');
 grid();

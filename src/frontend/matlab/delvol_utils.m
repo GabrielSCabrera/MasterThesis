@@ -13,6 +13,15 @@ classdef delvol_utils
       matrix_out = readmatrix(file_path);
     end
 
+    function [ax] = add_vlines(ax)
+      % Adds vertical lines to separate features by category
+      idx = [5, 10, 15, 20, 25, 30, 35, 40];
+      diff = 0.5;
+      for i = idx
+        xline(ax, i + diff, 'k', 'LineWidth', 1);
+      end
+    end
+
     function [y_train, y_test, y_train_pred, y_test_pred, scores] = load_from_delvol(directory)
       % Reads the data from a set of .csv files and returns its values as
       % matrices
@@ -172,6 +181,21 @@ classdef delvol_utils
       x_points = readtable(points_path,'ReadVariableNames',false);
       x_points = table2array(x_points);
       x_points = str2double(x_points);
+    end
+
+    function [sigd, strain] = load_stress_strain(filename)
+      % Reads the data from a .csv file and returns its values
+
+      arguments
+        filename string
+      end
+
+      storage = '~/Documents/MasterThesis/data/stress_strain_exps/';
+      path = strcat(storage, filename);
+      load(path)
+
+      sigd = times_real(:,3);
+      strain = times_real(:,2);
     end
 
     function [sigd, val] = load_plot_from_prep_no_outliers(filename)

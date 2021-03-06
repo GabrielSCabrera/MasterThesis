@@ -18,7 +18,7 @@ legend('Mean and Std of R^2')
 set(gca, 'xtick', 1:cols, 'xticklabel', folders);
 xlabel('Experiment (Rock Type Abbreviation)', 'Interpreter', 'latex');
 ylabel('$R^2$ Score', 'Interpreter', 'latex');
-title('Run- and Experiment-Wise $R^2$ Scores', 'Interpreter', 'latex');
+% title('Run- and Experiment-Wise $R^2$ Scores', 'Interpreter', 'latex');
 scaler = 0.1;
 plot([1-cols*scaler cols+cols*scaler], [0.5, 0.5], 'r:', 'DisplayName', 'Acceptable Score Cutoff');
 legend();

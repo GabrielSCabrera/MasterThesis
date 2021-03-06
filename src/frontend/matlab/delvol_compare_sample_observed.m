@@ -50,7 +50,7 @@ han.XLabel.Visible ='on';
 han.YLabel.Visible ='on';
 ylabel(han,'Predicted Values', 'Interpreter', 'latex');
 xlabel(han,'Experiment No.', 'Interpreter', 'latex');
-title('Comparing Mean and Std. of $R^2$ Scores for Each Experiment', 'Interpreter', 'latex');
+% title('Comparing Mean and Std. of $R^2$ Scores for Each Experiment', 'Interpreter', 'latex');
 title_obj = title(han,'Experiment No. vs. Predicted Values of Fracture Densities', 'Interpreter', 'latex');
 titlePos = get(title_obj , 'position');
 titlePos(1) = 0.45;

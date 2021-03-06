@@ -121,11 +121,11 @@ def parse_args():
         'Plots the stress vs. the strain over time per-experiment.'
     )
     help_plot_ondemand = (
-        'Plots the differential stress of a selected experiment relative to '
+        'Plots the time to failure of a selected experiment relative to '
         'a selected column label.'
     )
     help_plots_all = (
-        'Plots the differential stress of all experiment relative to all column'
+        'Plots the time to failure of all experiment relative to all column'
         ' labels.'
     )
     help_matlab = (
@@ -1631,7 +1631,7 @@ def procedure_delvol_data_prep():
         lines = np.load(i)
         stress_strain_data.append(np.array(lines, dtype = np.float64))
 
-    # Creating a map from sig_d (differential stress) to eps (axial strain)
+    # Creating a map from sig_d (time to failure) to eps (axial strain)
     stress_strain_map = {}
     idx1 = stress_strain_columns['sig_d']
     idx2 = stress_strain_columns['eps']
@@ -1785,7 +1785,7 @@ def procedure_delvol_combine():
     directory = config.delvol_relpath
 
     filename_pat = (
-        r'logspace\_(\d{4})\-(\d{2})\-(\d{2}) (\d{2})\:(\d{2})\:(\d{2})\.(\d{6})'
+        r'linspace\_(\d{4})\-(\d{2})\-(\d{2}) (\d{2})\:(\d{2})\:(\d{2})\.(\d{6})'
     )
     filename_repl = (
         r'\1/\2/\3 \4:\5:\6.\7'
@@ -1799,9 +1799,9 @@ def procedure_delvol_combine():
     N = len(files)
     if N == 0:
         msg = (
-            f'\n\nNo logspace delvol experiments found.  Run `python main.py '
-            f'--delvol-logspace` to create a set of experiment output files in '
-            f'`~/Documents/MasterThesis/results/delvol/`.\n'
+            f'\n\nNo linspace delvol experiments found.  Run '
+            f'`python main.py --delvol-linspace` to create a set of experiment '
+            f'output files in `~/Documents/MasterThesis/results/delvol/`.\n'
         )
         raise FileNotFoundError(msg)
     elif N == 1:
@@ -1820,7 +1820,7 @@ def procedure_delvol_combine():
 
     terminal.reset_screen()
     print(format.B('Selected Experiment: ') + format.I(selection))
-    parsers.combine_logspace_results(selection)
+    parsers.combine_linspace_results(selection)
 
 def procedure_delvol_logspace():
 
@@ -1913,13 +1913,13 @@ def procedure_stress_strain():
         if 'WG04' in path.name:
             data = np.load(path)
             eps = data[:,1]         # Axial Strain
-            sigds = data[:,2]       # Differential Stress
+            sigds = data[:,2]       # Time to Failure
             distf = data[:,3]       # Normalized Stress & Distance to Failure
 
             plt.grid()
             plt.plot(sigds, eps)
             plt.xlabel('Differential Stress [MPa]')
-            plt.ylabel('Axial Strain [MPa]')
+            plt.ylabel('Axial Strain [Dimensionless]')
             plt.xlim(np.min(sigds), np.max(sigds))
             plt.show()
 
@@ -1933,7 +1933,8 @@ def procedure_plot_ondemand():
         'delvtot'   : 'Change in Total Volume',
         'delv50'    : 'Change in 50ᵗʰ Percentile Volume',
         'time'      : 'Time',
-        'sig_d'     : 'Differential Stress [MPa]',
+        # 'sig_d'     : 'Differential Stress [MPa]',
+        'sig_d'     : 'Time to Failure [Dimensionless]',
         'x'         : 'Position (x)',
         'y'         : 'Position (y)',
         'z'         : 'Position (z)',
@@ -1978,7 +1979,7 @@ def procedure_plot_ondemand():
         'dc_max'    : '75ᵗʰ Percentile Distance Between Centroids',
         'tot_vol'   : 'Fracture Volume',
         'rand'      : 'Randomly Generated Values',
-        'eps'       : 'Axial Strain [MPa]',
+        'eps'       : 'Axial Strain [Dimensionless]',
     }
 
 
@@ -2034,7 +2035,8 @@ def procedure_plots_all():
         'delvtot'   : 'Change in Total Volume',
         'delv50'    : 'Change in 50ᵗʰ Percentile Volume',
         'time'      : 'Time',
-        'sig_d'     : 'Differential Stress [MPa]',
+        # 'sig_d'     : 'Differential Stress [MPa]',
+        'sig_d'     : 'Time to Failure [Dimensionless]',
         'x'         : 'Position (x)',
         'y'         : 'Position (y)',
         'z'         : 'Position (z)',
@@ -2079,7 +2081,7 @@ def procedure_plots_all():
         'dc_max'    : '75ᵗʰ Percentile Distance Between Centroids',
         'tot_vol'   : 'Fracture Volume',
         'rand'      : 'Randomly Generated Values',
-        # 'eps'       : 'Axial Strain [MPa]',
+        # 'eps'       : 'Axial Strain [Dimensionless]',
     }
 
     no_outliers = backend.utils.select.select_bool('Remove Outliers?')
@@ -2284,35 +2286,77 @@ if args.delvol_logspace:
 
 if args.test:
 
-    from scipy import io
-    files = [
-        'times_M8_1.mat',
-        'times_M8_2.mat',
-        'times_MONZ3.mat',
-        'times_MONZ4.mat',
-        'times_MONZ5.mat',
-        'times_WG01.mat',
-        'times_WG02.mat',
-        'times_WG04.mat',
-    ]
+    directory = 'delvtot'
+    script = 'delvol_importances_mean.m'
+    save_name = directory + '/importances_mean.png'
+    var = f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+    backend.select.run_matlab(
+        suppress = False,
+        script_name = script,
+        variables = var
+    )
 
-    new_files = [
-        'times_M8_1.npy',
-        'times_M8_2.npy',
-        'times_MONZ3.npy',
-        'times_MONZ4.npy',
-        'times_MONZ5.npy',
-        'times_WG01.npy',
-        'times_WG02.npy',
-        'times_WG04.npy',
-    ]
-
-    for file1, file2 in zip(files, new_files):
-        path1 = config.stress_strain_relpath / file1
-        path2 = config.stress_strain_npy_relpath / file2
-        loaded = io.loadmat(path1)
-
-        np.save(path2, loaded['times_real'])
+    # from scipy import io
+    #
+    # exps = [
+    #     'M8_1',
+    #     'M8_2',
+    #     'MONZ3',
+    #     'MONZ4',
+    #     'MONZ5',
+    #     'WG01',
+    #     'WG02',
+    #     'WG04',
+    # ]
+    #
+    # files = [
+    #     'times_M8_1.mat',
+    #     'times_M8_2.mat',
+    #     'times_MONZ3.mat',
+    #     'times_MONZ4.mat',
+    #     'times_MONZ5.mat',
+    #     'times_WG01.mat',
+    #     'times_WG02.mat',
+    #     'times_WG04.mat',
+    # ]
+    #
+    # new_files = [
+    #     'times_M8_1.npy',
+    #     'times_M8_2.npy',
+    #     'times_MONZ3.npy',
+    #     'times_MONZ4.npy',
+    #     'times_MONZ5.npy',
+    #     'times_WG01.npy',
+    #     'times_WG02.npy',
+    #     'times_WG04.npy',
+    # ]
+    #
+    # script = 'delvol_stress_strain.m'
+    # vars = []
+    # scripts = []
+    #
+    # for file1, file2, exp in zip(files, new_files, exps):
+    #
+    #     save_name = f'{exp}_stress_strain.png'
+    #
+    #     var = (
+    #         f'filename = \'{file1}\'; save_name = \'{save_name}\';'
+    #     )
+    #
+    #     vars.append(var)
+    #     scripts.append(script)
+    #
+    #     path1 = config.stress_strain_relpath / file1
+    #     path2 = config.stress_strain_npy_relpath / file2
+    #     loaded = io.loadmat(path1)
+    #
+    #     np.save(path2, loaded['times_real'])
+    #
+    # backend.select.run_matlab_set(
+    #     suppress = False,
+    #     scripts = scripts,
+    #     variables = vars
+    # )
 
 if args.cluster:
     procedure_cluster()

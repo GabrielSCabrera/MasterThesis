@@ -16,7 +16,7 @@ legend();
 set(gca, 'xtick', xpoints, 'xticklabel', scores.Properties.RowNames);
 xlabel('Experiment (Rock Type Abbreviation)', 'Interpreter', 'latex');
 ylabel('$R^2$ Average Score and Standard Deviation', 'Interpreter', 'latex');
-title('Comparing Mean and Std. of $R^2$ Scores for Each Experiment', 'Interpreter', 'latex');
+% title('Comparing Mean and Std. of $R^2$ Scores for Each Experiment', 'Interpreter', 'latex');
 grid();
 fig = gcf();
 delvol_utils.save_plot(fig, save_name);

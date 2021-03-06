@@ -11,6 +11,6 @@ chunk = 0.1*(max(x_points) - min(x_points));
 xlim([min(x_points) - chunk max(x_points) + chunk]);
 xlabel('Number of Models', 'Interpreter', 'latex');
 ylabel('$R^2$ Average Score and Standard Deviation', 'Interpreter', 'latex');
-title('Comparing Mean and Std. of $R^2$ Scores by Number of Models', 'Interpreter', 'latex');
+% title('Comparing Mean and Std. of $R^2$ Scores by Number of Models', 'Interpreter', 'latex');
 grid();
 delvol_utils.save_plot(fig, save_name);
