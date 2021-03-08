@@ -1340,6 +1340,8 @@ def procedure_delvol_all():
     BucketManager.download('delvol_data')
     terminal.reset_screen()
 
+    training_label = 'sig_d'
+    # training_label = 'delvtot'
     title = 'How many experiments to run?'
     val_range = [0, 100]
     N_experiments = select.select_int(title, val_range)
@@ -1359,7 +1361,6 @@ def procedure_delvol_all():
     path = backend.config.delvol_relpath / directory
     path.mkdir(exist_ok = True)
     length = len(exps)
-    training_label = 'delvtot'
     for n,i in enumerate(exps):
         title = backend.utils.format.B(f'EXPERIMENT {i} ')
         title += backend.utils.format.I(f'({n+1}/{length})')
@@ -2286,77 +2287,77 @@ if args.delvol_logspace:
 
 if args.test:
 
-    directory = 'delvtot'
-    script = 'delvol_importances_mean.m'
-    save_name = directory + '/importances_mean.png'
-    var = f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
-    backend.select.run_matlab(
-        suppress = False,
-        script_name = script,
-        variables = var
-    )
-
-    # from scipy import io
-    #
-    # exps = [
-    #     'M8_1',
-    #     'M8_2',
-    #     'MONZ3',
-    #     'MONZ4',
-    #     'MONZ5',
-    #     'WG01',
-    #     'WG02',
-    #     'WG04',
-    # ]
-    #
-    # files = [
-    #     'times_M8_1.mat',
-    #     'times_M8_2.mat',
-    #     'times_MONZ3.mat',
-    #     'times_MONZ4.mat',
-    #     'times_MONZ5.mat',
-    #     'times_WG01.mat',
-    #     'times_WG02.mat',
-    #     'times_WG04.mat',
-    # ]
-    #
-    # new_files = [
-    #     'times_M8_1.npy',
-    #     'times_M8_2.npy',
-    #     'times_MONZ3.npy',
-    #     'times_MONZ4.npy',
-    #     'times_MONZ5.npy',
-    #     'times_WG01.npy',
-    #     'times_WG02.npy',
-    #     'times_WG04.npy',
-    # ]
-    #
-    # script = 'delvol_stress_strain.m'
-    # vars = []
-    # scripts = []
-    #
-    # for file1, file2, exp in zip(files, new_files, exps):
-    #
-    #     save_name = f'{exp}_stress_strain.png'
-    #
-    #     var = (
-    #         f'filename = \'{file1}\'; save_name = \'{save_name}\';'
-    #     )
-    #
-    #     vars.append(var)
-    #     scripts.append(script)
-    #
-    #     path1 = config.stress_strain_relpath / file1
-    #     path2 = config.stress_strain_npy_relpath / file2
-    #     loaded = io.loadmat(path1)
-    #
-    #     np.save(path2, loaded['times_real'])
-    #
-    # backend.select.run_matlab_set(
+    # directory = 'delvtot'
+    # script = 'delvol_importances_mean.m'
+    # save_name = directory + '/importances_mean.png'
+    # var = f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+    # backend.select.run_matlab(
     #     suppress = False,
-    #     scripts = scripts,
-    #     variables = vars
+    #     script_name = script,
+    #     variables = var
     # )
+
+    from scipy import io
+
+    exps = [
+        'M8_1',
+        'M8_2',
+        'MONZ3',
+        'MONZ4',
+        'MONZ5',
+        'WG01',
+        'WG02',
+        'WG04',
+    ]
+
+    files = [
+        'times_M8_1.mat',
+        'times_M8_2.mat',
+        'times_MONZ3.mat',
+        'times_MONZ4.mat',
+        'times_MONZ5.mat',
+        'times_WG01.mat',
+        'times_WG02.mat',
+        'times_WG04.mat',
+    ]
+
+    new_files = [
+        'times_M8_1.npy',
+        'times_M8_2.npy',
+        'times_MONZ3.npy',
+        'times_MONZ4.npy',
+        'times_MONZ5.npy',
+        'times_WG01.npy',
+        'times_WG02.npy',
+        'times_WG04.npy',
+    ]
+
+    script = 'delvol_stress_strain.m'
+    vars = []
+    scripts = []
+
+    for file1, file2, exp in zip(files, new_files, exps):
+
+        save_name = f'{exp}_stress_strain.png'
+
+        var = (
+            f'filename = \'{file1}\'; save_name = \'{save_name}\';'
+        )
+
+        vars.append(var)
+        scripts.append(script)
+
+        path1 = config.stress_strain_relpath / file1
+        path2 = config.stress_strain_npy_relpath / file2
+        loaded = io.loadmat(path1)
+
+        np.save(path2, loaded['times_real'])
+
+    backend.select.run_matlab_set(
+        suppress = False,
+        scripts = scripts,
+        variables = vars
+    )
 
 if args.cluster:
     procedure_cluster()
