@@ -13,13 +13,30 @@ classdef delvol_utils
       matrix_out = readmatrix(file_path);
     end
 
+    function [headers] = rewrite_headers()
+      % Replaces headers with percentiles
+      headers = ["min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "25%", "50%", "75%", "max", "tot_vol", "rand"];
+    end
+
     function [ax] = add_vlines(ax)
       % Adds vertical lines to separate features by category
-      idx = [5, 10, 15, 20, 25, 30, 35, 40];
+      idx = [5. 10. 15. 20. 25. 30. 35. 39.];
+      % names = ["dmin", "th1", "th3", "l1", "l3", "ani", "vol", "dc"];
+      names = ["$d_{min}$", "$\theta_1$", "$\theta_3$", "$L_{min}$", "$L_{max}$", "$A$", "$v$", "$d_c$"];
       diff = 0.5;
-      for i = idx
-        xline(ax, i + diff, 'k', 'LineWidth', 1);
+      ypos_ratio = 1.04;
+      ypos = ylim(ax);
+      ypos = ypos_ratio*(ypos(2)-ypos(1));
+      for i = 1:length(idx)
+        xline(ax, idx(i) + diff, 'k', 'LineWidth', 2);
+        if i == 1
+          xpos = idx(i)/2;
+        else
+          xpos = (idx(i)-idx(i-1))/2 + idx(i-1);
+        end
+        text(ax, xpos, ypos, names(:,i), 'FontSize', 18, 'FontWeight','bold', 'HorizontalAlignment', 'center', 'Interpreter', 'latex');
       end
+      ax.LineWidth = 2;
     end
 
     function [y_train, y_test, y_train_pred, y_test_pred, scores] = load_from_delvol(directory)

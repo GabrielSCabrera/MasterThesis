@@ -8,19 +8,23 @@ chunk = 0.1*(max(x_points) - min(x_points));
 
 avg_arr = table2array(scores(:,avg_idx));
 std_arr = table2array(scores(:,std_idx));
-fig = plot(x_points, avg_arr)
+fig = plot(x_points, avg_arr);
 
 xlim([min(x_points) - chunk max(x_points) + chunk]);
-xlabel('Number of Models', 'Interpreter', 'latex');
-ylabel('$R^2$ Average Score', 'Interpreter', 'latex');
+xlabel('Number of Models', 'Interpreter', 'none', 'fontweight', 'bold');
+ylabel('R² Average Score', 'Interpreter', 'none', 'fontweight', 'bold');
 % title('Comparing Mean $R^2$ Scores by Number of Models', 'Interpreter', 'latex');
 grid();
+set(gca(), 'LineWidth', 2);
+set(gca(), 'FontSize', 11);
 delvol_utils.save_plot(fig, save_name_1);
 
 fig = plot(x_points, std_arr)
 xlim([min(x_points) - chunk max(x_points) + chunk]);
-xlabel('Number of Models', 'Interpreter', 'latex');
-ylabel('$R^2$ Standard Deviation', 'Interpreter', 'latex');
+xlabel('Number of Models', 'Interpreter', 'none', 'fontweight', 'bold');
+ylabel('R² Standard Deviation', 'Interpreter', 'none', 'fontweight', 'bold');
 % title('Comparing Std. of $R^2$ Scores by Number of Models', 'Interpreter', 'latex');
 grid();
+set(gca(), 'LineWidth', 2);
+set(gca(), 'FontSize', 11);
 delvol_utils.save_plot(fig, save_name_2);

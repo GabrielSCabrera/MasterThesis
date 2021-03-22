@@ -3,11 +3,13 @@
 [mean_filters, any_filters, weak_filters] = delvol_utils.load_filter(directory);
 [rows, cols] = size(importances);
 
+headers = delvol_utils.rewrite_headers();
 fig = figure();
 ax = gca();
 hold on
 
 totals = zeros(cols);
+
 for j = 1:rows
   step_N = N_good(j,1);
   if step_N >= 1
@@ -16,7 +18,16 @@ for j = 1:rows
   end
 end
 
-plot(1:cols, totals(1,:));
+% plot(1:cols, totals(1,:), 'LineWidth', 2, 'MarkerSize', 8);
+
+groups = [0 5 10 15 20 25 30 35 39 40 41];
+
+for i=1:length(groups)-1
+  idx1 = groups(i)+1;
+  idx2 = groups(i+1);
+  plot(idx1:idx2, totals(1,idx1:idx2), 'b-^', 'LineWidth', 2, 'MarkerSize', 8);
+end
+
 [ax] = delvol_utils.add_vlines(ax);
 
 xtickangle(45);

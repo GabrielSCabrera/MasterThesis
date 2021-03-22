@@ -3,6 +3,7 @@
 [mean_filters, any_filters, weak_filters] = delvol_utils.load_filter(directory);
 [rows, cols] = size(importances);
 
+headers = delvol_utils.rewrite_headers();
 fig = figure();
 ax = gca();
 hold on

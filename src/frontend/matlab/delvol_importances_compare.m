@@ -1,6 +1,7 @@
 [headers, importances, folders] = delvol_utils.load_importance(directory);
 [rows, cols] = size(importances);
 
+headers = delvol_utils.rewrite_headers();
 fig = figure();
 ax = gca();
 hold on

@@ -81,6 +81,9 @@ def parse_args():
     help_delvol_plots = (
         'Select a previously run experiment and create the related figures.'
     )
+    help_final_plots = (
+        'Creates and saves all the final plots used in the thesis.'
+    )
     help_delvol_logspace_plots = (
         'Select a previously run logspace experiment and create the related '
         'figures.'
@@ -199,6 +202,9 @@ def parse_args():
     )
     parser.add_argument(
         '--delvol-plots', action='store_true', help = help_delvol_plots
+    )
+    parser.add_argument(
+        '--final-plots', action='store_true', help = help_final_plots
     )
     parser.add_argument(
         '--delvol-logspace-plots', action='store_true',
@@ -381,6 +387,28 @@ def save_plot_delden(directory:str, path:Path = None, suppress:bool = True):
             f"save_name_4 = \'{save_name_4}\'; "
         )
     )
+
+def save_plot_delvol_conditional(directory:str, path:Path = None, suppress:bool = True):
+    scripts = [
+        'delvol_importances_good_sum_norm_all.m',
+    ]
+
+    variables = []
+
+    #################################################################
+    save_name = directory + '/importances_good_sum_norm_all.png'
+    variables.append(
+        f"directory = \'{directory}\'; save_name = \'{save_name}\'; "
+    )
+
+    #################################################################
+
+    if path is None:
+        path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    result = backend.select.run_matlab_set(scripts, variables, suppress)
 
 def save_plot_delvol(directory:str, path:Path = None, suppress:bool = True):
     '''
@@ -1542,7 +1570,225 @@ def procedure_delvol_plots():
     options = [str(i.name) for i in path.glob('*')]
     selection = select.scroll_select(title, options)
     terminal.reset_screen()
-    save_plot_delvol(selection, suppress = True)
+    # save_plot_delvol(selection, suppress = False)
+    save_plot_delvol_conditional(selection, suppress = False)
+
+def procedure_final_plots():
+    '''
+        Expects the existence of multiple directories!
+    '''
+
+    scripts = [
+        'delvol_compare.m',
+        'delvol_compare.m',
+        'delvol_compare_01.m',
+        'delvol_compare_01.m',
+        'delvol_importances_good_norm.m',
+        'delvol_importances_good_norm.m',
+        'delvol_importances_good_norm.m',
+        'delvol_importances_good_sum_norm_all.m',
+        'delvol_importances_good_sum_norm_all.m',
+        'delvol_stress_strain_all.m',
+        'delvol_linspace_bars.m',
+        'delvol_linspace_bars.m',
+        'delvol_plot_prepped_avg.m',
+        'delvol_plot_prepped_avg.m',
+        'delvol_plot_prepped_avg.m',
+        'delvol_plot_prepped_avg.m',
+        'delvol_plot_prepped_avg.m',
+        'delvol_plot_prepped_avg_means.m',
+        'delvol_plot_prepped_avg_means.m',
+        'delvol_plot_prepped_avg_means.m',
+        'delvol_plot_prepped_avg_means.m',
+        'delvol_plot_prepped_avg_means.m',
+    ]
+
+    variables = []
+
+    directory = 'final_plots'
+    suppress = False
+
+    #################################################################
+    save_name = directory + '/compare_delvtot' + '.png'
+    variables.append(
+        f"directory = 'delvtot_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+    save_name = directory + '/compare_sigd' + '.png'
+    variables.append(
+        f"directory = 'sigd_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+    save_name = directory + '/compare_delvtot_01' + '.png'
+    variables.append(
+        f"directory = 'delvtot_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+    save_name = directory + '/compare_sigd_01' + '.png'
+    variables.append(
+        f"directory = 'sigd_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+    # save_name = directory + '/importances_delvtot_'
+    # variables.append(
+    #     f"directory = 'delvtot_all'; save_name = \'{save_name}\';"
+    # )
+    # #################################################################
+    # save_name = directory + '/importances_sigd_'
+    # variables.append(
+    #     f"directory = 'sigd_all'; save_name = \'{save_name}\';"
+    # )
+    #################################################################
+    save_name = directory + '/importances_good_norm_marble.png'
+    variables.append(
+        f"directory = 'delvtot_marble'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+    save_name = directory + '/importances_good_norm_monzanite.png'
+    variables.append(
+        f"directory = 'delvtot_monzonite'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+    save_name = directory + '/importances_good_norm_granite.png'
+    variables.append(
+        f"directory = 'delvtot_granite'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+    save_name = directory + '/importances_good_sum_norm_all_delvtot.png'
+    variables.append(
+        f"directory = 'delvtot_all'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+    save_name = directory + '/importances_good_sum_norm_all_sigd.png'
+    variables.append(
+        f"directory = 'sigd_all'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+    # files_list = [
+    #     'times_M8_1.mat',
+    #     'times_M8_2.mat',
+    #     'times_MONZ3.mat',
+    #     'times_MONZ4.mat',
+    #     'times_MONZ5.mat',
+    #     'times_WG01.mat',
+    #     'times_WG02.mat',
+    #     'times_WG04.mat',
+    # ]
+    # exps = [
+    #     'M8_1',
+    #     'M8_2',
+    #     'MONZ3',
+    #     'MONZ4',
+    #     'MONZ5',
+    #     'WG01',
+    #     'WG02',
+    #     'WG04',
+    # ]
+    #
+    # for i,j in zip(files_list, exps):
+    #     save_name = directory + f'/{j}_stress_strain.png'
+    #     variables.append(
+    #         f"filename = '{i}'; save_name = \'{save_name}\';"
+    #     )
+    #################################################################
+    save_name = directory + f'/stress_strain_all.png'
+    variables.append(
+        f"save_name = \'{save_name}\';"
+    )
+    #################################################################
+    save_name = directory + '/linspace_bars_MONZ3.png'
+    variables.append(
+        f"directory = 'linspace_MONZ3_delvtot'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+    save_name = directory + '/linspace_bars_WG01.png'
+    variables.append(
+        f"directory = 'linspace_WG01_delvtot'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+
+
+    #################################################################
+    save_name = directory + '/WG01_vol_50.png'
+    variables.append(
+        f"filename = 'WG01_vol_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"label = '50ᵗʰ Percentile of Individual Fracture Volume';"
+    )
+    #################################################################
+    save_name = directory + '/WG01_ani_50.png'
+    variables.append(
+        f"filename = 'WG01_ani_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"label = '50ᵗʰ Percentile of Shape Anisotropy';"
+    )
+    #################################################################
+    save_name = directory + '/WG01_l1_50.png'
+    variables.append(
+        f"filename = 'WG01_l1_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"label = '50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture';"
+    )
+    #################################################################
+    save_name = directory + '/WG01_l3_50.png'
+    variables.append(
+        f"filename = 'WG01_l3_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"label = '50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture';"
+    )
+    #################################################################
+    save_name = directory + '/WG01_th1_50.png'
+    variables.append(
+        f"filename = 'WG01_th1_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"label = '50ᵗʰ Percentile Orientiation of Min. Eigenvector';"
+    )
+    #################################################################
+
+
+    #################################################################
+    save_name = directory + '/WG01_vol_50_mean.png'
+    variables.append(
+        f"filename = 'WG01_vol_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"label = '50ᵗʰ Percentile of Individual Fracture Volume';"
+    )
+    #################################################################
+    save_name = directory + '/WG01_ani_50_mean.png'
+    variables.append(
+        f"filename = 'WG01_ani_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"label = '50ᵗʰ Percentile of Shape Anisotropy';"
+    )
+    #################################################################
+    save_name = directory + '/WG01_l1_50_mean.png'
+    variables.append(
+        f"filename = 'WG01_l1_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"label = '50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture';"
+    )
+    #################################################################
+    save_name = directory + '/WG01_l3_50_mean.png'
+    variables.append(
+        f"filename = 'WG01_l3_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"label = '50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture';"
+    )
+    #################################################################
+    save_name = directory + '/WG01_th1_50_mean.png'
+    variables.append(
+        f"filename = 'WG01_th1_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"label = '50ᵗʰ Percentile Orientiation of Min. Eigenvector';"
+    )
+    #################################################################
+    path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    result = backend.select.run_matlab_set(scripts, variables, suppress)
+
+    if result != 0:
+        msg = (
+            '\n\033[1mReverting to Running Scripts Individually (Slow)\033[m\n'
+        )
+        print(msg, flush = True)
+        for script, var in zip(scripts, variables):
+            backend.select.run_matlab(
+                suppress = suppress,
+                script_name = script,
+                variables = var
+            )
 
 def procedure_delvol_logspace_plots():
     title = (
@@ -2057,14 +2303,14 @@ def procedure_plots_all():
         'th3_75'    : '75ᵗʰ Percentile Orientation of Max. Eigenvector',
         'th3_max'   : 'Maximum Orientation of Max. Eigenvector',
         'l1_min'    : 'Minimum of Min. Eigenvalue, Fracture Aperture',
-        'l1_25'     : '25ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture',
-        'l1_50'     : '50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture',
-        'l1_75'     : '75ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture',
+        'l1_25'     : '25ᵗʰ Percentile Min. Eigenvalue of Fracture Aperture',
+        'l1_50'     : '50ᵗʰ Percentile Min. Eigenvalue of Fracture Aperture',
+        'l1_75'     : '75ᵗʰ Percentile Min. Eigenvalue of Fracture Aperture',
         'l1_max'    : 'Maximum of Min. Eigenvalue, Fracture Aperture',
         'l3_min'    : 'Minimum of Max. Eigenvalue, Fracture Aperture',
-        'l3_25'     : '25ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture',
-        'l3_50'     : '50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture',
-        'l3_75'     : '75ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture',
+        'l3_25'     : '25ᵗʰ Percentile Max. Eigenvalue of Fracture Aperture',
+        'l3_50'     : '50ᵗʰ Percentile Max. Eigenvalue of Fracture Aperture',
+        'l3_75'     : '75ᵗʰ Percentile Max. Eigenvalue of Fracture Aperture',
         'l3_max'    : 'Maximum of Max. Eigenvalue, Fracture Aperture',
         'ani_min'   : 'Minimum of Shape Anisotropy',
         'ani_25'    : '25ᵗʰ Percentile Shape Anisotropy',
@@ -2297,67 +2543,78 @@ if args.test:
     #     variables = var
     # )
 
-    from scipy import io
+    # from scipy import io
+    #
+    # exps = [
+    #     'M8_1',
+    #     'M8_2',
+    #     'MONZ3',
+    #     'MONZ4',
+    #     'MONZ5',
+    #     'WG01',
+    #     'WG02',
+    #     'WG04',
+    # ]
+    #
+    # files = [
+    #     'times_M8_1.mat',
+    #     'times_M8_2.mat',
+    #     'times_MONZ3.mat',
+    #     'times_MONZ4.mat',
+    #     'times_MONZ5.mat',
+    #     'times_WG01.mat',
+    #     'times_WG02.mat',
+    #     'times_WG04.mat',
+    # ]
+    #
+    # new_files = [
+    #     'times_M8_1.npy',
+    #     'times_M8_2.npy',
+    #     'times_MONZ3.npy',
+    #     'times_MONZ4.npy',
+    #     'times_MONZ5.npy',
+    #     'times_WG01.npy',
+    #     'times_WG02.npy',
+    #     'times_WG04.npy',
+    # ]
+    #
+    # script = 'delvol_stress_strain.m'
+    # vars = []
+    # scripts = []
+    #
+    # for file1, file2, exp in zip(files, new_files, exps):
+    #
+    #     save_name = f'{exp}_stress_strain.png'
+    #
+    #     var = (
+    #         f'filename = \'{file1}\'; save_name = \'{save_name}\';'
+    #     )
+    #
+    #     vars.append(var)
+    #     scripts.append(script)
+    #
+    #     path1 = config.stress_strain_relpath / file1
+    #     path2 = config.stress_strain_npy_relpath / file2
+    #     loaded = io.loadmat(path1)
+    #
+    #     np.save(path2, loaded['times_real'])
+    #
+    # backend.select.run_matlab_set(
+    #     suppress = False,
+    #     scripts = scripts,
+    #     variables = vars
+    # )
 
-    exps = [
-        'M8_1',
-        'M8_2',
-        'MONZ3',
-        'MONZ4',
-        'MONZ5',
-        'WG01',
-        'WG02',
-        'WG04',
+    selections = [
+        'delvtot_marble',   'delvtot_monzonite',    'delvtot_granite',
+        'sigd_marble',      'sigd_monzonite',       'sigd_granite',
+        'delvtot_all', 'sigd_all',
     ]
 
-    files = [
-        'times_M8_1.mat',
-        'times_M8_2.mat',
-        'times_MONZ3.mat',
-        'times_MONZ4.mat',
-        'times_MONZ5.mat',
-        'times_WG01.mat',
-        'times_WG02.mat',
-        'times_WG04.mat',
-    ]
-
-    new_files = [
-        'times_M8_1.npy',
-        'times_M8_2.npy',
-        'times_MONZ3.npy',
-        'times_MONZ4.npy',
-        'times_MONZ5.npy',
-        'times_WG01.npy',
-        'times_WG02.npy',
-        'times_WG04.npy',
-    ]
-
-    script = 'delvol_stress_strain.m'
-    vars = []
-    scripts = []
-
-    for file1, file2, exp in zip(files, new_files, exps):
-
-        save_name = f'{exp}_stress_strain.png'
-
-        var = (
-            f'filename = \'{file1}\'; save_name = \'{save_name}\';'
-        )
-
-        vars.append(var)
-        scripts.append(script)
-
-        path1 = config.stress_strain_relpath / file1
-        path2 = config.stress_strain_npy_relpath / file2
-        loaded = io.loadmat(path1)
-
-        np.save(path2, loaded['times_real'])
-
-    backend.select.run_matlab_set(
-        suppress = False,
-        scripts = scripts,
-        variables = vars
-    )
+    for selection in selections:
+        save_plot_delvol(selection, suppress = False)
+        if selection in ['delvtot_all', 'sigd_all']:
+            save_plot_delvol_conditional(selection, suppress = False)
 
 if args.cluster:
     procedure_cluster()
@@ -2397,6 +2654,9 @@ if args.delvol_groups_log:
 
 if args.delvol_plots:
     procedure_delvol_plots()
+
+if args.final_plots:
+    procedure_final_plots()
 
 if args.delvol_logspace_plots:
     procedure_delvol_logspace_plots()
