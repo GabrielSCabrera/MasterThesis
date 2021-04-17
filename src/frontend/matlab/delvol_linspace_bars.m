@@ -6,7 +6,7 @@ std_idx = 6;
 
 avg_arr = table2array(scores(:,avg_idx));
 std_arr = table2array(scores(:,std_idx));
-fig = errorbar(x_points, avg_arr, std_arr, ':s', 'MarkerSize', 10, 'MarkerEdgeColor','red','MarkerFaceColor','white', 'LineStyle', 'none', 'LineWidth', 2);
+fig = errorbar(x_points, avg_arr, std_arr, 'b-s', 'MarkerSize', 10, 'MarkerEdgeColor','red','MarkerFaceColor','white', 'Color', 'b', 'LineStyle', 'none', 'LineWidth', 2);
 chunk = 0.05*(max(x_points) - min(x_points));
 xlim([min(x_points) - chunk max(x_points) + chunk]);
 xlabel('Number of Models', 'Interpreter', 'none', 'fontweight', 'bold');

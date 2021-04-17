@@ -2,7 +2,7 @@
 
 fig = figure();
 ax = gca();
-errorbar(sigd, mean, std, ':s', 'MarkerSize', 8, 'MarkerEdgeColor','red','MarkerFaceColor','white', 'LineStyle', 'none', 'LineWidth', 2);
+errorbar(sigd, mean, std, ':s', 'MarkerSize', 8, 'MarkerEdgeColor','red','MarkerFaceColor','white', 'Color', 'b', 'LineStyle', 'none', 'LineWidth', 2);
 set(ax, 'XDir','reverse');
 xlim([min(sigd) max(sigd)]);
 xlabel('Normalized Time to Failure', 'Interpreter', 'none', 'fontweight', 'bold');

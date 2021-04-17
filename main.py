@@ -1583,24 +1583,36 @@ def procedure_final_plots():
         'delvol_compare.m',
         'delvol_compare_01.m',
         'delvol_compare_01.m',
+        'delvol_hist.m',
+        'delvol_hist.m',
+        'delvol_hist_01.m',
+        'delvol_hist_01.m',
         'delvol_importances_good_norm.m',
         'delvol_importances_good_norm.m',
         'delvol_importances_good_norm.m',
         'delvol_importances_good_sum_norm_all.m',
+        'delvol_importances_good_norm.m',
+        'delvol_importances_good_norm.m',
+        'delvol_importances_good_norm.m',
         'delvol_importances_good_sum_norm_all.m',
         'delvol_stress_strain_all.m',
         'delvol_linspace_bars.m',
         'delvol_linspace_bars.m',
-        'delvol_plot_prepped_avg.m',
-        'delvol_plot_prepped_avg.m',
-        'delvol_plot_prepped_avg.m',
-        'delvol_plot_prepped_avg.m',
-        'delvol_plot_prepped_avg.m',
-        'delvol_plot_prepped_avg_means.m',
-        'delvol_plot_prepped_avg_means.m',
-        'delvol_plot_prepped_avg_means.m',
-        'delvol_plot_prepped_avg_means.m',
-        'delvol_plot_prepped_avg_means.m',
+        'delvol_plot_prepped_avg_sbs.m',
+        'delvol_plot_prepped_avg_sbs.m',
+        'delvol_plot_prepped_avg_sbs.m',
+        'delvol_plot_prepped_avg_sbs.m',
+        'delvol_plot_prepped_avg_sbs.m',
+        'delvol_plot_prepped_avg_means_sbs.m',
+        'delvol_plot_prepped_avg_means_sbs.m',
+        'delvol_plot_prepped_avg_means_sbs.m',
+        'delvol_plot_prepped_avg_means_sbs.m',
+        'delvol_plot_prepped_avg_means_sbs.m',
+        'delvol_plot_prepped_sbs_delvtot.m',
+        'delvol_plot_prepped_sbs_delvtot.m',
+        'delvol_plot_prepped_sbs_delvtot.m',
+        'delvol_plot_prepped_sbs_delvtot.m',
+        'delvol_plot_prepped_sbs_delvtot.m',
     ]
 
     variables = []
@@ -1629,27 +1641,37 @@ def procedure_final_plots():
         f"directory = 'sigd_all'; save_name = \'{save_name}\';"
     )
     #################################################################
-    # save_name = directory + '/importances_delvtot_'
-    # variables.append(
-    #     f"directory = 'delvtot_all'; save_name = \'{save_name}\';"
-    # )
-    # #################################################################
-    # save_name = directory + '/importances_sigd_'
-    # variables.append(
-    #     f"directory = 'sigd_all'; save_name = \'{save_name}\';"
-    # )
+    save_name = directory + '/hist_delvtot' + '.png'
+    variables.append(
+        f"directory = 'delvtot_all'; save_name = \'{save_name}\';"
+    )
     #################################################################
-    save_name = directory + '/importances_good_norm_marble.png'
+    save_name = directory + '/hist_sigd' + '.png'
+    variables.append(
+        f"directory = 'sigd_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+    save_name = directory + '/hist_delvtot_01' + '.png'
+    variables.append(
+        f"directory = 'delvtot_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+    save_name = directory + '/hist_sigd_01' + '.png'
+    variables.append(
+        f"directory = 'sigd_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+    save_name = directory + '/importances_good_norm_marble_delvtot.png'
     variables.append(
         f"directory = 'delvtot_marble'; save_name = \'{save_name}\'; "
     )
     #################################################################
-    save_name = directory + '/importances_good_norm_monzanite.png'
+    save_name = directory + '/importances_good_norm_monzonite_delvtot.png'
     variables.append(
         f"directory = 'delvtot_monzonite'; save_name = \'{save_name}\'; "
     )
     #################################################################
-    save_name = directory + '/importances_good_norm_granite.png'
+    save_name = directory + '/importances_good_norm_granite_delvtot.png'
     variables.append(
         f"directory = 'delvtot_granite'; save_name = \'{save_name}\'; "
     )
@@ -1659,37 +1681,25 @@ def procedure_final_plots():
         f"directory = 'delvtot_all'; save_name = \'{save_name}\'; "
     )
     #################################################################
+    save_name = directory + '/importances_good_norm_marble_sigd.png'
+    variables.append(
+        f"directory = 'sigd_marble'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+    save_name = directory + '/importances_good_norm_monzonite_sigd.png'
+    variables.append(
+        f"directory = 'sigd_monzonite'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
+    save_name = directory + '/importances_good_norm_granite_sigd.png'
+    variables.append(
+        f"directory = 'sigd_granite'; save_name = \'{save_name}\'; "
+    )
+    #################################################################
     save_name = directory + '/importances_good_sum_norm_all_sigd.png'
     variables.append(
         f"directory = 'sigd_all'; save_name = \'{save_name}\'; "
     )
-    #################################################################
-    # files_list = [
-    #     'times_M8_1.mat',
-    #     'times_M8_2.mat',
-    #     'times_MONZ3.mat',
-    #     'times_MONZ4.mat',
-    #     'times_MONZ5.mat',
-    #     'times_WG01.mat',
-    #     'times_WG02.mat',
-    #     'times_WG04.mat',
-    # ]
-    # exps = [
-    #     'M8_1',
-    #     'M8_2',
-    #     'MONZ3',
-    #     'MONZ4',
-    #     'MONZ5',
-    #     'WG01',
-    #     'WG02',
-    #     'WG04',
-    # ]
-    #
-    # for i,j in zip(files_list, exps):
-    #     save_name = directory + f'/{j}_stress_strain.png'
-    #     variables.append(
-    #         f"filename = '{i}'; save_name = \'{save_name}\';"
-    #     )
     #################################################################
     save_name = directory + f'/stress_strain_all.png'
     variables.append(
@@ -1708,70 +1718,129 @@ def procedure_final_plots():
     #################################################################
 
 
+
+
+
+
     #################################################################
-    save_name = directory + '/WG01_vol_50.png'
+    save_name = directory + '/vol_50.png'
     variables.append(
-        f"filename = 'WG01_vol_50_avg.csv'; save_name = \'{save_name}\'; "
-        f"label = '50ᵗʰ Percentile of Individual Fracture Volume';"
+        f"filename1 = 'WG01_vol_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_vol_50_avg.csv'; "
+        f"label = '50ᵗʰ Percentile of Individual Fracture Volume [N voxels]';"
     )
     #################################################################
-    save_name = directory + '/WG01_ani_50.png'
+    save_name = directory + '/ani_50.png'
     variables.append(
-        f"filename = 'WG01_ani_50_avg.csv'; save_name = \'{save_name}\'; "
-        f"label = '50ᵗʰ Percentile of Shape Anisotropy';"
+        f"filename1 = 'WG01_ani_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_ani_50_avg.csv'; "
+        f"label = '50ᵗʰ Percentile of Shape Anisotropy [dimensionless]';"
     )
     #################################################################
-    save_name = directory + '/WG01_l1_50.png'
+    save_name = directory + '/l1_50.png'
     variables.append(
-        f"filename = 'WG01_l1_50_avg.csv'; save_name = \'{save_name}\'; "
-        f"label = '50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture';"
+        f"filename1 = 'WG01_l1_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_l1_50_avg.csv'; "
+        f"label = '50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture [voxels]';"
     )
     #################################################################
-    save_name = directory + '/WG01_l3_50.png'
+    save_name = directory + '/l3_50.png'
     variables.append(
-        f"filename = 'WG01_l3_50_avg.csv'; save_name = \'{save_name}\'; "
-        f"label = '50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture';"
+        f"filename1 = 'WG01_l3_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_l3_50_avg.csv'; "
+        f"label = '50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture [voxels]';"
     )
     #################################################################
-    save_name = directory + '/WG01_th1_50.png'
+    save_name = directory + '/th1_50.png'
     variables.append(
         f"filename = 'WG01_th1_50_avg.csv'; save_name = \'{save_name}\'; "
-        f"label = '50ᵗʰ Percentile Orientiation of Min. Eigenvector';"
+        f"filename2 = 'MONZ3_th1_50_avg.csv'; "
+        f"label = '50ᵗʰ Percentile Orientiation of Min. Eigenvector [degrees]';"
+    )
+    #################################################################
+    save_name = directory + '/vol_50_mean.png'
+    variables.append(
+        f"filename1 = 'WG01_vol_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_vol_50_avg.csv'; "
+        f"label = '50ᵗʰ Percentile of Individual Fracture Volume [N voxels]';"
+    )
+    #################################################################
+    save_name = directory + '/ani_50_mean.png'
+    variables.append(
+        f"filename1 = 'WG01_ani_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_ani_50_avg.csv'; "
+        f"label = '50ᵗʰ Percentile of Shape Anisotropy [dimensionless]';"
+    )
+    #################################################################
+    save_name = directory + '/l1_50_mean.png'
+    variables.append(
+        f"filename1 = 'WG01_l1_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_l1_50_avg.csv'; "
+        f"label = '50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture [voxels]';"
+    )
+    #################################################################
+    save_name = directory + '/l3_50_mean.png'
+    variables.append(
+        f"filename1 = 'WG01_l3_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_l3_50_avg.csv'; "
+        f"label = '50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture [voxels]';"
+    )
+    #################################################################
+    save_name = directory + '/th1_50_mean.png'
+    variables.append(
+        f"filename1 = 'WG01_th1_50_avg.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_th1_50_avg.csv'; "
+        f"label = '50ᵗʰ Percentile Orientiation of Min. Eigenvector [degrees]';"
     )
     #################################################################
 
 
+
+
+
     #################################################################
-    save_name = directory + '/WG01_vol_50_mean.png'
+    save_name = directory + '/vol_50_scatter.png'
     variables.append(
-        f"filename = 'WG01_vol_50_avg.csv'; save_name = \'{save_name}\'; "
-        f"label = '50ᵗʰ Percentile of Individual Fracture Volume';"
+        f"filename1 = 'WG01_vol_50.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_vol_50.csv'; filename3 = 'WG01_delvtot.csv'; "
+        f"filename4 = 'MONZ3_delvtot.csv'; "
+        f"label = '50ᵗʰ Percentile of Individual Fracture Volume [N voxels]';"
     )
     #################################################################
-    save_name = directory + '/WG01_ani_50_mean.png'
+    save_name = directory + '/ani_50_scatter.png'
     variables.append(
-        f"filename = 'WG01_ani_50_avg.csv'; save_name = \'{save_name}\'; "
-        f"label = '50ᵗʰ Percentile of Shape Anisotropy';"
+        f"filename1 = 'WG01_ani_50.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_ani_50.csv'; filename3 = 'WG01_delvtot.csv'; "
+        f"filename4 = 'MONZ3_delvtot.csv'; "
+        f"label = '50ᵗʰ Percentile of Shape Anisotropy [dimensionless]';"
     )
     #################################################################
-    save_name = directory + '/WG01_l1_50_mean.png'
+    save_name = directory + '/l1_50_scatter.png'
     variables.append(
-        f"filename = 'WG01_l1_50_avg.csv'; save_name = \'{save_name}\'; "
-        f"label = '50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture';"
+        f"filename1 = 'WG01_l1_50.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_l1_50.csv'; filename3 = 'WG01_delvtot.csv'; "
+        f"filename4 = 'MONZ3_delvtot.csv'; "
+        f"label = '50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture [voxels]';"
     )
     #################################################################
-    save_name = directory + '/WG01_l3_50_mean.png'
+    save_name = directory + '/l3_50_scatter.png'
     variables.append(
-        f"filename = 'WG01_l3_50_avg.csv'; save_name = \'{save_name}\'; "
-        f"label = '50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture';"
+        f"filename1 = 'WG01_l3_50.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_l3_50.csv'; filename3 = 'WG01_delvtot.csv'; "
+        f"filename4 = 'MONZ3_delvtot.csv'; "
+        f"label = '50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture [voxels]';"
     )
     #################################################################
-    save_name = directory + '/WG01_th1_50_mean.png'
+    save_name = directory + '/th1_50_scatter.png'
     variables.append(
-        f"filename = 'WG01_th1_50_avg.csv'; save_name = \'{save_name}\'; "
-        f"label = '50ᵗʰ Percentile Orientiation of Min. Eigenvector';"
+        f"filename = 'WG01_th1_50.csv'; save_name = \'{save_name}\'; "
+        f"filename2 = 'MONZ3_th1_50.csv'; filename3 = 'WG01_delvtot.csv'; "
+        f"filename4 = 'MONZ3_delvtot.csv'; "
+        f"label = '50ᵗʰ Percentile Orientiation of Min. Eigenvector [degrees]';"
     )
     #################################################################
+
+
     path = backend.config.matlab_img_relpath
     path = path / directory
     path.mkdir(exist_ok = True)

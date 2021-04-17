@@ -19,3 +19,4 @@ scaler = 0.1;
 xlim([1-cols*scaler cols+cols*scaler]);
 delden_utils.save_plot(fig, save_name);
 hold off
+close all

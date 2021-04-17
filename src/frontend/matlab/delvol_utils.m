@@ -18,6 +18,22 @@ classdef delvol_utils
       headers = ["min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "min", "25%", "50%", "75%", "max", "25%", "50%", "75%", "max", "tot_vol", "rand"];
     end
 
+    function [out] = rewrite_folders(folders)
+      % Replaces headers with percentiles
+      orig = ["M8_1" "M8_2" "MONZ3" "MONZ4" "MONZ5" "WG01" "WG02" "WG04"];
+      new = ["Marble 1" "Marble 2" "Monzonite 3" "Monzonite 4" "Monzonite 5" "Granite 1" "Granite 2" "Granite 4"];
+      out = [];
+
+      for i=1:length(folders)
+        for j=1:length(orig)
+          if orig(j) == folders(i)
+            out = [out new(j)];
+            break
+          end
+        end
+      end
+    end
+
     function [ax] = add_vlines(ax)
       % Adds vertical lines to separate features by category
       idx = [5. 10. 15. 20. 25. 30. 35. 39.];
@@ -279,6 +295,28 @@ classdef delvol_utils
       std = data(:,3);
     end
 
+    function [delvtot, points] = load_plot_from_prep_delvtot(filename1, filename2)
+      % Reads the data from a set of .csv files and returns its values
+
+      arguments
+        filename1 string
+        filename2 string
+      end
+
+      storage = '~/Documents/MasterThesis/data/formatted_data/';
+      path = strcat(storage, filename1);
+      data = readtable(path);
+      data = table2array(data);
+      points = data(:,2);
+
+      storage2 = '~/Documents/MasterThesis/data/formatted_data/';
+      path2 = strcat(storage2, filename2);
+      data2 = readtable(path2);
+      data2 = table2array(data2);
+      delvtot = data2(:,2);
+
+    end
+
     function [N_good] = load_N_good(directory)
       % Reads the data from a set of .dat files and returns its values
 
@@ -330,7 +368,7 @@ classdef delvol_utils
       directory = dir(main_path);
       folders = {directory([directory.isdir]).name};
       folders = folders(~ismember(folders, {'.','..'}));
-      folder = sort(folders);
+      folders = sort(folders);
       r2_train_scores = [];
       r2_test_scores = [];
       N_experiments = length(folders);

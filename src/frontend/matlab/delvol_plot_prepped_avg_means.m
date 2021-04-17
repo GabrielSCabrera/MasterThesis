@@ -2,7 +2,7 @@
 
 fig = figure();
 ax = gca();
-plot(sigd, mean, '-o', 'LineWidth', 2, 'MarkerSize', 8);
+plot(sigd, mean, 'b-^', 'LineWidth', 2, 'MarkerSize', 8);
 set(ax, 'XDir','reverse');
 xlim([min(sigd) max(sigd)]);
 xlabel('Normalized Time to Failure', 'Interpreter', 'none', 'fontweight', 'bold');

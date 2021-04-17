@@ -16,4 +16,4 @@ xlabel('Experiment (Rock Type Abbreviation)');
 ylabel('R^2 Average Score and Standard Deviation');
 grid();
 delden_utils.save_plot(fig, save_name);
-();
+close all

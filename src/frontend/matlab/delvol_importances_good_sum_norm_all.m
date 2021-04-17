@@ -65,3 +65,4 @@ xlim([0.5 cols+0.5]);
 
 delvol_utils.save_plot(fig, save_name);
 hold off
+close all
