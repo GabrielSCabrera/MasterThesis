@@ -8,7 +8,7 @@ folders = delvol_utils.rewrite_folders(scores.Properties.RowNames);
 
 avg_arr = table2array(scores(:,avg_idx));
 std_arr = table2array(scores(:,std_idx));
-fig = errorbar(xpoints, avg_arr, std_arr, 'b-s', 'MarkerSize', 10, 'MarkerEdgeColor','red','MarkerFaceColor','white', 'LineStyle', 'none', 'Color', 'b', 'LineWidth', 2);
+fig = errorbar(xpoints, avg_arr, std_arr, 'b-s', 'MarkerSize', 10, 'MarkerEdgeColor','red','MarkerFaceColor','white', 'LineStyle', 'none', 'Color', 'b', 'LineWidth', 1);
 chunk = 0.1*(max(xpoints) - min(xpoints));
 xlim([min(xpoints) - chunk max(xpoints) + chunk]);
 set(gca(), 'xtick', xpoints, 'xticklabel', folders);

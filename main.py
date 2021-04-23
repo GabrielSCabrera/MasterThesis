@@ -1579,6 +1579,8 @@ def procedure_final_plots():
     '''
 
     scripts = [
+        'delvol_plot_prepped_avg_sbs_all.m',
+        'delvol_plot_prepped_sbs_delvtot_all.m',
         'delvol_compare.m',
         'delvol_compare.m',
         'delvol_compare_01.m',
@@ -1587,6 +1589,10 @@ def procedure_final_plots():
         'delvol_hist.m',
         'delvol_hist_01.m',
         'delvol_hist_01.m',
+        'delvol_compare_hist.m',
+        'delvol_compare_hist.m',
+        'delvol_compare_hist_01.m',
+        'delvol_compare_hist_01.m',
         'delvol_importances_good_norm.m',
         'delvol_importances_good_norm.m',
         'delvol_importances_good_norm.m',
@@ -1620,6 +1626,12 @@ def procedure_final_plots():
     directory = 'final_plots'
     suppress = False
 
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_avg_sbs_all.png'
+    variables.append(f'save_name = \'{save_name}\';')
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_delvtot_all.png'
+    variables.append(f'save_name = \'{save_name}\';')
     #################################################################
     save_name = directory + '/compare_delvtot' + '.png'
     variables.append(
@@ -1660,6 +1672,32 @@ def procedure_final_plots():
     variables.append(
         f"directory = 'sigd_all'; save_name = \'{save_name}\';"
     )
+    #################################################################
+    save_name = directory + '/compare_hist_delvtot' + '.png'
+    variables.append(
+        f"directory = 'delvtot_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+    save_name = directory + '/compare_hist_sigd' + '.png'
+    variables.append(
+        f"directory = 'sigd_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+    save_name = directory + '/compare_hist_delvtot_01' + '.png'
+    variables.append(
+        f"directory = 'delvtot_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+    save_name = directory + '/compare_hist_sigd_01' + '.png'
+    variables.append(
+        f"directory = 'sigd_all'; save_name = \'{save_name}\';"
+    )
+    #################################################################
+
+
+
+
+
     #################################################################
     save_name = directory + '/importances_good_norm_marble_delvtot.png'
     variables.append(
@@ -1839,7 +1877,6 @@ def procedure_final_plots():
         f"label = '50ᵗʰ Percentile Orientiation of Min. Eigenvector [degrees]';"
     )
     #################################################################
-
 
     path = backend.config.matlab_img_relpath
     path = path / directory
