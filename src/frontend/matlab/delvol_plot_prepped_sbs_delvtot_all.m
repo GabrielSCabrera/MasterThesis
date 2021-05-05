@@ -1,6 +1,11 @@
-filenames1 = ["WG01_vol_50.csv", "WG01_ani_50.csv", "WG01_l1_50.csv", "WG01_l3_50.csv", "WG01_th1_50.csv"];
-filenames2 = ["MONZ3_vol_50.csv", "MONZ3_ani_50.csv", "MONZ3_l1_50.csv", "MONZ3_l3_50.csv", "MONZ3_th1_50.csv"];
-labels = ["50ᵗʰ Percentile of Individual Fracture Volume [N voxels]", "50ᵗʰ Percentile of Shape Anisotropy [dimensionless]", "50ᵗʰ Percentile Min. Eigenvalue, Fracture Aperture [voxels]", "50ᵗʰ Percentile Max. Eigenvalue, Fracture Aperture [voxels]", "50ᵗʰ Percentile Orientiation of Min. Eigenvector [degrees]"];
+% filenames1 = ["WG01_vol_50.csv", "WG01_ani_50.csv", "WG01_l1_50.csv", "WG01_l3_50.csv", "WG01_th1_50.csv"];
+% filenames2 = ["MONZ3_vol_50.csv", "MONZ3_ani_50.csv", "MONZ3_l1_50.csv", "MONZ3_l3_50.csv", "MONZ3_th1_50.csv"];
+% abbrv = ["$v$", "$A$", "$L_{min}$", "$L_{max}$", "$\theta_1$"];
+
+filenames1 = ["WG01_vol_50.csv", "WG01_l3_50.csv", "WG01_tot_vol.csv"];
+filenames2 = ["MONZ3_vol_50.csv", "MONZ3_l3_50.csv", "MONZ3_tot_vol.csv"];
+abbrv = ["\boldmath$v$", "\boldmath$L_{max}$", "\boldmath$tot\_vol$"];
+
 filename3 = "WG01_delvtot.csv";
 filename4 = "MONZ3_delvtot.csv";
 
@@ -21,7 +26,7 @@ for i=1:N_rows
   difference = ylim_pre(2) - ylim_pre(1);
   ylim([ylim_pre(1) ylim_pre(2)+difference*0.2]);
   if i==1
-    title(ax, 'Granite 1', 'Interpreter', 'none', 'fontweight', 'bold');
+    title(ax, 'Granite 1, ⟨R²⟩=0.99', 'Interpreter', 'none', 'fontweight', 'bold');
   end
 
   alphabet = ('a':'z').';
@@ -31,6 +36,9 @@ for i=1:N_rows
   text(ax, 0.025,0.92,charlbl{2*i-1},'Units','normalized','FontSize',12, 'fontweight', 'bold')
 
   grid();
+  set(ax, 'LineWidth', 2);
+  set(ax, 'FontSize', 11);
+  ylabel(ax, abbrv(i), 'Interpreter', 'latex','FontSize', 16, 'fontweight', 'bold');
 
   ax = subplot(N_rows,2,2*i);
   plot(ax, delvtot2, points2, 'b^', 'MarkerSize', 7, 'MarkerEdgeColor','blue','MarkerFaceColor','none', 'LineWidth', 2);
@@ -39,16 +47,18 @@ for i=1:N_rows
   difference = ylim_pre(2) - ylim_pre(1);
   ylim([ylim_pre(1) ylim_pre(2)+difference*0.2]);
   if i==1
-    title(ax, 'Monzonite 3', 'Interpreter', 'none', 'fontweight', 'bold');
+    title(ax, 'Monzonite 3, ⟨R²⟩=0.59', 'Interpreter', 'none', 'fontweight', 'bold');
   end
 
   alphabet = ('a':'z').';
   chars = num2cell(alphabet(1:nIDs));
   chars = chars.';
   charlbl = strcat('(',chars,')');
-  text(ax, 0.025,0.92,charlbl{2*i},'Units','normalized','FontSize',12, 'fontweight', 'bold')
+  text(ax, 0.025,0.92,charlbl{2*i},'Units','normalized','FontSize', 12, 'fontweight', 'bold')
 
   grid();
+  set(ax, 'LineWidth', 2);
+  set(ax, 'FontSize', 11);
 
 end
 
@@ -57,18 +67,12 @@ han.Title.Visible='on';
 han.XLabel.Visible='on';
 han.YLabel.Visible='on';
 xlabel(han,'Change in Total Volume', 'Interpreter', 'none', 'fontweight', 'bold');
-ylabel(han,label, 'Interpreter', 'none', 'fontweight', 'bold');
 set(han, 'FontSize', 11);
 
-% xh = get(han,'xlabel');
-% p = get(xh,'position');
-% p(2) = 1.5*p(2);
-% set(xh,'position',p);
-
-% yh = get(han,'ylabel');
-% p = get(yh,'position');
-% p(1) = 1.25*p(1);
-% set(yh,'position',p);
+xh = get(han,'xlabel');
+p = get(xh,'position');
+p(2) = 1.25*p(2);
+set(xh,'position',p);
 
 set(gcf, 'Units', 'Centimeters', 'Position', [0, 0, 21.0, 29.7], 'PaperUnits', 'Centimeters', 'PaperSize', [21.0, 29.7]);
 delvol_utils.save_plot(fig, save_name);

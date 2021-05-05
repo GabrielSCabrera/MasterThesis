@@ -1579,6 +1579,7 @@ def procedure_final_plots():
     '''
 
     scripts = [
+        'delvol_chart_exps_final',
         'delvol_plot_prepped_avg_sbs_all.m',
         'delvol_plot_prepped_sbs_delvtot_all.m',
         'delvol_compare.m',
@@ -1626,6 +1627,11 @@ def procedure_final_plots():
     directory = 'final_plots'
     suppress = False
 
+    #################################################################
+    save_name = directory + '/delvol_chart_exps_final.png'
+    variables.append(
+        f"directory = 'delvtot_all'; save_name = '{save_name}';"
+    )
     #################################################################
     save_name = directory + '/delvol_plot_prepped_avg_sbs_all.png'
     variables.append(f'save_name = \'{save_name}\';')

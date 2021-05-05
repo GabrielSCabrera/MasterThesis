@@ -19,7 +19,6 @@ han.Title.Visible='on';
 han.XLabel.Visible='on';
 han.YLabel.Visible='on';
 xlabel(han,'Change in Total Volume', 'Interpreter', 'none', 'fontweight', 'bold');
-ylabel(han,label, 'Interpreter', 'none', 'fontweight', 'bold');
 set(han, 'FontSize', 11);
 
 xh = get(han,'xlabel');
