@@ -9,10 +9,15 @@ ax = gca();
 box on;
 hold on
 
+N1 = 0;
+N2 = 0;
+N3 = 0;
+
 totals1 = zeros(cols);
 for j = 1:2
   step_N = N_good(j,1);
   if step_N >= 1
+    N1 = N1 + 1;
     totals1 = totals1 + importances(j,:)/step_N;
   end
 end
@@ -21,6 +26,7 @@ totals2 = zeros(cols);
 for j = 3:5
   step_N = N_good(j,1);
   if step_N >= 1
+    N2 = N2 + 1;
     totals2 = totals2 + importances(j,:)/step_N;
   end
 end
@@ -29,6 +35,7 @@ totals3 = zeros(cols);
 for j = 6:8
   step_N = N_good(j,1);
   if step_N >= 1
+    N3 = N3 + 1;
     totals3 = totals3 + importances(j,:)/step_N;
   end
 end
@@ -38,6 +45,9 @@ end
 % plot(1:cols, totals3(1,:), '-o', 'LineWidth', 2, 'MarkerSize', 8);
 
 groups = [0 5 10 15 20 25 30 35 39 40 41];
+totals1 = totals1 / N1;
+totals2 = totals2 / N2;
+totals3 = totals3 / N3;
 
 for i=1:length(groups)-1
   idx1 = groups(i)+1;

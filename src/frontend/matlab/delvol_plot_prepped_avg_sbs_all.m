@@ -6,8 +6,8 @@ filenames1 = ["WG01_th1_50_avg.csv", "WG01_dmin_50_avg.csv", "WG01_ani_50_avg.cs
 filenames2 = ["MONZ3_th1_50_avg.csv", "MONZ3_dmin_50_avg.csv", "MONZ3_ani_50_avg.csv"];
 abbrv = ["\boldmath$\theta_1$", "\boldmath$d_{min}$", "\boldmath$A$"];
 
-filename3 = "WG01_sigd.csv";
-filename4 = "MONZ3_sigd.csv";
+filename3 = "WG01_delvtot.csv";
+filename4 = "MONZ3_delvtot.csv";
 
 fig = figure();
 N_rows = length(filenames1);
@@ -16,8 +16,11 @@ for i=1:N_rows
   filename1 = filenames1(i);
   filename2 = filenames2(i);
 
-  [sigd1, points1] = delvol_utils.load_plot_from_prep_sigd(filename1, filename3);
-  [sigd2, points2] = delvol_utils.load_plot_from_prep_sigd(filename2, filename4);
+  [delvtot1, points1] = delvol_utils.load_plot_from_prep_delvtot(filename1, filename3);
+  [delvtot2, points2] = delvol_utils.load_plot_from_prep_delvtot(filename2, filename4);
+
+  [sigd1, mean1, std1] = delvol_utils.load_plot_from_prep_avg(filename1);
+  [sigd2, mean2, std2] = delvol_utils.load_plot_from_prep_avg(filename2);
 
   ax = subplot(N_rows,2,2*i-1);
   plot(ax, sigd1, points1, 'b^', 'MarkerSize', 7, 'MarkerEdgeColor','blue','MarkerFaceColor','none', 'LineWidth', 2);

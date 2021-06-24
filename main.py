@@ -84,6 +84,9 @@ def parse_args():
     help_final_plots = (
         'Creates and saves all the final plots used in the thesis.'
     )
+    help_complete_plots = (
+        'Creates and saves all the plots used in the thesis.'
+    )
     help_delvol_logspace_plots = (
         'Select a previously run logspace experiment and create the related '
         'figures.'
@@ -122,6 +125,9 @@ def parse_args():
     )
     help_stress_strain = (
         'Plots the stress vs. the strain over time per-experiment.'
+    )
+    help_stress_strain_analysis = (
+        'Analyzes the stress vs. the strain over time per-experiment.'
     )
     help_plot_ondemand = (
         'Plots the time to failure of a selected experiment relative to '
@@ -207,6 +213,9 @@ def parse_args():
         '--final-plots', action='store_true', help = help_final_plots
     )
     parser.add_argument(
+        '--complete-plots', action='store_true', help = help_complete_plots
+    )
+    parser.add_argument(
         '--delvol-logspace-plots', action='store_true',
         help = help_delvol_logspace_plots
     )
@@ -238,6 +247,10 @@ def parse_args():
     )
     parser.add_argument(
         '--stress-strain', action='store_true', help = help_stress_strain
+    )
+    parser.add_argument(
+        '--stress-strain-analysis', action='store_true',
+        help = help_stress_strain_analysis
     )
     parser.add_argument(
         '--plot-ondemand', action='store_true', help = help_plot_ondemand
@@ -1579,6 +1592,16 @@ def procedure_final_plots():
     '''
 
     scripts = [
+        'delvol_plot_prepped_sbs_failure_dmin.m',
+        'delvol_plot_prepped_sbs_failure_th1.m',
+        'delvol_plot_prepped_sbs_failure_th3.m',
+        'delvol_plot_prepped_sbs_failure_th1_2.m',
+        'delvol_plot_prepped_sbs_failure_l1.m',
+        'delvol_plot_prepped_sbs_failure_l3.m',
+        'delvol_plot_prepped_sbs_delvtot_aperture.m',
+        'delvol_plot_prepped_sbs_delvtot_length.m',
+        'delvol_plot_prepped_sbs_delvtot_vol.m',
+        'delvol_plot_prepped_sbs_delvtot_dmin.m',
         'delvol_chart_exps_final',
         'delvol_plot_prepped_avg_sbs_all.m',
         'delvol_plot_prepped_sbs_delvtot_all.m',
@@ -1627,6 +1650,36 @@ def procedure_final_plots():
     directory = 'final_plots'
     suppress = False
 
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_failure_dmin.png'
+    variables.append(f'save_name = \'{save_name}\';')
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_failure_th1.png'
+    variables.append(f'save_name = \'{save_name}\';')
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_failure_th3.png'
+    variables.append(f'save_name = \'{save_name}\';')
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_failure_th1_2.png'
+    variables.append(f'save_name = \'{save_name}\';')
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_failure_l1.png'
+    variables.append(f'save_name = \'{save_name}\';')
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_failure_l3.png'
+    variables.append(f'save_name = \'{save_name}\';')
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_delvtot_aperture.png'
+    variables.append(f'save_name = \'{save_name}\';')
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_delvtot_length.png'
+    variables.append(f'save_name = \'{save_name}\';')
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_delvtot_vol.png'
+    variables.append(f'save_name = \'{save_name}\';')
+    #################################################################
+    save_name = directory + '/delvol_plot_prepped_sbs_delvtot_dmin.png'
+    variables.append(f'save_name = \'{save_name}\';')
     #################################################################
     save_name = directory + '/delvol_chart_exps_final.png'
     variables.append(
@@ -1890,17 +1943,105 @@ def procedure_final_plots():
 
     result = backend.select.run_matlab_set(scripts, variables, suppress)
 
-    if result != 0:
-        msg = (
-            '\n\033[1mReverting to Running Scripts Individually (Slow)\033[m\n'
-        )
-        print(msg, flush = True)
-        for script, var in zip(scripts, variables):
-            backend.select.run_matlab(
-                suppress = suppress,
-                script_name = script,
-                variables = var
+    # if result != 0:
+    #     msg = (
+    #         '\n\033[1mReverting to Running Scripts Individually (Slow)\033[m\n'
+    #     )
+    #     print(msg, flush = True)
+    #     for script, var in zip(scripts, variables):
+    #         backend.select.run_matlab(
+    #             suppress = suppress,
+    #             script_name = script,
+    #             variables = var
+    #         )
+
+def procedure_complete_plots():
+    '''
+        Expects the existence of multiple directories!
+    '''
+
+    scripts = []
+    variables = []
+
+    directory = 'complete_plots'
+    suppress = False
+
+    experiments = ['WG01', 'WG02', 'WG04', 'MONZ3', 'MONZ5', 'M8_1', 'M8_2']
+    features_sigd = ['vol_min', 'vol_75', 'ani_min', 'ani_75', 'ani_max', 'l1_max', 'l3_min', 'l3_25', 'th1_min', 'th1_75', 'dmin_min', 'dmin_75']
+    features_delvtot = ['vol_50', 'ani_min', 'ani_25', 'l1_25', 'l1_50', 'l3_25', 'th1_min', 'th1_75', 'dmin_min', 'dmin_50']
+
+    labels_sigd = [
+        'Min. of Individual Fracture Volume [voxels]',
+        '75ᵗʰ Percentile of Individual Fracture Volume [voxels]',
+        'Min. of Fracture Shape Anisotropy [dimensionless]',
+        '75ᵗʰ Percentile of Fracture Shape Anisotropy [dimensionless]',
+        'Max. of Fracture Shape Anisotropy [dimensionless]',
+        'Max. of Fracture Aperture [voxels]',
+        'Min. of Fracture Length [voxels]',
+        '25ᵗʰ Percentile of Fracture Length [voxels]',
+        'Min. of Orientation of Min. Eigenvector [degrees]',
+        '75ᵗʰ Percentile of Orientation of Min. Eigenvector [degrees]',
+        'Min. of Min. Distance Between Fracture Centroids [voxels]',
+        '50ᵗʰ Percentile of Min. Distance Between Fracture Centroids [voxels]',
+        'Total Fracture Volume'
+    ]
+    labels_delvtot = [
+        '50ᵗʰ Percentile of Individual Fracture Volume [voxels]',
+        'Min. of Fracture Shape Anisotropy [dimensionless]',
+        '25ᵗʰ Percentile of Fracture Shape Anisotropy [dimensionless]',
+        '25ᵗʰ Percentile of Fracture Aperture [voxels]',
+        '50ᵗʰ Percentile of Fracture Aperture [voxels]',
+        '25ᵗʰ Percentile of Fracture Length [voxels]',
+        'Min. of Orientation of Min. Eigenvector [degrees]',
+        '75ᵗʰ Percentile of Orientation of Min. Eigenvector [degrees]',
+        'Min. of Min. Distance Between Fracture Centroids [voxels]',
+        '50ᵗʰ Percentile of Min. Distance Between Fracture Centroids [voxels]',
+    ]
+
+    for feature, label in zip(features_sigd, labels_sigd):
+        for experiment in experiments:
+            scripts.extend([
+                'delvol_plot_sbs_final.m',
+            ])
+            #################################################################
+            save_name = directory + f'/failure_{feature}_{experiment}.png'
+            variables.append(
+                f"filename1 = '{experiment}_{feature}.csv'; "
+                f"filename2 = '{experiment}_{feature}_avg.csv'; "
+                f"save_name = \'{save_name}\'; "
+                f"label = '{label}';"
             )
+    for feature, label in zip(features_delvtot, labels_delvtot):
+        for experiment in experiments:
+            scripts.extend([
+                'delvol_plot_delvtot_final.m',
+            ])
+            #################################################################
+            save_name = directory + f'/delvtot_{feature}_{experiment}.png'
+            variables.append(
+                f"filename1 = '{experiment}_{feature}.csv'; save_name = \'{save_name}\'; "
+                f"filename2 = '{experiment}_delvtot.csv'; "
+                f"label = '{label}';"
+            )
+            #################################################################
+
+    path = backend.config.matlab_img_relpath
+    path = path / directory
+    path.mkdir(exist_ok = True)
+
+    result = backend.select.run_matlab_set(scripts, variables, suppress)
+
+    # if result != 0:
+    #     msg = (
+    #         '\n\033[1mReverting to Running Scripts Individually (Slow)\033[m\n'
+    #     )
+    #     print(msg, flush = True)
+    #     for script, var in zip(scripts, variables):
+    #         backend.select.run_matlab(
+    #             suppress = suppress,
+    #             script_name = script,
+    #             variables = var
+    #         )
 
 def procedure_delvol_logspace_plots():
     title = (
@@ -2281,6 +2422,73 @@ def procedure_stress_strain():
             plt.ylabel('Axial Strain [Dimensionless]')
             plt.xlim(np.min(sigds), np.max(sigds))
             plt.show()
+
+def procedure_stress_strain_analysis():
+    import matplotlib.pyplot as plt
+    paths = config.stress_strain_npy_relpath.glob('*.npy')
+    data = []
+    eps = []
+    sigds = []
+    distf = []
+    name = []
+    mean = []
+    std = []
+    arr = []
+
+    delvtot = {
+        'WG01':0.993441,
+        'MONZ4':0.156212,
+        'M8_1':0.304093,
+        'MONZ3':0.243432,
+        'WG04':0.831269,
+        'WG02':0.849412,
+        'M8_2':0.617452,
+        'MONZ5':0.389660
+    }
+
+    sigd = {
+        'WG01':0.770652,
+        'MONZ4':-0.944321,
+        'M8_1':0.572417,
+        'MONZ3':0.537322,
+        'WG04':0.698369,
+        'WG02':0.508940,
+        'M8_2':0.763573,
+        'MONZ5':0.522523
+    }
+
+    for n,path in enumerate(paths):
+        data.append(np.load(path))
+        eps.append(data[n][:,1])       # Axial Strain
+        sigds.append(data[n][:,2])     # Time to Failure
+        distf.append(data[n][:,3])     # Normalized Stress & Distance to Failure
+        n = re.findall(r'times_(.+)\.npy', path.name)[0]
+        name.append(n)
+
+    for e,s,d,n in zip(eps, sigds, distf, name):
+        diffs = np.diff(s)
+        mean.append(np.mean(diffs))
+        std.append(np.std(diffs))
+        arr.append([mean[-1], std[-1], delvtot[n], sigd[n]])
+
+    arr = np.array(arr)
+    plt.plot(arr[:,1], arr[:,2], 'rx', label = 'Change in Total Volume')
+    plt.plot(arr[:,1], arr[:,3], 'b^', label = 'Time to Failure')
+    plt.ylabel('R²-Score')
+    plt.xlabel('Standard Deviation of Change in Time to Failure')
+    plt.ylim([0, 1])
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+    plt.plot(arr[:,0], arr[:,2], 'rx', label = 'Change in Total Volume')
+    plt.plot(arr[:,0], arr[:,3], 'b^', label = 'Time to Failure')
+    plt.ylabel('R²-Score')
+    plt.xlabel('Mean Change in Time to Failure')
+    plt.ylim([0, 1])
+    plt.legend()
+    plt.grid()
+    plt.show()
 
 def procedure_plot_ondemand():
 
@@ -2770,6 +2978,9 @@ if args.delvol_plots:
 if args.final_plots:
     procedure_final_plots()
 
+if args.complete_plots:
+    procedure_complete_plots()
+
 if args.delvol_logspace_plots:
     procedure_delvol_logspace_plots()
 
@@ -2799,6 +3010,9 @@ if args.delvol_combine:
 
 if args.stress_strain:
     procedure_stress_strain()
+
+if args.stress_strain_analysis:
+    procedure_stress_strain_analysis()
 
 if args.matlab:
     procedure_matlab()

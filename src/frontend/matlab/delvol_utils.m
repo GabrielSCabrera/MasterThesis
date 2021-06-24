@@ -317,6 +317,22 @@ classdef delvol_utils
 
     end
 
+    function [time, points] = load_plot_from_prep_scatter(filename)
+      % Reads the data from a set of .csv files and returns its values
+
+      arguments
+        filename string
+      end
+
+      storage = '~/Documents/MasterThesis/data/formatted_data/';
+      path = strcat(storage, filename);
+      data = readtable(path);
+      data = table2array(data);
+      time = data(:,1);
+      points = data(:,2);
+
+    end
+
     function [sigd, points] = load_plot_from_prep_sigd(filename1, filename2)
       % Reads the data from a set of .csv files and returns its values
 
@@ -338,7 +354,6 @@ classdef delvol_utils
       sigd = data2(:,2);
 
     end
-
 
     function [N_good] = load_N_good(directory)
       % Reads the data from a set of .dat files and returns its values
@@ -579,6 +594,34 @@ classdef delvol_utils
       msg = 'Saved MATLAB Plot to Path:';
       disp(msg);
       disp(file_path);
+    end
+
+    function [X, Y, Z] = get_heatmap_matrices(x_points, y_points)
+      arguments
+        x_points
+        y_points
+      end
+      gridsize = 100;
+      xrange = linspace(min(x_points), max(x_points), gridsize);
+      xstep = xrange(2) - xrange(1);
+      yrange = linspace(min(0, min(y_points)), max(1, max(y_points)), gridsize);
+      ystep = yrange(2) - yrange(1);
+      [X,Y] = meshgrid(xrange, yrange);
+      X = X - xstep/2.0;
+      Y = Y - ystep/2.0;
+      Z = zeros(gridsize, gridsize);
+
+      for i=2:gridsize
+        for j=2:gridsize
+          xmin = xrange(i-1);
+          xmax = xrange(i);
+          ymin = yrange(j-1);
+          ymax = yrange(j);
+          dens = sum(x_points >= xmin & x_points < xmax & y_points >= ymin & y_points < ymax);
+          Z(j,i) = dens;
+        end
+      end
+      Z(Z > 0) = Z(Z > 0) + 4;
     end
   end
 end
